@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Completion Certificate - <%- internship.studentName %></title>
+    <link rel="stylesheet" href="/css/latter.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="page">
+        <!-- Watermark -->
+        <div class="watermark">
+            <img src="/logo.png" alt="Watermark">
+        </div>
+
+        <!-- Header -->
+        <header>
+            <div class="logo-section">
+                <img src="/logo.png" alt="Creative Web Infotech" class="company-logo">
+            </div>
+            <div class="contact-info">
+                <p><i class="fa-solid fa-envelope"></i> info@cdmi.in</p>
+                <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
+                        internship.facultyContactNo.slice(5) %></p>
+                <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+            </div>
+        </header>
+
+        <div class="yellow-divider"></div>
+
+        <h2 class="document-title">Internship Completion Certificate</h2>
+
+        <div class="date-section">
+            <p><strong>Date : <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new Date().getMonth() +
+                            1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %></strong></p>
+        </div>
+
+        <div class="recipient-details">
+            <p><strong>To,</strong></p>
+            <p><strong><%- internship.studentName %></strong></p>
+            <p><%- internship.collegeName %></p>
+            <p><strong>Address :</strong> <%- internship.address %></p>
+            <p><strong>Mob no :</strong>+91 <%- internship.studentContactNo.slice(0, 5) + ' ' +
+                    internship.studentContactNo.slice(5) %></p>
+        </div>
+
+        <div class="letter-body">
+            <p><strong>Dear <%- internship.studentName %>,</strong></p>
+            <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
+                        internship.collegeName %></strong>, has successfully completed an internship as a
+                <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web Infotech</strong> from
+                <strong>
+                    <%= internship.startDate ? internship.startDate.split('-').reverse().join('-') : 'N/A' %>
+                </strong> to
+                <strong>
+                    <%= internship.endingDate ? internship.endingDate.split('-').reverse().join('-') : 'N/A' %>
+                </strong>.
+            </p>
+            <p>During the internship, the intern demonstrated excellent skills, professional behavior, and a strong work
+                ethic. We wish <%- internship.studentName %> all the best in their future endeavors.</p>
+        </div>
+
+        <div class="internship-details">
+            <p><strong>Details of the Internship:</strong></p>
+            <table>
+                <tr>
+                    <td><strong>Internship Position</strong></td>
+                    <td>: <%- internship.internshipPosition %></td>
+                </tr>
+                <tr>
+                    <td><strong>Duration</strong></td>
+                    <td>: <%- internship.duration %> Hours</td>
+                </tr>
+                <tr>
+                    <td><strong>Starting Date</strong></td>
+                    <td>: <%= internship.startDate.split('-').reverse().join('-') %>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Ending Date</strong></td>
+                    <td>: <%= internship.endingDate ? internship.endingDate.split('-').reverse().join('-') : 'N/A' %>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Working Time</strong></td>
+                    <td>: <%- internship.workingTime %></td>
+                </tr>
+                <tr>
+                    <td><strong>Mentor</strong></td>
+                    <td>: <%- internship.internFacultyName %></td>
+                </tr>
+            </table>
+        </div>
+
+
+
+        <footer>
+            <div class="signatures" style="margin-top: 50px;">
+                <div class="sign-box">
+                    <div class="line"></div>
+                    <p><strong>Intern Sign</strong></p>
+                </div>
+                <div class="sign-box">
+                    <div class="line"></div>
+                    <p><strong>Creative Web Infotech</strong></p>
+                </div>
+            </div>
+            <div class="footer-line"></div>
+            <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
+            <p>Surat,Gujarat INDIA - 395006 | https://www.cdmi.in/</p>
+        </footer>
+    </div>
+
+</body>
+
+</html>

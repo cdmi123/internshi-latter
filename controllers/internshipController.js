@@ -39,6 +39,22 @@ exports.viewInternship = async (req, res) => {
     }
 };
 
+// View Internship Ending Letter
+exports.viewEndingLetter = async (req, res) => {
+    try {
+        const internship = await Internship.findById(req.params.id);
+        if (!internship) {
+            return res.status(404).send('Internship not found');
+        }
+        res.render('view-ending-letter', {
+            internship: internship
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server Error');
+    }
+};
+
 // ... (Rest of the controller functions remain same, just exporting them again)
 exports.getAddForm = (req, res) => {
     res.render('add-internship', {
