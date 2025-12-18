@@ -29,7 +29,7 @@
                                 <% } %>
 
                                     <form action="/add" method="POST">
-                                        <!-- Section 1 -->
+                                        <!-- Section 1: Student Information -->
                                         <div class="mb-5">
                                             <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
                                                 <span class="bg-soft-primary p-2 rounded-circle me-3"><i
@@ -38,68 +38,46 @@
                                             </h5>
                                             <div class="row g-4">
                                                 <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="studentName"
-                                                            name="studentName" placeholder="John Doe"
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="text" class="form-control border-0"
+                                                            id="studentName" name="studentName" placeholder="John Doe"
                                                             value="<%= formData.studentName || '' %>" required>
                                                         <label for="studentName">Student Name</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="collegeName"
-                                                            name="collegeName" placeholder="College Name"
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="text" class="form-control border-0"
+                                                            id="collegeName" name="collegeName"
+                                                            placeholder="College Name"
                                                             value="<%= formData.collegeName || '' %>" required>
                                                         <label for="collegeName">College Name</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="date" class="form-control" id="date" name="date"
-                                                            placeholder="Date" value="<%= formData.date || '' %>"
-                                                            required>
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="date" class="form-control border-0" id="date"
+                                                            name="date" placeholder="Date"
+                                                            value="<%= formData.date || '' %>" required>
                                                         <label for="date">Application Date</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="date" class="form-control" id="startDate"
-                                                            name="startDate" placeholder="Starting Date"
-                                                            value="<%= formData.startDate || '' %>" required>
-                                                        <label for="startDate">Starting Date</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="duration"
-                                                            name="duration" placeholder="Duration"
-                                                            value="<%= formData.duration || '' %>" required>
-                                                        <label for="duration">Duration (Hours)</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="endingDate"
-                                                            name="endingDate" placeholder="Ending Date"
-                                                            value="<%= formData.endingDate || '' %>" readonly>
-                                                        <label for="endingDate">Ending Date (Auto)</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-12">
-                                                    <div class="form-floating">
-                                                        <textarea class="form-control" id="address" name="address"
-                                                            placeholder="Address" style="height: 100px"
-                                                            required><%= formData.address || '' %></textarea>
-                                                        <label for="address">Full Address</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="tel" class="form-control" id="studentContactNo"
-                                                            name="studentContactNo" placeholder="1234567890"
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="tel" class="form-control border-0"
+                                                            id="studentContactNo" name="studentContactNo"
+                                                            placeholder="1234567890"
                                                             value="<%= formData.studentContactNo || '' %>" required
                                                             pattern="[0-9]{10}">
                                                         <label for="studentContactNo">Student Contact No</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <textarea class="form-control border-0" id="address"
+                                                            name="address" placeholder="Address" style="height: 100px"
+                                                            required><%= formData.address || '' %></textarea>
+                                                        <label for="address">Full Address</label>
                                                     </div>
                                                 </div>
                                             </div>
@@ -107,57 +85,115 @@
 
                                         <hr class="text-muted opacity-10 my-4">
 
-                                        <!-- Section 2 -->
-                                        <div class="mb-4">
+                                        <!-- Section 2: Branch & Internship -->
+                                        <div class="mb-5">
                                             <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
                                                 <span class="bg-soft-primary p-2 rounded-circle me-3"><i
-                                                        class="fas fa-briefcase"></i></span>
-                                                Internship Details
+                                                        class="fas fa-building"></i></span>
+                                                Branch & Internship Details
                                             </h5>
                                             <div class="row g-4">
                                                 <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="internshipPosition"
-                                                            name="internshipPosition" placeholder="Web Developer"
+                                                    <div class="shadow-sm rounded bg-white px-3 border d-flex align-items-center"
+                                                        style="height: 58px;">
+                                                        <select class="form-select border-0 p-0" name="branch" required>
+                                                            <option value="" disabled selected>Select Branch</option>
+                                                            <option value="yogichowk" <%=formData.branch==='yogichowk'
+                                                                ? 'selected' : '' %>>Yogichowk</option>
+                                                            <option value="sarthana" <%=formData.branch==='sarthana'
+                                                                ? 'selected' : '' %>>Sarthana</option>
+                                                            <option value="adajan" <%=formData.branch==='adajan'
+                                                                ? 'selected' : '' %>>Adajan</option>
+                                                            <option value="katargam" <%=formData.branch==='katargam'
+                                                                ? 'selected' : '' %>>Katargam</option>
+                                                            <option value="dindoli" <%=formData.branch==='dindoli'
+                                                                ? 'selected' : '' %>>Dindoli</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="text" class="form-control border-0"
+                                                            id="internshipPosition" name="internshipPosition"
+                                                            placeholder="Web Developer"
                                                             value="<%= formData.internshipPosition || '' %>" required>
                                                         <label for="internshipPosition">Position / Role</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label
-                                                        class="form-label text-muted small fw-bold text-uppercase ls-1 mb-2">Working
-                                                        Hours</label>
-                                                    <div class="bg-light p-3 rounded-3 d-flex gap-4 border">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio"
-                                                                name="workingTime" id="time6" value="6 hrs/day"
-                                                                <%=(formData.workingTime==='6 hrs/day' ) ? 'checked'
-                                                                : '' %> required>
-                                                            <label class="form-check-label fw-medium" for="time6">6 Hrs
-                                                                / Day</label>
-                                                        </div>
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="radio"
-                                                                name="workingTime" id="time4" value="4 hrs/day"
-                                                                <%=(formData.workingTime==='4 hrs/day' ) ? 'checked'
-                                                                : '' %>>
-                                                            <label class="form-check-label fw-medium" for="time4">4 Hrs
-                                                                / Day</label>
+                                                    <div class="shadow-sm rounded bg-white px-3 border d-flex align-items-center justify-content-center"
+                                                        style="height: 58px;">
+                                                        <div class="d-flex gap-4">
+                                                            <div class="form-check mb-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="workingTime" id="time6" value="6 hrs/day"
+                                                                    <%=(formData.workingTime==='6 hrs/day' ) ? 'checked'
+                                                                    : '' %> required>
+                                                                <label class="form-check-label small fw-medium"
+                                                                    for="time6">6 Hrs</label>
+                                                            </div>
+                                                            <div class="form-check mb-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="workingTime" id="time4" value="4 hrs/day"
+                                                                    <%=(formData.workingTime==='4 hrs/day' ) ? 'checked'
+                                                                    : '' %>>
+                                                                <label class="form-check-label small fw-medium"
+                                                                    for="time4">4 Hrs</label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="text" class="form-control" id="internFacultyName"
-                                                            name="internFacultyName" placeholder="Faculty Name"
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="date" class="form-control border-0" id="startDate"
+                                                            name="startDate" placeholder="Starting Date"
+                                                            value="<%= formData.startDate || '' %>" required>
+                                                        <label for="startDate">Starting Date</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="text" class="form-control border-0" id="duration"
+                                                            name="duration" placeholder="Duration"
+                                                            value="<%= formData.duration || '' %>" required>
+                                                        <label for="duration">Duration (Hours)</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded bg-light">
+                                                        <input type="text" class="form-control border-0 bg-light"
+                                                            id="endingDate" name="endingDate" placeholder="Ending Date"
+                                                            value="<%= formData.endingDate || '' %>" readonly>
+                                                        <label for="endingDate">Ending Date (Auto)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <hr class="text-muted opacity-10 my-4">
+
+                                        <!-- Section 3: Faculty Details -->
+                                        <div class="mb-4">
+                                            <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
+                                                <span class="bg-soft-primary p-2 rounded-circle me-3"><i
+                                                        class="fas fa-chalkboard-teacher"></i></span>
+                                                Faculty Information
+                                            </h5>
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="text" class="form-control border-0"
+                                                            id="internFacultyName" name="internFacultyName"
+                                                            placeholder="Faculty Name"
                                                             value="<%= formData.internFacultyName || '' %>" required>
                                                         <label for="internFacultyName">Faculty Name</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-floating">
-                                                        <input type="tel" class="form-control" id="facultyContactNo"
-                                                            name="facultyContactNo" placeholder="0987654321"
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="tel" class="form-control border-0"
+                                                            id="facultyContactNo" name="facultyContactNo"
+                                                            placeholder="0987654321"
                                                             value="<%= formData.facultyContactNo || '' %>" required
                                                             pattern="[0-9]{10}">
                                                         <label for="facultyContactNo">Faculty Contact No</label>

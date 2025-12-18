@@ -49,6 +49,11 @@ const internshipSchema = new mongoose.Schema({
     facultyContactNo: {
         type: String,
         required: true
+    },
+    branch: {
+        type: String,
+        enum: ['yogichowk', 'sarthana', 'adajan', 'katargam', 'dindoli'],
+        required: true
     }
 });
 

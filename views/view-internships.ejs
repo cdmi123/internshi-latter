@@ -67,18 +67,26 @@
             <!-- Table -->
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
                 <div
-                    class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                    class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <h5 class="mb-0 fw-bold">Recent Applications</h5>
-                    <button class="btn btn-light btn-sm rounded-circle"><i class="fas fa-ellipsis-h"></i></button>
+                    <div class="search-box">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-light border-0"><i
+                                    class="fas fa-search text-muted"></i></span>
+                            <input type="text" id="dashboardSearch" class="form-control bg-light border-0 px-3"
+                                placeholder="Search applications..." style="width: 250px;">
+                        </div>
+                    </div>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-custom align-middle mb-0 table-hover">
+                        <table class="table table-custom align-middle mb-0 table-hover" id="applicationsTable">
                             <thead>
                                 <tr>
                                     <th class="py-3 px-4">Student</th>
                                     <th class="py-3 px-4">Position / Shift</th>
                                     <th class="py-3 px-4">Duration</th>
+                                    <th class="py-3 px-4">Branch</th>
                                     <th class="py-3 px-4">Date</th>
                                     <th class="py-3 px-4">Faculty</th>
                                     <th class="py-3 px-4 text-end">Actions</th>
@@ -87,24 +95,24 @@
                             <tbody>
                                 <% if (internships.length> 0) { %>
                                     <% internships.forEach(item=> { %>
-                                        <tr>
+                                        <tr class="application-row">
                                             <td class="px-4">
                                                 <div class="d-flex align-items-center">
                                                     <div class="avatar-circle">
                                                         <%= item.studentName.charAt(0).toUpperCase() %>
                                                     </div>
                                                     <div>
-                                                        <div class="fw-bold text-dark">
+                                                        <div class="fw-bold text-dark student-name">
                                                             <%= item.studentName %>
                                                         </div>
-                                                        <div class="small text-muted">
+                                                        <div class="small text-muted student-contact">
                                                             <%= item.studentContactNo %>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td class="px-4">
-                                                <div class="fw-semibold text-dark">
+                                                <div class="fw-semibold text-dark internship-position">
                                                     <%= item.internshipPosition %>
                                                 </div>
                                                 <div class="mt-1">
@@ -118,15 +126,20 @@
                                                 </div>
                                             </td>
                                             <td class="px-4">
-                                                <span class="badge badge-soft-info">
-                                                    <%= item.duration %>
+                                                <div class="fw-bold text-dark">
+                                                    <%= item.duration || 'N/A' %>
+                                                </div>
+                                            </td>
+                                            <td class="px-4">
+                                                <span class="badge badge-soft-primary text-capitalize branch-name">
+                                                    <%= item.branch || '--' %>
                                                 </span>
                                             </td>
                                             <td class="px-4 text-muted font-monospace small">
                                                 <%= item.date.toISOString().split('T')[0] %>
                                             </td>
                                             <td class="px-4">
-                                                <div class="small text-dark fw-bold">
+                                                <div class="small text-dark fw-bold faculty-name">
                                                     <%= item.internFacultyName %>
                                                 </div>
                                                 <div class="small text-muted">
@@ -134,43 +147,88 @@
                                                 </div>
                                             </td>
                                             <td class="px-4 text-end">
-                                                <a href="/view/<%= item._id %>"
-                                                    class="btn btn-sm btn-light text-secondary me-1"
-                                                    data-bs-toggle="tooltip" title="View Offer Letter">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                                <a href="/ending-letter/<%= item._id %>"
-                                                    class="btn btn-sm btn-light text-warning me-1"
-                                                    data-bs-toggle="tooltip" title="Ending Letter">
-                                                    <i class="fas fa-certificate"></i>
-                                                </a>
-                                                <a href="/edit/<%= item._id %>"
-                                                    class="btn btn-sm btn-light text-primary me-1"
-                                                    data-bs-toggle="tooltip" title="Edit">
-                                                    <i class="fas fa-pen"></i>
-                                                </a>
-                                                <a href="/delete/<%= item._id %>"
-                                                    class="btn btn-sm btn-light text-danger" title="Delete"
-                                                    onclick="return confirm('Are you sure?');">
-                                                    <i class="fas fa-trash"></i>
-                                                </a>
+                                                <div class="d-flex flex-wrap gap-2 justify-content-end"
+                                                    style="width: 80px; margin-left: auto;">
+                                                    <a href="/view/<%= item._id %>"
+                                                        class="btn btn-sm btn-light text-secondary"
+                                                        data-bs-toggle="tooltip" title="View Offer Letter">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="/ending-letter/<%= item._id %>"
+                                                        class="btn btn-sm btn-light text-warning"
+                                                        data-bs-toggle="tooltip" title="Ending Letter">
+                                                        <i class="fas fa-certificate"></i>
+                                                    </a>
+                                                    <a href="/edit/<%= item._id %>"
+                                                        class="btn btn-sm btn-light text-primary"
+                                                        data-bs-toggle="tooltip" title="Edit">
+                                                        <i class="fas fa-pen"></i>
+                                                    </a>
+                                                    <a href="/delete/<%= item._id %>"
+                                                        class="btn btn-sm btn-light text-danger" title="Delete"
+                                                        onclick="return confirm('Are you sure?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
                                             </td>
                                         </tr>
                                         <% }) %>
                                             <% } else { %>
-                                                <tr>
-                                                    <td colspan="5" class="text-center py-5 text-muted">
+                                                <tr id="emptyStateRow">
+                                                    <td colspan="7" class="text-center py-5 text-muted">
                                                         <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-2130362-1800926.png"
                                                             alt="Empty" style="width: 150px; opacity: 0.5;">
                                                         <p class="mt-3">No applications found yet.</p>
                                                     </td>
                                                 </tr>
                                                 <% } %>
+                                                    <tr id="noResultsRow" style="display: none;">
+                                                        <td colspan="7" class="text-center py-5 text-muted">
+                                                            <i class="fas fa-search fa-3x mb-3 opacity-25"></i>
+                                                            <p>No matching applications found.</p>
+                                                        </td>
+                                                    </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                const searchInput = document.getElementById('dashboardSearch');
+                const tableRows = document.querySelectorAll('.application-row');
+                const noResultsRow = document.getElementById('noResultsRow');
+
+                if (searchInput) {
+                    searchInput.addEventListener('input', function () {
+                        const query = this.value.toLowerCase().trim();
+                        let hasVisibleRows = false;
+
+                        tableRows.forEach(row => {
+                            const name = row.querySelector('.student-name').textContent.toLowerCase();
+                            const contact = row.querySelector('.student-contact').textContent.toLowerCase();
+                            const position = row.querySelector('.internship-position').textContent.toLowerCase();
+                            const branch = row.querySelector('.branch-name').textContent.toLowerCase();
+                            const faculty = row.querySelector('.faculty-name').textContent.toLowerCase();
+
+                            if (name.includes(query) || contact.includes(query) ||
+                                position.includes(query) || branch.includes(query) ||
+                                faculty.includes(query)) {
+                                row.style.display = '';
+                                hasVisibleRows = true;
+                            } else {
+                                row.style.display = 'none';
+                            }
+                        });
+
+                        if (noResultsRow) {
+                            noResultsRow.style.display = hasVisibleRows || query === '' ? 'none' : '';
+                        }
+                    });
+                }
+            });
+        </script>
 
         <%- include('partials/footer') %>

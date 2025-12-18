@@ -47,7 +47,18 @@
             <p><strong>To,</strong></p>
             <p><strong><%- internship.studentName %></strong></p>
             <p><%- internship.collegeName %></p>
-            <p><strong>Address :</strong> <%- internship.address %></p>
+            <p><strong>Address :</strong>
+                <% let addr=internship.address; if (addr.length> 30) {
+                    let splitIndex = addr.lastIndexOf(' ', 30);
+                    if (splitIndex === -1) splitIndex = 30;
+                    let firstLine = addr.substring(0, splitIndex);
+                    let secondLine = addr.substring(splitIndex).trim();
+                    %>
+                    <%- firstLine %><br><%- secondLine %>
+                            <% } else { %>
+                                <%- addr %>
+                                    <% } %>
+            </p>
             <p><strong>Mob no :</strong>+91 <%- internship.studentContactNo.slice(0, 5) + ' ' +
                     internship.studentContactNo.slice(5) %></p>
         </div>
