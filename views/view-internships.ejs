@@ -1,0 +1,171 @@
+<%- include('partials/header') %>
+    <%- include('partials/sidebar') %>
+
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Dashboard</h2>
+                    <p class="text-muted mb-0">Overview of internship applications</p>
+                </div>
+                <a href="/add" class="btn btn-primary rounded-pill px-4 py-2">
+                    <i class="fas fa-plus me-2"></i> New Application
+                </a>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card stat-card shadow-sm p-4 h-100 card-hover">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.75rem;">Total
+                                    Applications</h6>
+                                <h2 class="fw-bold mb-0 text-dark">
+                                    <%= stats.total %>
+                                </h2>
+                            </div>
+                            <div class="icon-box bg-gradient-primary text-white shadow">
+                                <i class="fas fa-users"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card shadow-sm p-4 h-100 card-hover">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.75rem;">6 Hr
+                                    Shift</h6>
+                                <h2 class="fw-bold mb-0 text-dark">
+                                    <%= stats.shift6 %>
+                                </h2>
+                            </div>
+                            <div class="icon-box bg-gradient-success text-white shadow">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card shadow-sm p-4 h-100 card-hover">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div>
+                                <h6 class="text-muted text-uppercase fw-bold mb-1" style="font-size: 0.75rem;">4 Hr
+                                    Shift</h6>
+                                <h2 class="fw-bold mb-0 text-dark">
+                                    <%= stats.shift4 %>
+                                </h2>
+                            </div>
+                            <div class="icon-box bg-gradient-warning text-white shadow">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                <div
+                    class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold">Recent Applications</h5>
+                    <button class="btn btn-light btn-sm rounded-circle"><i class="fas fa-ellipsis-h"></i></button>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-custom align-middle mb-0 table-hover">
+                            <thead>
+                                <tr>
+                                    <th class="py-3 px-4">Student</th>
+                                    <th class="py-3 px-4">Position / Shift</th>
+                                    <th class="py-3 px-4">Duration</th>
+                                    <th class="py-3 px-4">Date</th>
+                                    <th class="py-3 px-4">Faculty</th>
+                                    <th class="py-3 px-4 text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% if (internships.length> 0) { %>
+                                    <% internships.forEach(item=> { %>
+                                        <tr>
+                                            <td class="px-4">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-circle">
+                                                        <%= item.studentName.charAt(0).toUpperCase() %>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark">
+                                                            <%= item.studentName %>
+                                                        </div>
+                                                        <div class="small text-muted">
+                                                            <%= item.studentContactNo %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="px-4">
+                                                <div class="fw-semibold text-dark">
+                                                    <%= item.internshipPosition %>
+                                                </div>
+                                                <div class="mt-1">
+                                                    <% if (item.workingTime==='6 hrs/day' ) { %>
+                                                        <span class="badge badge-soft-success"><i
+                                                                class="fas fa-clock me-1"></i> 6 Hrs</span>
+                                                        <% } else { %>
+                                                            <span class="badge badge-soft-warning"><i
+                                                                    class="fas fa-clock me-1"></i> 4 Hrs</span>
+                                                            <% } %>
+                                                </div>
+                                            </td>
+                                            <td class="px-4">
+                                                <span class="badge badge-soft-info">
+                                                    <%= item.duration %>
+                                                </span>
+                                            </td>
+                                            <td class="px-4 text-muted font-monospace small">
+                                                <%= item.date.toISOString().split('T')[0] %>
+                                            </td>
+                                            <td class="px-4">
+                                                <div class="small text-dark fw-bold">
+                                                    <%= item.internFacultyName %>
+                                                </div>
+                                                <div class="small text-muted">
+                                                    <%= item.facultyContactNo %>
+                                                </div>
+                                            </td>
+                                            <td class="px-4 text-end">
+                                                <a href="/view/<%= item._id %>"
+                                                    class="btn btn-sm btn-light text-secondary me-1"
+                                                    data-bs-toggle="tooltip" title="View">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="/edit/<%= item._id %>"
+                                                    class="btn btn-sm btn-light text-primary me-1"
+                                                    data-bs-toggle="tooltip" title="Edit">
+                                                    <i class="fas fa-pen"></i>
+                                                </a>
+                                                <a href="/delete/<%= item._id %>"
+                                                    class="btn btn-sm btn-light text-danger" title="Delete"
+                                                    onclick="return confirm('Are you sure?');">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                            <% } else { %>
+                                                <tr>
+                                                    <td colspan="5" class="text-center py-5 text-muted">
+                                                        <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-2130362-1800926.png"
+                                                            alt="Empty" style="width: 150px; opacity: 0.5;">
+                                                        <p class="mt-3">No applications found yet.</p>
+                                                    </td>
+                                                </tr>
+                                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>

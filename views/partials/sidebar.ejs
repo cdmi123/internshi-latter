@@ -1,0 +1,50 @@
+<!-- Mobile Sidebar (Offcanvas) -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="sidebarOffcanvas">
+    <div class="offcanvas-header bg-light">
+        <h5 class="offcanvas-title fw-bold text-primary"><i class="fas fa-cube me-2"></i>InternManage</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link <%= title === 'Internship List' ? 'active' : '' %>" href="/">
+                    <i class="fas fa-layer-group me-3"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <%= title === 'Add Internship' ? 'active' : '' %>" href="/add">
+                    <i class="fas fa-plus-circle me-3"></i> New Application
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- Desktop Sidebar (Fixed) -->
+<aside class="d-none d-lg-block position-fixed start-0 top-0 bottom-0 sidebar-wrapper shadow-sm">
+    <div class="sidebar-brand">
+        <i class="fas fa-cube fa-lg"></i>
+        <span>InternManage</span>
+    </div>
+    <div class="h-100 overflow-auto py-2">
+        <ul class="nav flex-column">
+            <li class="nav-item mb-1">
+                <a class="nav-link <%= title === 'Internship List' ? 'active' : '' %>" href="/">
+                    <i class="fas fa-layer-group me-3" style="width: 20px;"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item mb-1">
+                <a class="nav-link <%= title === 'Add Internship' ? 'active' : '' %>" href="/add">
+                    <i class="fas fa-plus-circle me-3" style="width: 20px;"></i> New Application
+                </a>
+            </li>
+        </ul>
+
+        <div class="mt-5 px-4">
+            <div class="card bg-light border-0 p-3 rounded-3">
+                <small class="text-muted fw-bold d-block mb-2">PRO TIP</small>
+                <p class="small text-muted mb-0">Use the dashboard to track all internship metrics effectively.</p>
+            </div>
+        </div>
+    </div>
+</aside>

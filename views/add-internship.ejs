@@ -1,0 +1,219 @@
+<%- include('partials/header') %>
+    <%- include('partials/sidebar') %>
+
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-0">New Application</h2>
+                    <p class="text-muted small">Create a new internship record</p>
+                </div>
+                <a href="/" class="btn btn-light text-muted px-4">
+                    <i class="fas fa-times me-2"></i> Cancel
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                        <div class="card-body p-5">
+
+                            <% if (error) { %>
+                                <div class="alert alert-danger rounded-3 shadow-sm border-0 mb-4" role="alert">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-exclamation-circle fs-4 me-3"></i>
+                                        <div>
+                                            <%= error %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
+
+                                    <form action="/add" method="POST">
+                                        <!-- Section 1 -->
+                                        <div class="mb-5">
+                                            <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
+                                                <span class="bg-soft-primary p-2 rounded-circle me-3"><i
+                                                        class="fas fa-user"></i></span>
+                                                Student Information
+                                            </h5>
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" id="studentName"
+                                                            name="studentName" placeholder="John Doe"
+                                                            value="<%= formData.studentName || '' %>" required>
+                                                        <label for="studentName">Student Name</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" id="collegeName"
+                                                            name="collegeName" placeholder="College Name"
+                                                            value="<%= formData.collegeName || '' %>" required>
+                                                        <label for="collegeName">College Name</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="date" class="form-control" id="date" name="date"
+                                                            placeholder="Date" value="<%= formData.date || '' %>"
+                                                            required>
+                                                        <label for="date">Application Date</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="date" class="form-control" id="startDate"
+                                                            name="startDate" placeholder="Starting Date"
+                                                            value="<%= formData.startDate || '' %>" required>
+                                                        <label for="startDate">Starting Date</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" id="duration"
+                                                            name="duration" placeholder="Duration"
+                                                            value="<%= formData.duration || '' %>" required>
+                                                        <label for="duration">Duration (Hours)</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" id="endingDate"
+                                                            name="endingDate" placeholder="Ending Date"
+                                                            value="<%= formData.endingDate || '' %>" readonly>
+                                                        <label for="endingDate">Ending Date (Auto)</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-floating">
+                                                        <textarea class="form-control" id="address" name="address"
+                                                            placeholder="Address" style="height: 100px"
+                                                            required><%= formData.address || '' %></textarea>
+                                                        <label for="address">Full Address</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="tel" class="form-control" id="studentContactNo"
+                                                            name="studentContactNo" placeholder="1234567890"
+                                                            value="<%= formData.studentContactNo || '' %>" required
+                                                            pattern="[0-9]{10}">
+                                                        <label for="studentContactNo">Student Contact No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <hr class="text-muted opacity-10 my-4">
+
+                                        <!-- Section 2 -->
+                                        <div class="mb-4">
+                                            <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
+                                                <span class="bg-soft-primary p-2 rounded-circle me-3"><i
+                                                        class="fas fa-briefcase"></i></span>
+                                                Internship Details
+                                            </h5>
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" id="internshipPosition"
+                                                            name="internshipPosition" placeholder="Web Developer"
+                                                            value="<%= formData.internshipPosition || '' %>" required>
+                                                        <label for="internshipPosition">Position / Role</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label
+                                                        class="form-label text-muted small fw-bold text-uppercase ls-1 mb-2">Working
+                                                        Hours</label>
+                                                    <div class="bg-light p-3 rounded-3 d-flex gap-4 border">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="workingTime" id="time6" value="6 hrs/day"
+                                                                <%=(formData.workingTime==='6 hrs/day' ) ? 'checked'
+                                                                : '' %> required>
+                                                            <label class="form-check-label fw-medium" for="time6">6 Hrs
+                                                                / Day</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio"
+                                                                name="workingTime" id="time4" value="4 hrs/day"
+                                                                <%=(formData.workingTime==='4 hrs/day' ) ? 'checked'
+                                                                : '' %>>
+                                                            <label class="form-check-label fw-medium" for="time4">4 Hrs
+                                                                / Day</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="text" class="form-control" id="internFacultyName"
+                                                            name="internFacultyName" placeholder="Faculty Name"
+                                                            value="<%= formData.internFacultyName || '' %>" required>
+                                                        <label for="internFacultyName">Faculty Name</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating">
+                                                        <input type="tel" class="form-control" id="facultyContactNo"
+                                                            name="facultyContactNo" placeholder="0987654321"
+                                                            value="<%= formData.facultyContactNo || '' %>" required
+                                                            pattern="[0-9]{10}">
+                                                        <label for="facultyContactNo">Faculty Contact No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5 pt-3 border-top">
+                                            <button type="submit"
+                                                class="btn btn-primary btn-lg px-5 rounded-pill fw-bold">
+                                                <i class="fas fa-paper-plane me-2"></i> Submit Application
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                    <!-- Auto Calculation Script -->
+                                    <script>
+                                        const startDateInput = document.getElementById('startDate');
+                                        const durationInput = document.getElementById('duration');
+                                        const workingTimeInputs = document.getElementsByName('workingTime');
+                                        const endingDateInput = document.getElementById('endingDate'); // We need to add this field first
+
+                                        function calculateEndDate() {
+                                            const startDateVal = startDateInput.value;
+                                            const durationVal = parseInt(durationInput.value);
+                                            let workingTimeVal = 0;
+
+                                            for (const radio of workingTimeInputs) {
+                                                if (radio.checked) {
+                                                    workingTimeVal = parseInt(radio.value);
+                                                    break;
+                                                }
+                                            }
+
+                                            if (startDateVal && durationVal && workingTimeVal) {
+                                                const start = new Date(startDateVal);
+                                                const days = Math.ceil(durationVal / workingTimeVal);
+                                                start.setDate(start.getDate() + days);
+
+                                                // Format to YYYY-MM-DD
+                                                const year = start.getFullYear();
+                                                const month = String(start.getMonth() + 1).padStart(2, '0');
+                                                const day = String(start.getDate()).padStart(2, '0');
+                                                endingDateInput.value = `${year}-${month}-${day}`;
+                                            }
+                                        }
+
+                                        startDateInput.addEventListener('change', calculateEndDate);
+                                        durationInput.addEventListener('input', calculateEndDate);
+                                        workingTimeInputs.forEach(radio => radio.addEventListener('change', calculateEndDate));
+                                    </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
