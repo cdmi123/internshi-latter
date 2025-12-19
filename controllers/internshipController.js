@@ -3,22 +3,36 @@ const Internship = require('../models/Internship');
 // Get all internships with stats
 exports.getAllInternships = async (req, res) => {
     try {
-        const internships = await Internship.find().sort({ date: -1 });
+        const page = parseInt(req.query.page) || 1;
+        const limit = 20;
+        const skip = (page - 1) * limit;
 
-        // Calculate Stats
+        const totalRecords = await Internship.countDocuments({ status: { $ne: 'deleted' } });
+        const internships = await Internship.find({ status: { $ne: 'deleted' } })
+            .sort({ date: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalPages = Math.ceil(totalRecords / limit);
+
+        // Calculate Stats for all active records (not just current page)
+        const allActiveInternships = await Internship.find({ status: { $ne: 'deleted' } });
         const stats = {
-            total: internships.length,
-            shift6: internships.filter(i => i.workingTime === '6 hrs/day').length,
-            shift4: internships.filter(i => i.workingTime === '4 hrs/day').length
+            total: totalRecords,
+            shift6: allActiveInternships.filter(i => i.workingTime === '6 hrs/day').length,
+            shift4: allActiveInternships.filter(i => i.workingTime === '4 hrs/day').length
         };
 
         res.render('view-internships', {
             title: 'Internship List',
             internships: internships,
-            stats: stats
+            stats: stats,
+            currentPage: page,
+            totalPages: totalPages,
+            limit: limit
         });
     } catch (err) {
-        console.error(err);
+        console.error("Error in getAllInternships:", err);
         res.status(500).send('Server Error');
     }
 };
@@ -55,7 +69,6 @@ exports.viewEndingLetter = async (req, res) => {
     }
 };
 
-// ... (Rest of the controller functions remain same, just exporting them again)
 exports.getAddForm = (req, res) => {
     res.render('add-internship', {
         title: 'Add Internship',
@@ -113,7 +126,7 @@ exports.updateInternship = async (req, res) => {
 
 exports.deleteInternship = async (req, res) => {
     try {
-        await Internship.findByIdAndDelete(req.params.id);
+        await Internship.findByIdAndUpdate(req.params.id, { status: 'deleted' });
         res.redirect('/');
     } catch (err) {
         console.error(err);

@@ -85,7 +85,6 @@
                                 <tr>
                                     <th class="py-3 px-4">Student</th>
                                     <th class="py-3 px-4">Position / Shift</th>
-                                    <th class="py-3 px-4">Duration</th>
                                     <th class="py-3 px-4">Branch</th>
                                     <th class="py-3 px-4">Date</th>
                                     <th class="py-3 px-4">Faculty</th>
@@ -119,15 +118,15 @@
                                                     <% if (item.workingTime==='6 hrs/day' ) { %>
                                                         <span class="badge badge-soft-success"><i
                                                                 class="fas fa-clock me-1"></i> 6 Hrs</span>
+
+                                                        <span class="badge badge-soft-success"><i
+                                                                class="fas fa-clock me-1"></i> 120 Hrs</span>
                                                         <% } else { %>
                                                             <span class="badge badge-soft-warning"><i
-                                                                    class="fas fa-clock me-1"></i> 4 Hrs</span>
+                                                                    class="fas fa-clock me-1"></i> 4 Hrs</span> / <span
+                                                                class="badge badge-soft-success"><i
+                                                                    class="fas fa-clock me-1"></i> 120 Hrs</span>
                                                             <% } %>
-                                                </div>
-                                            </td>
-                                            <td class="px-4">
-                                                <div class="fw-bold text-dark">
-                                                    <%= item.duration || 'N/A' %>
                                                 </div>
                                             </td>
                                             <td class="px-4">
@@ -190,6 +189,56 @@
                                                     </tr>
                             </tbody>
                         </table>
+                    </div>
+                </div>
+
+                <!-- Premium Pagination Footer -->
+                <div class="card-footer bg-white border-top py-3 px-4">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                        <div class="text-muted small order-2 order-md-1">
+                            <% const displayLimit=typeof limit !=='undefined' ? limit : 20; %>
+                                Showing <span class="fw-bold text-dark">
+                                    <%= (currentPage - 1) * displayLimit + 1 %>
+                                </span>
+                                to <span class="fw-bold text-dark">
+                                    <%= Math.min(currentPage * displayLimit, stats.total) %>
+                                </span>
+                                of <span class="fw-bold text-dark">
+                                    <%= stats.total %>
+                                </span> results
+                        </div>
+
+                        <% if (totalPages> 1) { %>
+                            <nav aria-label="Page navigation" class="order-1 order-md-2">
+                                <ul class="pagination pagination-sm justify-content-center mb-0 gap-2">
+                                    <!-- Previous Button -->
+                                    <li class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                        <a class="page-link border-0 shadow-sm rounded-3 px-3 py-2 bg-light text-dark"
+                                            href="?page=<%= currentPage - 1 %>" aria-label="Previous">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+
+                                    <!-- Page Numbers -->
+                                    <% for(let i=1; i <=totalPages; i++) { %>
+                                        <li class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                            <a class="page-link border-0 shadow-sm rounded-3 px-3 py-2 <%= currentPage === i ? 'bg-primary text-white' : 'bg-light text-dark shadow-none' %>"
+                                                href="?page=<%= i %>">
+                                                <%= i %>
+                                            </a>
+                                        </li>
+                                        <% } %>
+
+                                            <!-- Next Button -->
+                                            <li class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                                <a class="page-link border-0 shadow-sm rounded-3 px-3 py-2 bg-light text-dark"
+                                                    href="?page=<%= currentPage + 1 %>" aria-label="Next">
+                                                    <i class="fas fa-chevron-right"></i>
+                                                </a>
+                                            </li>
+                                </ul>
+                            </nav>
+                            <% } %>
                     </div>
                 </div>
             </div>
