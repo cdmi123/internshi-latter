@@ -61,6 +61,38 @@
             </div>
 
             <!-- Stats Cards -->
+            <!-- Logbook Selection Modal -->
+            <div class="modal fade" id="logbookModal" tabindex="-1" aria-labelledby="logbookModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content border-0 shadow-lg rounded-4">
+                        <div class="modal-header border-0 pb-0">
+                            <h5 class="modal-title fw-bold" id="logbookModalLabel">Select Internship Course</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body py-4">
+                            <div class="text-center mb-4">
+                                <div class="icon-box bg-soft-success text-success mx-auto mb-3"
+                                    style="width: 60px; height: 60px; line-height: 60px; font-size: 24px;">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <h6 class="fw-bold" id="logbookStudentName">Student Name</h6>
+                                <p class="text-muted small">Select the course to download the logbook.</p>
+                            </div>
+
+                            <div id="logbookList" class="d-grid gap-2">
+                                <!-- Internship items will be injected here -->
+                                <div class="text-center">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="row g-4 mb-5">
                 <div class="col-md-4">
                     <div class="card stat-card shadow-sm p-4 h-100 card-hover">
@@ -206,6 +238,17 @@
                                                         data-bs-toggle="tooltip" title="Ending Letter">
                                                         <i class="fas fa-certificate"></i>
                                                     </a>
+                                                    <a href="/logbook-manage/<%= item._id %>"
+                                                        class="btn btn-sm btn-light text-info" data-bs-toggle="tooltip"
+                                                        title="Manage Logbook">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="javascript:void(0)"
+                                                        onclick="openLogbookModal('<%= item.studentContactNo %>', '<%= item.studentName %>')"
+                                                        class="btn btn-sm btn-light text-success"
+                                                        data-bs-toggle="tooltip" title="Download Logbook">
+                                                        <i class="fas fa-file-excel"></i>
+                                                    </a>
                                                     <a href="/edit/<%= item._id %>"
                                                         class="btn btn-sm btn-light text-primary"
                                                         data-bs-toggle="tooltip" title="Edit">
@@ -326,6 +369,52 @@
                     });
                 }
             });
+
+            async function openLogbookModal(contactNo, studentName) {
+                const modal = new bootstrap.Modal(document.getElementById('logbookModal'));
+                const listContainer = document.getElementById('logbookList');
+                document.getElementById('logbookStudentName').textContent = studentName;
+
+                modal.show();
+                listContainer.innerHTML = `
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                `;
+
+                try {
+                    const response = await fetch(`/api/student-internships?contactNo=${contactNo}`);
+                    const internships = await response.json();
+
+                    if (internships.length === 0) {
+                        listContainer.innerHTML = '<div class="alert alert-warning">No internships found.</div>';
+                        return;
+                    }
+
+                    let html = '';
+                    internships.forEach(item => {
+                        html += `
+                            <a href="/logbook/${item._id}" class="btn btn-outline-light text-dark text-start p-3 border shadow-sm mb-2 hover-shadow d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold text-primary">${item.internshipPosition}</div>
+                                    <div class="small text-muted">
+                                        <i class="far fa-calendar-alt me-1"></i> ${item.startDate} (${item.duration})
+                                    </div>
+                                </div>
+                                <i class="fas fa-download text-muted"></i>
+                            </a>
+                        `;
+                    });
+
+                    listContainer.innerHTML = html;
+
+                } catch (error) {
+                    console.error('Error fetching internships:', error);
+                    listContainer.innerHTML = '<div class="alert alert-danger">Error loading data.</div>';
+                }
+            }
         </script>
 
         <%- include('partials/footer') %>

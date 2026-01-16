@@ -29,11 +29,22 @@ const upload = multer({
 // Read (List)
 router.get('/', internshipController.getAllInternships);
 
+// API: Get Internships by Student Contact
+router.get('/api/student-internships', internshipController.getStudentInternships);
+
 // Read (View Letter)
 router.get('/view/:id', internshipController.viewInternship);
 
 // Read (View Ending Letter)
 router.get('/ending-letter/:id', internshipController.viewEndingLetter);
+
+// Download Logbook
+router.get('/logbook/:id', internshipController.generateLogbook);
+
+// Logbook Management
+router.get('/logbook-manage/:id', internshipController.manageLogbook);
+router.post('/logbook-manage/:id/add', internshipController.addLogbookEntry);
+router.get('/logbook-manage/delete/:id', internshipController.deleteLogbookEntry);
 
 // Create (Add)
 router.get('/add', internshipController.getAddForm);
