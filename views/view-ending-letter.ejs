@@ -65,18 +65,30 @@
 
         <div class="letter-body">
             <p><strong>Dear <%- internship.studentName %>,</strong></p>
-            <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
-                        internship.collegeName %></strong>, has successfully completed an internship as a
-                <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web Infotech</strong> from
-                <strong>
-                    <%= internship.startDate ? internship.startDate.split('-').reverse().join('-') : 'N/A' %>
-                </strong> to
-                <strong>
-                    <%= internship.endingDate ? internship.endingDate.split('-').reverse().join('-') : 'N/A' %>
-                </strong>.
-            </p>
-            <p>During the internship, the intern demonstrated excellent skills, professional behavior, and a strong work
-                ethic. We wish <%- internship.studentName %> all the best in their future endeavors.</p>
+            <% if (internship.marks && internship.grade) { %>
+                <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
+                            internship.collegeName %></strong>, has successfully completed the internship with grade
+                    <strong><%- internship.grade %></strong> and marks <strong><%- internship.marks %></strong> out of
+                    50 for <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web
+                        Infotech</strong> from <strong>
+                        <%= internship.startDate ? internship.startDate.split('-').reverse().join('-') : 'N/A' %>
+                    </strong> to <strong>
+                        <%= internship.endingDate ? internship.endingDate.split('-').reverse().join('-') : 'N/A' %>
+                    </strong> .
+                </p>
+                <% } else { %>
+                    <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
+                                internship.collegeName %></strong>, has successfully completed an internship as a
+                        <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web Infotech</strong>
+                        from <strong>
+                            <%= internship.startDate ? internship.startDate.split('-').reverse().join('-') : 'N/A' %>
+                        </strong> to <strong>
+                            <%= internship.endingDate ? internship.endingDate.split('-').reverse().join('-') : 'N/A' %>
+                        </strong> .
+                    </p>
+                    <% } %>
+                        <p>During the internship, the intern demonstrated excellent skills, professional behavior, and a
+                            strong work ethic.</p>
         </div>
 
         <div class="internship-details">
@@ -130,6 +142,147 @@
         </footer>
     </div>
 
+    <!-- Completion Button -->
+    <div class="no-print" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <button onclick="openCompletionModal()"
+            style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Completion</button>
+    </div>
+
+    <!-- Modal -->
+    <div id="completionModal"
+        style="display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+        <div
+            style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px;">
+            <span onclick="closeCompletionModal()"
+                style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
+            <h2>Internship Completion</h2>
+
+            <div style="margin-bottom: 20px;">
+                <label>
+                    <input type="radio" name="completionType" value="withMarks" checked onchange="toggleMarksInput()">
+                    With Marks
+                </label>
+                <label style="margin-left: 20px;">
+                    <input type="radio" name="completionType" value="withoutMarks" onchange="toggleMarksInput()">
+                    Without Marks
+                </label>
+            </div>
+
+            <div id="marksInputSection">
+                <label for="marks">Marks (out of 50):</label>
+                <input type="number" id="marks" name="marks" min="0" max="50" step="0.01"
+                    style="width: 100%; padding: 8px; margin-top: 5px;">
+                <label for="grade" style="display: block; margin-top: 10px;">Grade:</label>
+                <input type="text" readonly id="grade" name="grade" style="width: 100%; padding: 8px; margin-top: 5px;">
+            </div>
+
+            <div style="margin-top: 20px; text-align: right;">
+                <button onclick="saveCompletionData()"
+                    style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Save
+                    & Print</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+
+    <script>
+        const modal = document.getElementById("completionModal");
+        const marksInput = document.getElementById("marks");
+        const gradeInput = document.getElementById("grade");
+        let currentGrade = '';
+
+        function openCompletionModal() {
+            modal.style.display = "block";
+        }
+
+        function closeCompletionModal() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                closeCompletionModal();
+            }
+        }
+
+        function toggleMarksInput() {
+            const type = document.querySelector('input[name="completionType"]:checked').value;
+            const inputSection = document.getElementById("marksInputSection");
+            if (type === 'withoutMarks') {
+                inputSection.style.display = 'none';
+                marksInput.value = '';
+                gradeInput.value = '';
+            } else {
+                inputSection.style.display = 'block';
+            }
+        }
+
+        marksInput.addEventListener('input', calculateGrade);
+
+        function calculateGrade() {
+            const marks = parseFloat(marksInput.value);
+            if (isNaN(marks)) {
+                gradeInput.value = '';
+                currentGrade = '';
+                return;
+            }
+
+            if (marks >= 47.00 && marks <= 50.00) currentGrade = 'O';
+            else if (marks >= 37.00 && marks <= 46.99) currentGrade = 'E';
+            else if (marks >= 27.00 && marks <= 36.99) currentGrade = 'A';
+            else if (marks >= 20.00 && marks <= 26.99) currentGrade = 'B';
+            else currentGrade = 'Fail/Low';
+
+            gradeInput.value = currentGrade;
+        }
+
+        async function saveCompletionData() {
+            const type = document.querySelector('input[name="completionType"]:checked').value;
+            let marks = null;
+            let grade = null;
+
+            if (type === 'withMarks') {
+                marks = parseFloat(marksInput.value);
+                grade = gradeInput.value;
+
+                if (isNaN(marks)) {
+                    alert('Please enter valid marks.');
+                    return;
+                }
+                if (!grade) {
+                    alert('Please check the grade.');
+                    return;
+                }
+            }
+
+            try {
+                const response = await fetch('/update-marks/<%= internship._id %>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ marks, grade })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Error saving data');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error saving data');
+            }
+        }
+    </script>
 </body>
 
 </html>

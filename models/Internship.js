@@ -55,6 +55,12 @@ const internshipSchema = new mongoose.Schema({
         enum: ['yogichowk', 'sarthana', 'adajan', 'katargam', 'dindoli', 'navsari'],
         required: true
     },
+    marks: {
+        type: Number
+    },
+    grade: {
+        type: String
+    },
     status: {
         type: String,
         enum: ['active', 'deleted'],
