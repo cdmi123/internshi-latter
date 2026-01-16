@@ -33,10 +33,10 @@ router.get('/', internshipController.getAllInternships);
 router.get('/api/student-internships', internshipController.getStudentInternships);
 
 // Read (View Letter)
-router.get('/view/:id', internshipController.viewInternship);
+router.get('/view-letter/:id', internshipController.viewInternship);
 
 // Read (View Ending Letter)
-router.get('/ending-letter/:id', internshipController.viewEndingLetter);
+router.get('/completion-letter/:id', internshipController.viewEndingLetter);
 
 // Download Logbook
 router.get('/logbook/:id', internshipController.generateLogbook);

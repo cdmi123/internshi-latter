@@ -326,6 +326,12 @@
                     listContainer.innerHTML = '<div class="alert alert-danger">Error loading data.</div>';
                 }
             }
+
+            function deleteInternship(id) {
+                if (confirm('Are you sure you want to delete this internship?')) {
+                    window.location.href = '/delete/' + id;
+                }
+            }
         </script>
 
         <%- include('partials/footer') %>
