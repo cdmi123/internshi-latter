@@ -1,0 +1,92 @@
+<% if (internships.length> 0) { %>
+    <% internships.forEach(function(item) { %>
+        <tr class="application-row">
+            <td class="px-4">
+                <div class="d-flex align-items-center">
+                    <div class="avatar-initial rounded-circle bg-soft-primary text-primary fw-bold me-3">
+                        <%= item.studentName.charAt(0).toUpperCase() %>
+                    </div>
+                    <div>
+                        <div class="fw-bold text-dark student-name">
+                            <%= item.studentName %>
+                        </div>
+                        <div class="small text-muted student-contact">
+                            <%= item.studentContactNo %>
+                        </div>
+                    </div>
+                </div>
+            </td>
+            <td class="px-4">
+                <div class="fw-semibold text-dark internship-position">
+                    <%= item.internshipPosition %>
+                </div>
+                <div class="mt-1">
+                    <% if (item.workingTime==='6 hrs/day' ) { %>
+                        <span class="badge badge-soft-success"><i class="fas fa-clock me-1"></i> 6 Hrs</span>
+
+                        <span class="badge badge-soft-success"><i class="fas fa-clock me-1"></i> 120 Hrs</span>
+                        <% } else { %>
+                            <span class="badge badge-soft-warning"><i class="fas fa-clock me-1"></i> 4 Hrs</span> /
+                            <span class="badge badge-soft-success"><i class="fas fa-clock me-1"></i> 120 Hrs</span>
+                            <% } %>
+                </div>
+            </td>
+            <td class="px-4">
+                <span class="badge badge-soft-primary text-capitalize branch-name">
+                    <%= item.branch || '--' %>
+                </span>
+            </td>
+            <td class="px-4 text-muted font-monospace small">
+                <%= item.date.toISOString().split('T')[0] %>
+            </td>
+            <td class="px-4">
+                <div class="small text-dark fw-bold faculty-name">
+                    <%= item.internFacultyName %>
+                </div>
+                <div class="small text-muted">
+                    <%= item.facultyContactNo %>
+                </div>
+            </td>
+            <td class="px-4 text-end">
+                <div class="d-flex flex-wrap gap-2 justify-content-end" style="width: 80px; margin-left: auto;">
+                    <a href="/view-letter/<%= item._id %>" class="btn btn-sm btn-light text-primary"
+                        data-bs-toggle="tooltip" title="View Application">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <a href="/completion-letter/<%= item._id %>" class="btn btn-sm btn-light text-warning"
+                        data-bs-toggle="tooltip" title="Ending Letter">
+                        <i class="fas fa-certificate"></i>
+                    </a>
+                    <a href="/logbook-manage/<%= item._id %>" class="btn btn-sm btn-light text-info"
+                        data-bs-toggle="tooltip" title="Manage Logbook">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="javascript:void(0)"
+                        onclick="openLogbookModal('<%= item.studentContactNo %>', '<%= item.studentName %>')"
+                        class="btn btn-sm btn-light text-success" data-bs-toggle="tooltip" title="Download Logbook">
+                        <i class="fas fa-file-excel"></i>
+                    </a>
+                    <a href="/edit/<%= item._id %>" class="btn btn-sm btn-light text-secondary" data-bs-toggle="tooltip"
+                        title="Edit">
+                        <i class="fas fa-pen"></i>
+                    </a>
+                    <a href="javascript:void(0)" onclick="deleteInternship('<%= item._id %>')"
+                        class="btn btn-sm btn-light text-danger" data-bs-toggle="tooltip" title="Delete">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </td>
+        </tr>
+        <% }) %>
+            <% } else { %>
+                <tr id="noResultsRow">
+                    <td colspan="6" class="text-center py-5">
+                        <div class="text-muted">
+                            <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
+                            <p class="mb-0">No records found matching your
+                                criteria.
+                            </p>
+                        </div>
+                    </td>
+                </tr>
+                <% } %>

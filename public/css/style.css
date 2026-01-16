@@ -140,6 +140,10 @@ body {
     margin-right: 1rem;
 }
 
+.col-student-name { min-width: 200px; }
+.col-position { min-width: 160px; }
+.col-actions { min-width: 140px; }
+
 /* --- Badge --- */
 .badge-soft {
     padding: 0.35em 0.8em;

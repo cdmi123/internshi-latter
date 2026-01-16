@@ -144,140 +144,51 @@
                 </div>
             </div>
 
+            <!-- Faculty Filter & Search -->
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <form action="/" method="GET" id="facultyFilterForm">
+                        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                            <span class="input-group-text bg-white border-0 ps-4">
+                                <i class="fas fa-chalkboard-teacher text-muted"></i>
+                            </span>
+                            <input type="text" name="faculty" class="form-control border-0 py-2"
+                                placeholder="Search by Faculty Name..." value="<%= selectedFaculty %>"
+                                onkeypress="if(event.key === 'Enter') this.form.submit()">
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-8">
+                    <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                        <span class="input-group-text bg-white border-0 ps-4">
+                            <i class="fas fa-search text-muted"></i>
+                        </span>
+                        <input type="text" id="dashboardSearch" class="form-control border-0 py-2"
+                            placeholder="Search by name, position, or other details...">
+                    </div>
+                </div>
+            </div>
+
             <!-- Table -->
             <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-                <div
-                    class="card-header bg-white border-bottom py-3 px-4 d-flex justify-content-between align-items-center flex-wrap gap-3">
-                    <h5 class="mb-0 fw-bold">Recent Applications</h5>
-                    <div class="search-box">
-                        <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light border-0"><i
-                                    class="fas fa-search text-muted"></i></span>
-                            <input type="text" id="dashboardSearch" class="form-control bg-light border-0 px-3"
-                                placeholder="Search applications..." style="width: 250px;">
-                        </div>
-                    </div>
+                <div class="card-header bg-white border-bottom py-3">
+                    <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-list-ul me-2"></i>Internship Applications</h6>
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-custom align-middle mb-0 table-hover" id="applicationsTable">
-                            <thead>
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="bg-light">
                                 <tr>
-                                    <th class="py-3 px-4">Student</th>
-                                    <th class="py-3 px-4">Position / Shift</th>
-                                    <th class="py-3 px-4">Branch</th>
-                                    <th class="py-3 px-4">Date</th>
-                                    <th class="py-3 px-4">Faculty</th>
-                                    <th class="py-3 px-4 text-end">Actions</th>
+                                    <th class="px-4 py-3 col-student-name">Student Name</th>
+                                    <th class="px-4 py-3 col-position">Position & Duration</th>
+                                    <th class="px-4 py-3">Branch</th>
+                                    <th class="px-4 py-3">Date</th>
+                                    <th class="px-4 py-3">Faculty Guide</th>
+                                    <th class="px-4 py-3 text-end col-actions">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <% if (internships.length> 0) { %>
-                                    <% internships.forEach(item=> { %>
-                                        <tr class="application-row">
-                                            <td class="px-4">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-circle">
-                                                        <%= item.studentName.charAt(0).toUpperCase() %>
-                                                    </div>
-                                                    <div>
-                                                        <div class="fw-bold text-dark student-name">
-                                                            <%= item.studentName %>
-                                                        </div>
-                                                        <div class="small text-muted student-contact">
-                                                            <%= item.studentContactNo %>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="px-4">
-                                                <div class="fw-semibold text-dark internship-position">
-                                                    <%= item.internshipPosition %>
-                                                </div>
-                                                <div class="mt-1">
-                                                    <% if (item.workingTime==='6 hrs/day' ) { %>
-                                                        <span class="badge badge-soft-success"><i
-                                                                class="fas fa-clock me-1"></i> 6 Hrs</span>
-
-                                                        <span class="badge badge-soft-success"><i
-                                                                class="fas fa-clock me-1"></i> 120 Hrs</span>
-                                                        <% } else { %>
-                                                            <span class="badge badge-soft-warning"><i
-                                                                    class="fas fa-clock me-1"></i> 4 Hrs</span> / <span
-                                                                class="badge badge-soft-success"><i
-                                                                    class="fas fa-clock me-1"></i> 120 Hrs</span>
-                                                            <% } %>
-                                                </div>
-                                            </td>
-                                            <td class="px-4">
-                                                <span class="badge badge-soft-primary text-capitalize branch-name">
-                                                    <%= item.branch || '--' %>
-                                                </span>
-                                            </td>
-                                            <td class="px-4 text-muted font-monospace small">
-                                                <%= item.date.toISOString().split('T')[0] %>
-                                            </td>
-                                            <td class="px-4">
-                                                <div class="small text-dark fw-bold faculty-name">
-                                                    <%= item.internFacultyName %>
-                                                </div>
-                                                <div class="small text-muted">
-                                                    <%= item.facultyContactNo %>
-                                                </div>
-                                            </td>
-                                            <td class="px-4 text-end">
-                                                <div class="d-flex flex-wrap gap-2 justify-content-end"
-                                                    style="width: 80px; margin-left: auto;">
-                                                    <a href="/view/<%= item._id %>"
-                                                        class="btn btn-sm btn-light text-secondary"
-                                                        data-bs-toggle="tooltip" title="View Offer Letter">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="/ending-letter/<%= item._id %>"
-                                                        class="btn btn-sm btn-light text-warning"
-                                                        data-bs-toggle="tooltip" title="Ending Letter">
-                                                        <i class="fas fa-certificate"></i>
-                                                    </a>
-                                                    <a href="/logbook-manage/<%= item._id %>"
-                                                        class="btn btn-sm btn-light text-info" data-bs-toggle="tooltip"
-                                                        title="Manage Logbook">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a href="javascript:void(0)"
-                                                        onclick="openLogbookModal('<%= item.studentContactNo %>', '<%= item.studentName %>')"
-                                                        class="btn btn-sm btn-light text-success"
-                                                        data-bs-toggle="tooltip" title="Download Logbook">
-                                                        <i class="fas fa-file-excel"></i>
-                                                    </a>
-                                                    <a href="/edit/<%= item._id %>"
-                                                        class="btn btn-sm btn-light text-primary"
-                                                        data-bs-toggle="tooltip" title="Edit">
-                                                        <i class="fas fa-pen"></i>
-                                                    </a>
-                                                    <a href="/delete/<%= item._id %>"
-                                                        class="btn btn-sm btn-light text-danger" title="Delete"
-                                                        onclick="return confirm('Are you sure?');">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <% }) %>
-                                            <% } else { %>
-                                                <tr id="emptyStateRow">
-                                                    <td colspan="7" class="text-center py-5 text-muted">
-                                                        <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-state-2130362-1800926.png"
-                                                            alt="Empty" style="width: 150px; opacity: 0.5;">
-                                                        <p class="mt-3">No applications found yet.</p>
-                                                    </td>
-                                                </tr>
-                                                <% } %>
-                                                    <tr id="noResultsRow" style="display: none;">
-                                                        <td colspan="7" class="text-center py-5 text-muted">
-                                                            <i class="fas fa-search fa-3x mb-3 opacity-25"></i>
-                                                            <p>No matching applications found.</p>
-                                                        </td>
-                                                    </tr>
+                            <tbody id="internshipTableBody">
+                                <%- include('partials/internship-rows', { internships: internships }) %>
                             </tbody>
                         </table>
                     </div>

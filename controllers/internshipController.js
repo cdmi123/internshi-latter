@@ -12,16 +12,32 @@ exports.getAllInternships = async (req, res) => {
         const limit = 20;
         const skip = (page - 1) * limit;
 
-        const totalRecords = await Internship.countDocuments({ status: { $ne: 'deleted' } });
-        const internships = await Internship.find({ status: { $ne: 'deleted' } })
+        // Faculty Filter Query
+        const selectedFaculty = req.query.faculty || '';
+        let query = { status: { $ne: 'deleted' } };
+
+        if (selectedFaculty) {
+            // Use regex for case-insensitive partial match
+            query.internFacultyName = { $regex: selectedFaculty, $options: 'i' };
+        }
+
+        const totalRecords = await Internship.countDocuments(query);
+        const internships = await Internship.find(query)
             .sort({ date: -1 })
             .skip(skip)
             .limit(limit);
 
         const totalPages = Math.ceil(totalRecords / limit);
 
+        // Get Unique Faculties for Dropdown (from ACTIVE records only)
+        const uniqueFaculties = await Internship.distinct('internFacultyName', { status: { $ne: 'deleted' } });
+
         // Calculate Stats for all active records (not just current page)
-        const allActiveInternships = await Internship.find({ status: { $ne: 'deleted' } });
+        // Note: Stats usually show GLOBAL stats, but if filtered, maybe show filtered stats?
+        // Let's keep stats global for now as per dashboard convention, or we can make them filtered.
+        // User asked for "filtering faculty name wise set". Usually dashboard stats remain global or adjust.
+        // Let's filter stats too if a filter is active to be consistent.
+        const allActiveInternships = await Internship.find(query);
         const stats = {
             total: totalRecords,
             shift6: allActiveInternships.filter(i => i.workingTime === '6 hrs/day').length,
@@ -34,7 +50,9 @@ exports.getAllInternships = async (req, res) => {
             stats: stats,
             currentPage: page,
             totalPages: totalPages,
-            limit: limit
+            limit: limit,
+            uniqueFaculties: uniqueFaculties.sort(),
+            selectedFaculty: selectedFaculty
         });
     } catch (err) {
         console.error("Error in getAllInternships:", err);
