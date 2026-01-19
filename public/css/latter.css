@@ -30,7 +30,8 @@ body {
     /* Ensure content doesn't spill out */
     display: flex;
     flex-direction: column;
-
+    transform: scale(0.65);
+    transform-origin: top center;
 }
 
 /* Watermark */
@@ -241,6 +242,7 @@ footer {
         box-shadow: none;
         padding: 40px 50px;
         border: none;
+        transform: none !important;
     }
 
     .watermark img {

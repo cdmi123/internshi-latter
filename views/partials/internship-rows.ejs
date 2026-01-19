@@ -53,6 +53,11 @@
                         data-bs-toggle="tooltip" title="View Application">
                         <i class="fas fa-eye"></i>
                     </a>
+                    <a href="javascript:void(0)"
+                        onclick="openCompleteModal('<%= item._id %>', '<%= item.studentName %>')"
+                        class="btn btn-sm btn-light text-success" data-bs-toggle="tooltip" title="Complete Internship">
+                        <i class="fas fa-check-circle"></i>
+                    </a>
                     <a href="/completion-letter/<%= item._id %>" class="btn btn-sm btn-light text-warning"
                         data-bs-toggle="tooltip" title="Ending Letter">
                         <i class="fas fa-certificate"></i>

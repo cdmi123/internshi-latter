@@ -71,9 +71,9 @@
                     <strong><%- internship.grade %></strong> and marks <strong><%- internship.marks %></strong> out of
                     50 for <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web
                         Infotech</strong> from <strong>
-                        <%= internship.startDate ? internship.startDate.split('-').reverse().join('-') : 'N/A' %>
+                        <%= internship.startDate ? internship.startDate : 'N/A' %>
                     </strong> to <strong>
-                        <%= internship.endingDate ? internship.endingDate.split('-').reverse().join('-') : 'N/A' %>
+                        <%= internship.endingDate ? internship.endingDate : 'N/A' %>
                     </strong> .
                 </p>
                 <% } else { %>
@@ -81,9 +81,9 @@
                                 internship.collegeName %></strong>, has successfully completed an internship as a
                         <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web Infotech</strong>
                         from <strong>
-                            <%= internship.startDate ? internship.startDate.split('-').reverse().join('-') : 'N/A' %>
+                            <%= internship.startDate ? internship.startDate : 'N/A' %>
                         </strong> to <strong>
-                            <%= internship.endingDate ? internship.endingDate.split('-').reverse().join('-') : 'N/A' %>
+                            <%= internship.endingDate ? internship.endingDate : 'N/A' %>
                         </strong> .
                     </p>
                     <% } %>
@@ -104,12 +104,12 @@
                 </tr>
                 <tr>
                     <td><strong>Starting Date</strong></td>
-                    <td>: <%= internship.startDate.split('-').reverse().join('-') %>
+                    <td>: <%= internship.startDate %>
                     </td>
                 </tr>
                 <tr>
                     <td><strong>Ending Date</strong></td>
-                    <td>: <%= internship.endingDate ? internship.endingDate.split('-').reverse().join('-') : 'N/A' %>
+                    <td>: <%= internship.endingDate ? internship.endingDate : 'N/A' %>
                     </td>
                 </tr>
                 <tr>
@@ -148,46 +148,287 @@
             style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Completion</button>
     </div>
 
-    <!-- Modal -->
-    <div id="completionModal"
-        style="display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
-        <div
-            style="background-color: #fefefe; margin: 15% auto; padding: 20px; border: 1px solid #888; width: 80%; max-width: 500px; border-radius: 8px;">
-            <span onclick="closeCompletionModal()"
-                style="color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer;">&times;</span>
-            <h2>Internship Completion</h2>
-
-            <div style="margin-bottom: 20px;">
-                <label>
-                    <input type="radio" name="completionType" value="withMarks" checked onchange="toggleMarksInput()">
-                    With Marks
-                </label>
-                <label style="margin-left: 20px;">
-                    <input type="radio" name="completionType" value="withoutMarks" onchange="toggleMarksInput()">
-                    Without Marks
-                </label>
+    <!-- Styled Modal -->
+    <div id="completionModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-headers">
+                <h2><i class="fas fa-award"></i> Completion Details</h2>
+                <span class="close-btn" onclick="closeCompletionModal()">&times;</span>
             </div>
 
-            <div id="marksInputSection">
-                <label for="marks">Marks (out of 50):</label>
-                <input type="number" id="marks" name="marks" min="0" max="50" step="0.01"
-                    style="width: 100%; padding: 8px; margin-top: 5px;">
-                <label for="grade" style="display: block; margin-top: 10px;">Grade:</label>
-                <input type="text" readonly id="grade" name="grade" style="width: 100%; padding: 8px; margin-top: 5px;">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="section-label">Certificate Type</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="completionType" value="withMarks" checked
+                                onchange="toggleMarksInput()">
+                            <span>With Marks</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="completionType" value="withoutMarks"
+                                onchange="toggleMarksInput()">
+                            <span>Without Marks</span>
+                        </label>
+                    </div>
+                </div>
+
+
+
+                <div id="marksInputSection">
+                    <div class="row-flex">
+                        <div class="col-half">
+                            <div class="form-group">
+                                <label for="marks">Marks (out of 50)</label>
+                                <input type="number" id="marks" class="form-control" name="marks" min="0" max="50"
+                                    step="0.01" placeholder="e.g. 45">
+                            </div>
+                        </div>
+                        <div class="col-half">
+                            <div class="form-group">
+                                <label for="grade">Grade</label>
+                                <input type="text" readonly id="grade" class="form-control readonly" name="grade"
+                                    placeholder="-">
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div style="margin-top: 20px; text-align: right;">
-                <button onclick="saveCompletionData()"
-                    style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Save
-                    & Print</button>
+            <div class="modal-footer">
+                <button onclick="closeCompletionModal()" class="btn btn-secondary">Cancel</button>
+                <button onclick="saveCompletionData()" class="btn btn-primary">
+                    <i class="fas fa-print"></i> Save & Print
+                </button>
             </div>
         </div>
     </div>
 
     <style>
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* Prevent body scroll if needed */
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 8vh auto;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            font-family: 'Open Sans', sans-serif;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-headers {
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: #fff;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-headers h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .close-btn {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 25px;
+            background-color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #eaedf0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            background-color: #fcfcfc;
+            color: #333;
+        }
+
+        .form-control:focus {
+            border-color: #4ca1af;
+            background-color: #fff;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(76, 161, 175, 0.1);
+        }
+
+        .form-control.readonly {
+            background-color: #f1f3f5;
+            color: #6c757d;
+            border-color: transparent;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+        }
+
+        .radio-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: #555;
+            position: relative;
+        }
+
+        .radio-option:hover {
+            background-color: #e9ecef;
+        }
+
+        .radio-option input {
+            transform: scale(1.2);
+            margin-right: 8px;
+            accent-color: #2c3e50;
+        }
+
+        .row-flex {
+            display: flex;
+            gap: 15px;
+        }
+
+        .col-half {
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #666;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f1f1f1;
+            border-color: #ccc;
+            color: #333;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 239, 125, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
         @media print {
-            .no-print {
-                display: none;
+
+            .no-print,
+            .modal-overlay {
+                display: none !important;
             }
         }
     </style>
@@ -200,10 +441,13 @@
 
         function openCompletionModal() {
             modal.style.display = "block";
+            // Prevent background scrolling
+            document.body.style.overflow = "hidden";
         }
 
         function closeCompletionModal() {
             modal.style.display = "none";
+            document.body.style.overflow = "auto";
         }
 
         window.onclick = function (event) {
@@ -221,6 +465,8 @@
                 gradeInput.value = '';
             } else {
                 inputSection.style.display = 'block';
+                // slight animation
+                inputSection.style.animation = "fadeIn 0.5s";
             }
         }
 
@@ -248,6 +494,8 @@
             let marks = null;
             let grade = null;
 
+
+
             if (type === 'withMarks') {
                 marks = parseFloat(marksInput.value);
                 grade = gradeInput.value;
@@ -261,6 +509,12 @@
                     return;
                 }
             }
+
+            // Show loading state
+            const btn = document.querySelector('.btn-primary');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
 
             try {
                 const response = await fetch('/update-marks/<%= internship._id %>', {
@@ -276,10 +530,14 @@
                     location.reload();
                 } else {
                     alert('Error saving data');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
                 }
             } catch (error) {
                 console.error('Error:', error);
                 alert('Error saving data');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
     </script>

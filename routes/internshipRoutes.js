@@ -51,11 +51,15 @@ router.get('/add', internshipController.getAddForm);
 router.post('/add', internshipController.createInternship);
 
 // Excel Upload
+router.get('/download-template', internshipController.downloadTemplate);
 router.post('/upload-excel', upload.single('excelFile'), internshipController.uploadExcel);
 
 // Update (Edit)
 router.get('/edit/:id', internshipController.getEditForm);
 router.post('/edit/:id', internshipController.updateInternship);
+
+// Complete Internship
+router.post('/complete/:id', internshipController.completeInternship);
 
 // Update Marks
 router.post('/update-marks/:id', internshipController.updateMarks);

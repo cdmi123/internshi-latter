@@ -149,8 +149,29 @@ exports.updateInternship = async (req, res) => {
 
 exports.updateMarks = async (req, res) => {
     try {
-        const { marks, grade } = req.body;
-        await Internship.findByIdAndUpdate(req.params.id, { marks, grade });
+        const { marks, grade, endingDate } = req.body;
+        console.log("updateMarks Request Body:", req.body);
+
+        const updateData = { marks, grade };
+
+        if (endingDate) {
+            // Ensure format consistency if needed, but standardizing on what we receive or what we want to store
+            // If receiving YYYY-MM-DD from date input, store as DD-MM-YYYY or keep YYYY-MM-DD.
+            // Existing data seems to use DD-MM-YYYY strings. Input type="date" gives YYYY-MM-DD.
+            if (endingDate.includes('-')) {
+                const p = endingDate.split('-');
+                if (p[0].length === 4) {
+                    updateData.endingDate = `${p[2]}-${p[1]}-${p[0]}`;
+                } else {
+                    updateData.endingDate = endingDate;
+                }
+            } else {
+                updateData.endingDate = endingDate;
+            }
+        }
+        console.log("Updata Data:", updateData);
+
+        await Internship.findByIdAndUpdate(req.params.id, updateData);
         res.json({ success: true });
     } catch (err) {
         console.error(err);
@@ -407,53 +428,234 @@ exports.uploadExcel = async (req, res) => {
             return res.status(400).send('Excel file is empty.');
         }
 
-        const internships = data.map(row => {
-            let wTime = (row['Working Time'] || row['workingTime'] || '6 hrs/day').toString().toLowerCase().trim();
-            // Check if it matches allowed patterns
-            if (wTime.includes('6')) wTime = '6 hrs/day';
-            else if (wTime.includes('4')) wTime = '4 hrs/day';
-            else wTime = ''; // Mark as invalid for filtering
+        const successRows = [];
+        const errorRows = [];
+        let rowNumber = 2; // Starting from row 2 (assuming header is row 1)
 
-            return {
-                startDate: row['Starting Date'] || row['startDate'] || '',
-                duration: row['Duration'] || row['duration'] || '',
-                endingDate: row['Ending Date'] || row['endingDate'] || '',
-                studentName: row['Student Name'] || row['studentName'] || '',
-                collegeName: row['College Name'] || row['collegeName'] || '',
-                address: row['Full Address'] || row['address'] || '',
-                internshipPosition: row['Internship Position'] || row['internshipPosition'] || '',
-                workingTime: wTime,
-                studentContactNo: row['Student Contact No'] || row['studentContactNo'] || '',
-                internFacultyName: row['Faculty Name'] || row['internFacultyName'] || '',
-                facultyContactNo: row['Faculty Contact No'] || row['facultyContactNo'] || '',
-                branch: (row['Branch'] || row['branch'] || 'yogichowk').toLowerCase().trim(),
-                status: 'active'
+        // Date Parsing Helper
+        const parseExcelDate = (input) => {
+            if (!input) return null;
+
+            // If it's a number (Excel date code)
+            if (typeof input === 'number') {
+                // Excel dates start from Dec 30, 1899
+                const date = new Date(Math.round((input - 25569) * 86400 * 1000));
+                return date;
+            }
+
+            // If it's a string (e.g., "DD-MM-YYYY" or "YYYY-MM-DD")
+            if (typeof input === 'string') {
+                const parts = input.split(/[-/.]/);
+                if (parts.length === 3) {
+                    // Check for DD-MM-YYYY (most common in India)
+                    // Heuristic: if first part is > 1900, it's YYYY-MM-DD
+                    if (parts[0].length === 4) {
+                        return new Date(parts[0], parts[1] - 1, parts[2]);
+                    } else {
+                        return new Date(parts[2], parts[1] - 1, parts[0]);
+                    }
+                }
+                return new Date(input);
+            }
+            return null;
+        };
+
+        const formatDateForDB = (dateObj) => {
+            if (!dateObj || isNaN(dateObj.getTime())) return null;
+            // We need simple string format or Date object? Schema says Date for 'date' and String for 'startDate'.
+            // Existing data has 'startDate' as format "DD-MM-YYYY" string (mostly).
+            // Let's stick to "YYYY-MM-DD" for better sorting or "DD-MM-YYYY" to match consistency.
+            // Looking at getStudentInternships, client expects startDate string.
+            // Let's use standard DD-MM-YYYY
+            const d = dateObj.getDate().toString().padStart(2, '0');
+            const m = (dateObj.getMonth() + 1).toString().padStart(2, '0');
+            const y = dateObj.getFullYear();
+            return `${d}-${m}-${y}`;
+        };
+
+
+        for (const row of data) {
+            const errors = [];
+
+            // Normalize Keys (handle case variations)
+            const getVal = (keys) => {
+                for (let k of keys) {
+                    if (row[k]) return row[k];
+                }
+                return null;
             };
-        });
 
-        // Validation - ensure required fields are present and workingTime is valid
-        const validInternships = internships.filter(i =>
-            i.studentName && i.startDate && i.duration && i.branch && (i.workingTime === '6 hrs/day' || i.workingTime === '4 hrs/day')
-        );
+            const studentName = getVal(['Student Name', 'studentName', 'Name']);
+            const applicationDateRaw = getVal(['Application Date', 'applicationDate', 'Date']);
+            const startDateRaw = getVal(['Starting Date', 'startDate', 'Start Date']);
+            const duration = getVal(['Duration', 'duration']);
+            const branch = getVal(['Branch', 'branch']);
+            const workingTimeRaw = getVal(['Working Time', 'workingTime']);
 
-        console.log(`Found ${internships.length} rows, ${validInternships.length} valid.`);
+            // Validations
+            if (!studentName) errors.push("Missing Student Name");
 
-        if (validInternships.length > 0) {
-            await Internship.insertMany(validInternships);
+            // Strict Date Validation
+            let startDateFormatted = null;
+            if (!startDateRaw) {
+                errors.push("Missing Starting Date");
+            } else {
+                const parsedDate = parseExcelDate(startDateRaw);
+                if (parsedDate && !isNaN(parsedDate.getTime())) {
+                    startDateFormatted = formatDateForDB(parsedDate);
+                } else {
+                    errors.push(`Invalid Starting Date: ${startDateRaw}`);
+                }
+            }
+
+            // Duration
+            if (!duration) errors.push("Missing Duration");
+
+            // Branch
+            const branchRaw = (branch || 'yogichowk').toString().toLowerCase().trim();
+
+            // Working Time
+            let workingTime = '6 hrs/day';
+            if (workingTimeRaw) {
+                const wt = workingTimeRaw.toString().toLowerCase();
+                if (wt.includes('4')) workingTime = '4 hrs/day';
+                else if (wt.includes('6')) workingTime = '6 hrs/day';
+                else errors.push("Invalid Working Time (must be 4 or 6 hrs)");
+            }
+
+            if (errors.length > 0) {
+                errorRows.push({ row: rowNumber, name: studentName || 'Unknown', errors: errors.join(', ') });
+            } else {
+                successRows.push({
+                    studentName: studentName,
+                    startDate: startDateFormatted,
+                    duration: duration,
+                    endingDate: getVal(['Ending Date', 'endingDate']) ? formatDateForDB(parseExcelDate(getVal(['Ending Date', 'endingDate']))) : '',
+                    collegeName: getVal(['College Name', 'collegeName']) || '',
+                    address: getVal(['Full Address', 'address']) || 'Surat',
+                    internshipPosition: getVal(['Internship Position', 'internshipPosition']) || 'Intern',
+                    workingTime: workingTime,
+                    studentContactNo: getVal(['Student Contact No', 'studentContactNo', 'Contact']) || '0000000000',
+                    internFacultyName: getVal(['Faculty Name', 'internFacultyName', 'Faculty']) || 'TBD',
+                    facultyContactNo: getVal(['Faculty Contact No', 'facultyContactNo']) || '0000000000',
+                    branch: branchRaw,
+                    status: 'active',
+                    date: parseExcelDate(applicationDateRaw) || new Date() // Use provided date or current date
+                });
+            }
+            rowNumber++;
         }
 
-        // Delete the uploaded file
+        // Insert Valid Rows
+        if (successRows.length > 0) {
+            await Internship.insertMany(successRows);
+        }
+
+        // Delete File
         if (fs.existsSync(filePath)) {
             fs.unlinkSync(filePath);
         }
 
-        res.redirect('/');
+        // Render with feedback
+        // Instead of simple redirect, we render the page with params or use flush
+        // For simplicity, we can pass query params or Render 'view-internships' directly with alert
+
+        // Re-fetching data for the view
+        const page = 1;
+        const limit = 20;
+        const totalRecords = await Internship.countDocuments({ status: { $ne: 'deleted' } });
+        const internships = await Internship.find({ status: { $ne: 'deleted' } })
+            .sort({ date: -1 })
+            .limit(limit);
+        const totalPages = Math.ceil(totalRecords / limit);
+        const uniqueFaculties = await Internship.distinct('internFacultyName', { status: { $ne: 'deleted' } });
+
+        // Stats
+        const allActive = await Internship.find({ status: { $ne: 'deleted' } });
+        const stats = {
+            total: totalRecords,
+            shift6: allActive.filter(i => i.workingTime === '6 hrs/day').length,
+            shift4: allActive.filter(i => i.workingTime === '4 hrs/day').length
+        };
+
+        res.render('view-internships', {
+            title: 'Internship List',
+            internships: internships,
+            stats: stats,
+            currentPage: page,
+            totalPages: totalPages,
+            limit: limit,
+            uniqueFaculties: uniqueFaculties.sort(),
+            selectedFaculty: '',
+            uploadResult: {
+                success: successRows.length,
+                failed: errorRows.length,
+                errors: errorRows
+            }
+        });
+
     } catch (err) {
         console.error("Error in uploadExcel:", err);
         if (req.file && fs.existsSync(req.file.path)) {
             fs.unlinkSync(req.file.path);
         }
         res.status(500).send('Error processing Excel file: ' + err.message);
+    }
+};
+
+// Download Excel Template
+exports.downloadTemplate = async (req, res) => {
+    try {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Template');
+
+        worksheet.columns = [
+            { header: 'Application Date', key: 'applicationDate', width: 15 },
+            { header: 'Student Name', key: 'studentName', width: 25 },
+            { header: 'Starting Date', key: 'startDate', width: 15 },
+            { header: 'Duration', key: 'duration', width: 15 },
+            { header: 'Ending Date', key: 'endingDate', width: 15 },
+            { header: 'College Name', key: 'collegeName', width: 25 },
+            { header: 'Full Address', key: 'address', width: 30 },
+            { header: 'Internship Position', key: 'internshipPosition', width: 25 },
+            { header: 'Working Time', key: 'workingTime', width: 15 },
+            { header: 'Student Contact No', key: 'studentContactNo', width: 15 },
+            { header: 'Faculty Name', key: 'internFacultyName', width: 20 },
+            { header: 'Faculty Contact No', key: 'facultyContactNo', width: 15 },
+            { header: 'Branch', key: 'branch', width: 15 }
+        ];
+
+        // Add a sample row
+        worksheet.addRow({
+            applicationDate: '01-01-2024',
+            studentName: 'John Doe',
+            startDate: '01-01-2024',
+            duration: '6 Months',
+            endingDate: '30-06-2024',
+            collegeName: 'XYZ College',
+            address: '123, Main St, Surat',
+            internshipPosition: 'Web Developer',
+            workingTime: '6 hrs/day',
+            studentContactNo: '9876543210',
+            internFacultyName: 'Dr. Smith',
+            facultyContactNo: '9123456780',
+            branch: 'Yogichowk'
+        });
+
+        // Add instructions
+        worksheet.addRow({});
+        const noteRow = worksheet.addRow(['Note: Date format should be DD-MM-YYYY or Excel Date format. Working Time should be "6 hrs/day" or "4 hrs/day".']);
+        noteRow.font = { italic: true, color: { argb: 'FF888888' } };
+
+        res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        res.setHeader('Content-Disposition', 'attachment; filename=Internship_Bulk_Upload_Template.xlsx');
+
+        await workbook.xlsx.write(res);
+        res.end();
+
+    } catch (err) {
+        console.error("Error generating template:", err);
+        res.status(500).send('Server Error');
     }
 };
 
@@ -517,6 +719,32 @@ exports.deleteLogbookEntry = async (req, res) => {
         }
     } catch (err) {
         console.error("Error deleting logbook entry:", err);
+        res.status(500).send('Server Error');
+    }
+};
+
+// Complete Internship (Update End Date)
+exports.completeInternship = async (req, res) => {
+    try {
+        const { endingDate } = req.body;
+
+        // Standardize Date Format
+        let formattedDate = endingDate;
+        if (endingDate && endingDate.includes('-')) {
+            const p = endingDate.split('-');
+            // Input date YYYY-MM-DD -> DD-MM-YYYY (if needed by DB convention)
+            // However, checking existing data, if we want consistency with upload which uses DD-MM-YYYY
+            // But input type="date" gives YYYY-MM-DD.
+            // Let's store as DD-MM-YYYY to match what seems to be the preferred string format in this app
+            if (p[0].length === 4) {
+                formattedDate = `${p[2]}-${p[1]}-${p[0]}`;
+            }
+        }
+
+        await Internship.findByIdAndUpdate(req.params.id, { endingDate: formattedDate });
+        res.redirect('/');
+    } catch (err) {
+        console.error("Error completing internship:", err);
         res.status(500).send('Server Error');
     }
 };

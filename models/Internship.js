@@ -23,7 +23,7 @@ const internshipSchema = new mongoose.Schema({
     },
     collegeName: {
         type: String,
-        required: true
+        required: false
     },
     address: {
         type: String,
