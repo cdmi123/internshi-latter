@@ -265,14 +265,24 @@
                                             </form>
                                         </div>
                                         <div class="col-md-8">
-                                            <div class="input-group shadow-sm rounded-pill overflow-hidden">
-                                                <span class="input-group-text bg-white border-0 ps-4">
-                                                    <i class="fas fa-search text-muted"></i>
-                                                </span>
-                                                <input type="text" id="dashboardSearch"
-                                                    class="form-control border-0 py-2"
-                                                    placeholder="Search by name, position, or other details...">
-                                            </div>
+                                            <form action="/" method="GET">
+                                                <% if (typeof selectedFaculty !=='undefined' && selectedFaculty) { %>
+                                                    <input type="hidden" name="faculty" value="<%= selectedFaculty %>">
+                                                    <% } %>
+                                                        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                                                            <span class="input-group-text bg-white border-0 ps-4">
+                                                                <i class="fas fa-search text-muted"></i>
+                                                            </span>
+                                                            <input type="text" id="dashboardSearch" name="search"
+                                                                class="form-control border-0 py-2"
+                                                                placeholder="Search all records..."
+                                                                value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+                                                            <button type="submit" class="btn btn-white border-0"
+                                                                aria-label="Search">
+                                                                <!-- Hidden submit button or just enter key works -->
+                                                            </button>
+                                                        </div>
+                                            </form>
                                         </div>
                                     </div>
 
@@ -365,37 +375,53 @@
         <script>
             document.addEventListener('DOMContentLoaded', function () {
                 const searchInput = document.getElementById('dashboardSearch');
-                const tableRows = document.querySelectorAll('.application-row');
-                const noResultsRow = document.getElementById('noResultsRow');
+                const tableBody = document.getElementById('internshipTableBody');
+
+                // Debounce function
+                function debounce(func, wait) {
+                    let timeout;
+                    return function (...args) {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => func.apply(this, args), wait);
+                    };
+                }
 
                 if (searchInput) {
-                    searchInput.addEventListener('input', function () {
-                        const query = this.value.toLowerCase().trim();
-                        let hasVisibleRows = false;
+                    const form = searchInput.closest('form');
 
-                        tableRows.forEach(row => {
-                            const name = row.querySelector('.student-name').textContent.toLowerCase();
-                            const contact = row.querySelector('.student-contact').textContent.toLowerCase();
-                            const position = row.querySelector('.internship-position').textContent.toLowerCase();
-                            const branch = row.querySelector('.branch-name').textContent.toLowerCase();
-                            const faculty = row.querySelector('.faculty-name').textContent.toLowerCase();
-
-                            if (name.includes(query) || contact.includes(query) ||
-                                position.includes(query) || branch.includes(query) ||
-                                faculty.includes(query)) {
-                                row.style.display = '';
-                                hasVisibleRows = true;
-                            } else {
-                                row.style.display = 'none';
-                            }
-                        });
-
-                        if (noResultsRow) {
-                            noResultsRow.style.display = hasVisibleRows || query === '' ? 'none' : '';
-                        }
+                    // Prevent default form submission on enter
+                    form.addEventListener('submit', function (e) {
+                        e.preventDefault();
                     });
+
+                    const performSearch = async () => {
+                        const query = searchInput.value;
+                        const facultyInput = form.querySelector('input[name="faculty"]');
+                        const faculty = facultyInput ? facultyInput.value : '';
+
+                        try {
+                            const res = await fetch(`/?search=${encodeURIComponent(query)}&faculty=${encodeURIComponent(faculty)}&ajax=true`);
+                            if (res.ok) {
+                                const html = await res.text();
+                                tableBody.innerHTML = html;
+
+                                // Update URL parameters without Page Refresh
+                                const params = new URLSearchParams(window.location.search);
+                                if (query) params.set('search', query);
+                                else params.delete('search');
+
+                                const newUrl = `${window.location.pathname}?${params.toString()}`;
+                                window.history.pushState({ path: newUrl }, '', newUrl);
+                            }
+                        } catch (err) {
+                            console.error('Search failed', err);
+                        }
+                    };
+
+                    searchInput.addEventListener('input', debounce(performSearch, 300));
                 }
             });
+
 
             async function openLogbookModal(contactNo, studentName) {
                 const modal = new bootstrap.Modal(document.getElementById('logbookModal'));

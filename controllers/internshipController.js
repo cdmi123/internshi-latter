@@ -21,22 +21,41 @@ exports.getAllInternships = async (req, res) => {
             query.internFacultyName = { $regex: selectedFaculty, $options: 'i' };
         }
 
+        const searchQuery = req.query.search || '';
+        if (searchQuery) {
+            const searchRegex = { $regex: searchQuery, $options: 'i' };
+            query.$or = [
+                { studentName: searchRegex },
+                { internshipPosition: searchRegex },
+                { collegeName: searchRegex },
+                { studentContactNo: searchRegex },
+                { branch: searchRegex }
+            ];
+        }
+
         const totalRecords = await Internship.countDocuments(query);
         const internships = await Internship.find(query)
-            .sort({ date: -1 })
+            .sort({ _id: -1 })
             .skip(skip)
             .limit(limit);
 
         const totalPages = Math.ceil(totalRecords / limit);
 
+        // AJAX Request: Return only the rows
+        if (req.query.ajax) {
+            return res.render('partials/internship-rows', { internships: internships }, (err, html) => {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Error rendering partial');
+                }
+                res.send(html);
+            });
+        }
+
         // Get Unique Faculties for Dropdown (from ACTIVE records only)
         const uniqueFaculties = await Internship.distinct('internFacultyName', { status: { $ne: 'deleted' } });
 
-        // Calculate Stats for all active records (not just current page)
-        // Note: Stats usually show GLOBAL stats, but if filtered, maybe show filtered stats?
-        // Let's keep stats global for now as per dashboard convention, or we can make them filtered.
-        // User asked for "filtering faculty name wise set". Usually dashboard stats remain global or adjust.
-        // Let's filter stats too if a filter is active to be consistent.
+        // Calculate Stats for all active records
         const allActiveInternships = await Internship.find(query);
         const stats = {
             total: totalRecords,
@@ -52,7 +71,8 @@ exports.getAllInternships = async (req, res) => {
             totalPages: totalPages,
             limit: limit,
             uniqueFaculties: uniqueFaculties.sort(),
-            selectedFaculty: selectedFaculty
+            selectedFaculty: selectedFaculty,
+            searchQuery: searchQuery
         });
     } catch (err) {
         console.error("Error in getAllInternships:", err);
@@ -565,7 +585,7 @@ exports.uploadExcel = async (req, res) => {
         const limit = 20;
         const totalRecords = await Internship.countDocuments({ status: { $ne: 'deleted' } });
         const internships = await Internship.find({ status: { $ne: 'deleted' } })
-            .sort({ date: -1 })
+            .sort({ _id: -1 })
             .limit(limit);
         const totalPages = Math.ceil(totalRecords / limit);
         const uniqueFaculties = await Internship.distinct('internFacultyName', { status: { $ne: 'deleted' } });
