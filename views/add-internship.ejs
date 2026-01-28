@@ -93,6 +93,7 @@
                                                 Branch & Internship Details
                                             </h5>
                                             <div class="row g-4">
+                                                <!-- Branch -->
                                                 <div class="col-md-6">
                                                     <div class="shadow-sm rounded bg-white px-3 border d-flex align-items-center"
                                                         style="height: 58px;">
@@ -113,6 +114,8 @@
                                                         </select>
                                                     </div>
                                                 </div>
+
+                                                <!-- Position -->
                                                 <div class="col-md-6">
                                                     <div class="form-floating shadow-sm rounded">
                                                         <input type="text" class="form-control border-0"
@@ -122,10 +125,22 @@
                                                         <label for="internshipPosition">Position / Role</label>
                                                     </div>
                                                 </div>
+
+                                                <!-- Start Date -->
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="date" class="form-control border-0" id="startDate"
+                                                            name="startDate" placeholder="Starting Date"
+                                                            value="<%= formData.startDate || '' %>" required>
+                                                        <label for="startDate">Starting Date</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Working Time (Radio Buttons) -->
                                                 <div class="col-md-6">
                                                     <div class="shadow-sm rounded bg-white px-3 border d-flex align-items-center justify-content-center"
                                                         style="height: 58px;">
-                                                        <div class="d-flex gap-4">
+                                                        <div class="d-flex gap-3">
                                                             <div class="form-check mb-0">
                                                                 <input class="form-check-input" type="radio"
                                                                     name="workingTime" id="time6" value="6 hrs/day"
@@ -142,25 +157,65 @@
                                                                 <label class="form-check-label small fw-medium"
                                                                     for="time4">4 Hrs</label>
                                                             </div>
+                                                            <div class="form-check mb-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="workingTime" id="time2" value="2 hrs/day"
+                                                                    <%=(formData.workingTime==='2 hrs/day' ) ? 'checked'
+                                                                    : '' %>>
+                                                                <label class="form-check-label small fw-medium"
+                                                                    for="time2">2 Hrs</label>
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-floating shadow-sm rounded">
-                                                        <input type="date" class="form-control border-0" id="startDate"
-                                                            name="startDate" placeholder="Starting Date"
-                                                            value="<%= formData.startDate || '' %>" required>
-                                                        <label for="startDate">Starting Date</label>
+
+                                                <!-- Calculation Mode & Dynamic Inputs -->
+                                                <div class="col-12">
+                                                    <div class="bg-light p-3 rounded shadow-sm border mb-3">
+                                                        <label class="fw-bold text-muted small mb-2 d-block">Calculation
+                                                            Mode</label>
+                                                        <div class="d-flex gap-4">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="calcMode" id="modeMonth" value="month"
+                                                                    checked>
+                                                                <label class="form-check-label" for="modeMonth">Month
+                                                                    Wise</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="calcMode" id="modeHours" value="hours">
+                                                                <label class="form-check-label" for="modeHours">Hours
+                                                                    Wise</label>
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div class="col-md-6">
+
+                                                <!-- Month Wise: Month Input -->
+                                                <div class="col-md-6" id="monthInputDiv">
                                                     <div class="form-floating shadow-sm rounded">
-                                                        <input type="text" class="form-control border-0" id="duration"
-                                                            name="duration" placeholder="Duration"
-                                                            value="<%= formData.duration || '' %>" required>
-                                                        <label for="duration">Duration (Hours)</label>
+                                                        <input type="number" class="form-control border-0"
+                                                            id="durationMonths" placeholder="No. of Months" min="1"
+                                                            max="24">
+                                                        <label for="durationMonths">Number of Months</label>
                                                     </div>
                                                 </div>
+
+                                                <!-- Hours Wise: Total Hours Input -->
+                                                <div class="col-md-6" id="hoursInputDiv" style="display: none;">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="number" class="form-control border-0"
+                                                            id="totalHours" placeholder="Total Hours">
+                                                        <label for="totalHours">Total Hours</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Hidden Actual Duration Field (to store final string like "3 Months" or "120 Hours") -->
+                                                <input type="hidden" name="duration" id="finalDuration"
+                                                    value="<%= formData.duration || '' %>">
+
+                                                <!-- Ending Date -->
                                                 <div class="col-md-6">
                                                     <div class="form-floating shadow-sm rounded bg-light">
                                                         <input type="text" class="form-control border-0 bg-light"
@@ -215,38 +270,93 @@
                                     <!-- Auto Calculation Script -->
                                     <script>
                                         const startDateInput = document.getElementById('startDate');
-                                        const durationInput = document.getElementById('duration');
+                                        const endingDateInput = document.getElementById('endingDate');
                                         const workingTimeInputs = document.getElementsByName('workingTime');
-                                        const endingDateInput = document.getElementById('endingDate'); // We need to add this field first
 
-                                        function calculateEndDate() {
-                                            const startDateVal = startDateInput.value;
-                                            const durationVal = parseInt(durationInput.value);
-                                            let workingTimeVal = 0;
+                                        // Mode & Dynamic Inputs
+                                        const modeMonth = document.getElementById('modeMonth');
+                                        const modeHours = document.getElementById('modeHours');
+                                        const monthInputDiv = document.getElementById('monthInputDiv');
+                                        const hoursInputDiv = document.getElementById('hoursInputDiv');
+                                        const durationMonthsInput = document.getElementById('durationMonths');
+                                        const totalHoursInput = document.getElementById('totalHours');
+                                        const finalDuration = document.getElementById('finalDuration');
 
+                                        function toggleMode() {
+                                            if (modeHours.checked) {
+                                                monthInputDiv.style.display = 'none';
+                                                hoursInputDiv.style.display = 'block';
+                                                durationMonthsInput.value = ''; // Reset months
+                                            } else {
+                                                monthInputDiv.style.display = 'block';
+                                                hoursInputDiv.style.display = 'none';
+                                                totalHoursInput.value = ''; // Reset hours
+                                            }
+                                            calculate();
+                                        }
+
+                                        function calculate() {
+                                            const startStr = startDateInput.value;
+                                            if (!startStr) return;
+                                            const start = new Date(startStr);
+
+                                            // 1. Get Selected Shift
+                                            let shift = 0;
                                             for (const radio of workingTimeInputs) {
                                                 if (radio.checked) {
-                                                    workingTimeVal = parseInt(radio.value);
+                                                    shift = parseInt(radio.value);
                                                     break;
                                                 }
                                             }
 
-                                            if (startDateVal && durationVal && workingTimeVal) {
-                                                const start = new Date(startDateVal);
-                                                const days = Math.ceil(durationVal / workingTimeVal);
-                                                start.setDate(start.getDate() + days);
+                                            // 2. Mode Logic
+                                            if (modeMonth.checked) {
+                                                const months = parseInt(durationMonthsInput.value);
+                                                if (months && months > 0) {
+                                                    finalDuration.value = months + (months === 1 ? ' Month' : ' Months');
 
-                                                // Format to YYYY-MM-DD
-                                                const year = start.getFullYear();
-                                                const month = String(start.getMonth() + 1).padStart(2, '0');
-                                                const day = String(start.getDate()).padStart(2, '0');
-                                                endingDateInput.value = `${year}-${month}-${day}`;
+                                                    // Add months
+                                                    start.setMonth(start.getMonth() + months);
+
+                                                    // Handle day overflow (e.g., Jan 31 + 1 mo -> Feb 28/29)
+                                                    // JS setMonth handles this locally but might skip months. 
+                                                    // Standard busines logic: Jan 31 + 1m = Feb 28.
+                                                    // For simple JS:
+                                                    // Note: new Date('2023-01-31').setMonth(1) -> March 2/3.
+                                                    // If we want "start date + N months", we should check day.
+
+                                                    updateDate(start);
+                                                }
+                                            } else {
+                                                // Hours Mode
+                                                const totalHrs = parseInt(totalHoursInput.value);
+                                                if (totalHrs && totalHrs > 0 && shift > 0) {
+                                                    finalDuration.value = totalHrs + ' Hours';
+
+                                                    const days = Math.ceil(totalHrs / shift);
+                                                    start.setDate(start.getDate() + days);
+                                                    updateDate(start);
+                                                }
                                             }
                                         }
 
-                                        startDateInput.addEventListener('change', calculateEndDate);
-                                        durationInput.addEventListener('input', calculateEndDate);
-                                        workingTimeInputs.forEach(radio => radio.addEventListener('change', calculateEndDate));
+                                        function updateDate(dateObj) {
+                                            const y = dateObj.getFullYear();
+                                            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+                                            const d = String(dateObj.getDate()).padStart(2, '0');
+                                            endingDateInput.value = `${y}-${m}-${d}`;
+                                        }
+
+                                        // Listeners
+                                        document.querySelectorAll('input[name="calcMode"]').forEach(el => el.addEventListener('change', toggleMode));
+
+                                        startDateInput.addEventListener('change', calculate);
+                                        durationMonthsInput.addEventListener('input', calculate);
+                                        totalHoursInput.addEventListener('input', calculate);
+                                        workingTimeInputs.forEach(r => r.addEventListener('change', calculate));
+
+                                        // Init
+                                        toggleMode();
                                     </script>
                         </div>
                     </div>

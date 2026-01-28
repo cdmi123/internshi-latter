@@ -71,9 +71,11 @@
                     <strong><%- internship.grade %></strong> and marks <strong><%- internship.marks %></strong> out of
                     50 for <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web
                         Infotech</strong> from <strong>
-                        <%= internship.startDate ? internship.startDate : 'N/A' %>
+                        <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
                     </strong> to <strong>
-                        <%= internship.endingDate ? internship.endingDate : 'N/A' %>
+                        <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                            internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
                     </strong> .
                 </p>
                 <% } else { %>
@@ -81,9 +83,11 @@
                                 internship.collegeName %></strong>, has successfully completed an internship as a
                         <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web Infotech</strong>
                         from <strong>
-                            <%= internship.startDate ? internship.startDate : 'N/A' %>
+                            <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                                internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
                         </strong> to <strong>
-                            <%= internship.endingDate ? internship.endingDate : 'N/A' %>
+                            <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                                internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
                         </strong> .
                     </p>
                     <% } %>
@@ -104,12 +108,14 @@
                 </tr>
                 <tr>
                     <td><strong>Starting Date</strong></td>
-                    <td>: <%= internship.startDate %>
+                    <td>: <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
                     </td>
                 </tr>
                 <tr>
                     <td><strong>Ending Date</strong></td>
-                    <td>: <%= internship.endingDate ? internship.endingDate : 'N/A' %>
+                    <td>: <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                            internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
                     </td>
                 </tr>
                 <tr>

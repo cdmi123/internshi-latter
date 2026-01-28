@@ -35,7 +35,7 @@ const internshipSchema = new mongoose.Schema({
     },
     workingTime: {
         type: String,
-        enum: ['6 hrs/day', '4 hrs/day'],
+        enum: ['6 hrs/day', '4 hrs/day', '2 hrs/day'],
         required: true
     },
     studentContactNo: {

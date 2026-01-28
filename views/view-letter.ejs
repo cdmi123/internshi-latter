@@ -83,11 +83,12 @@
                 </tr>
                 <tr>
                     <td><strong>Duration</strong></td>
-                    <td>: <%- internship.duration %> Hours</td>
+                    <td>: <%- internship.duration %></td>
                 </tr>
                 <tr>
                     <td><strong>Starting Date</strong></td>
-                    <td>: <%= internship.startDate.split('-').reverse().join('-') %>
+                    <td>: <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
                     </td>
                 </tr>
                 <tr>
