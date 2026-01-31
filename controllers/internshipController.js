@@ -768,3 +768,33 @@ exports.completeInternship = async (req, res) => {
         res.status(500).send('Server Error');
     }
 };
+
+// Toggle Status (Joining, Completion, Logbook)
+exports.toggleStatus = async (req, res) => {
+    try {
+        const { type } = req.query; // 'joining', 'completion', 'logbook'
+        const internship = await Internship.findById(req.params.id);
+
+        if (!internship) {
+            return res.status(404).json({ success: false, error: 'Internship not found' });
+        }
+
+        let updateField = {};
+        if (type === 'joining') {
+            updateField.joiningLetterGiven = !internship.joiningLetterGiven;
+        } else if (type === 'completion') {
+            updateField.completionLetterGiven = !internship.completionLetterGiven;
+        } else if (type === 'logbook') {
+            updateField.logbookGiven = !internship.logbookGiven;
+        } else {
+            return res.status(400).json({ success: false, error: 'Invalid type' });
+        }
+
+        await Internship.findByIdAndUpdate(req.params.id, updateField);
+        res.json({ success: true, newState: updateField });
+
+    } catch (err) {
+        console.error("Error toggling status:", err);
+        res.status(500).json({ success: false, error: 'Server Error' });
+    }
+};

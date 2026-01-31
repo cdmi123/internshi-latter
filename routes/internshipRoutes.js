@@ -64,6 +64,9 @@ router.post('/complete/:id', internshipController.completeInternship);
 // Update Marks
 router.post('/update-marks/:id', internshipController.updateMarks);
 
+// Toggle Status (AJAX)
+router.post('/toggle-status/:id', internshipController.toggleStatus);
+
 // Delete
 router.get('/delete/:id', internshipController.deleteInternship);
 

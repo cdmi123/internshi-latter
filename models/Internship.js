@@ -65,6 +65,18 @@ const internshipSchema = new mongoose.Schema({
         type: String,
         enum: ['active', 'deleted'],
         default: 'active'
+    },
+    joiningLetterGiven: {
+        type: Boolean,
+        default: false
+    },
+    completionLetterGiven: {
+        type: Boolean,
+        default: false
+    },
+    logbookGiven: {
+        type: Boolean,
+        default: false
     }
 });
 
