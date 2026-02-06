@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Offer Letter - <%- internship.studentName %></title>
+    <link rel="stylesheet" href="/css/latter.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="page">
+        <!-- Watermark -->
+        <div class="watermark">
+            <img src="/logo.png" alt="Watermark">
+        </div>
+
+        <!-- Header -->
+        <header>
+            <div class="logo-section">
+                <img src="/logo.png" alt="Creative Web Infotech" class="company-logo">
+            </div>
+            <div class="contact-info">
+                <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
+                <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
+                        internship.facultyContactNo.slice(5) %></p>
+                <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+            </div>
+        </header>
+
+        <div class="yellow-divider"></div>
+
+        <h2 class="document-title">Internship Offer Letter</h2>
+
+        <div class="date-section">
+            <p><strong>Date : <%= new Date(internship.date).getDate().toString().padStart(2, '0' ) %>-<%= (new
+                            Date(internship.date).getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new
+                                Date(internship.date).getFullYear() %></strong></p>
+        </div>
+
+        <div class="recipient-details">
+            <p><strong>To,</strong></p>
+            <p><strong><%- internship.studentName %></strong></p>
+            <p><%- internship.collegeName %></p>
+            <p><strong>Address :</strong>
+                <% let addr=internship.address; if (addr.length> 30) {
+                    let splitIndex = addr.lastIndexOf(' ', 30);
+                    if (splitIndex === -1) splitIndex = 30;
+                    let firstLine = addr.substring(0, splitIndex);
+                    let secondLine = addr.substring(splitIndex).trim();
+                    %>
+                    <%- firstLine %><br><%- secondLine %>
+                            <% } else { %>
+                                <%- addr %>
+                                    <% } %>
+            </p>
+            <p><strong>Mob no :</strong>+91 <%- internship.studentContactNo.slice(0, 5) + ' ' +
+                    internship.studentContactNo.slice(5) %></p>
+        </div>
+
+        <div class="letter-body">
+            <p><strong>Dear <%- internship.studentName %>,</strong></p>
+            <p>It gives me great pleasure to inform you that <strong>Creative Web Infotech</strong> has Join you as
+                an
+                <strong><%- internship.internshipPosition %></strong> to be based in Surat. This is non-payable
+                internship, so no
+                stipend will be provided during the internship period.
+            </p>
+        </div>
+
+        <div class="internship-details">
+            <p><strong>Details of the Internship are as follow:</strong></p>
+            <table>
+                <tr>
+                    <td><strong>Internship Position</strong></td>
+                    <td>: <%- internship.internshipPosition %></td>
+                </tr>
+                <tr>
+                    <td><strong>Duration</strong></td>
+                    <td>: <%- internship.duration %></td>
+                </tr>
+                <tr>
+                    <td><strong>Starting Date</strong></td>
+                    <td>: <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Working Time</strong></td>
+                    <td>: <%- internship.workingTime %></td>
+                </tr>
+                <tr>
+                    <td><strong>Reporting to</strong></td>
+                    <td>: <%- internship.internFacultyName %></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="declaration">
+            <p><strong>Student declaration and acceptance of offer:</strong></p>
+            <p>I have read the terms and conditions and information regarding my internship offer letter. I affirm
+                that
+                I accept the offer and will join the above-mentioned company on said date.</p>
+        </div>
+
+
+
+        <footer>
+            <div class="signatures">
+                <div class="sign-box">
+                    <div class="line"></div>
+                    <p><strong>Intern Sign</strong></p>
+                </div>
+                <div class="sign-box">
+                    <div class="line"></div>
+                    <p><strong>Creative Web Infotech</strong></p>
+                </div>
+            </div>
+            <div class="footer-line"></div>
+            <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
+            <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
+        </footer>
+    </div>
+
+</body>
+
+</html>

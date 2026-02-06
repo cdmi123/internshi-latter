@@ -1,0 +1,300 @@
+<%- include('partials/header') %>
+    <%- include('partials/sidebar') %>
+
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Manage Logbook</h2>
+                    <p class="text-muted mb-0">
+                        <%= internship.studentName %> - <%= internship.internshipPosition %>
+                    </p>
+                </div>
+                <a href="/" class="btn btn-outline-secondary rounded-pill px-4">
+                    <i class="fas fa-arrow-left me-2"></i> Back
+                </a>
+            </div>
+
+            <div class="row g-4">
+                <!-- Add New Entry Form -->
+                <div class="col-lg-4">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div class="card-header bg-white border-bottom py-3">
+                            <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-plus-circle me-2"></i>Add New Week
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <form action="/logbook-manage/<%= internship._id %>/add" method="POST">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">Week No</label>
+                                    <input type="number" name="weekNo" class="form-control" required min="1"
+                                        placeholder="e.g. 1">
+                                </div>
+                                <div class="row g-2 mb-3">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-muted">Start Date</label>
+                                        <input type="date" readonly name="startDate" class="form-control" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-bold text-muted">End Date</label>
+                                        <input type="date" readonly name="endDate" class="form-control" required>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">Task Name (Assigned)</label>
+                                    <textarea name="taskAssigned" class="form-control" rows="2" required
+                                        placeholder="Describe the assigned task"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">Completion Task</label>
+                                    <textarea name="taskCompleted" class="form-control" rows="3" required
+                                        placeholder="Describe what was completed"></textarea>
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">Technology / Tools Used</label>
+                                    <input type="text" name="technology" class="form-control" required
+                                        placeholder="e.g. Node.js, HTML, VS Code">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label small fw-bold text-muted">No. of Hours Completed</label>
+                                    <input type="number" name="hours" class="form-control" value="36" required>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary rounded-pill">Add Entry</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Existing Entries List -->
+                <div class="col-lg-8">
+                    <div class="card border-0 shadow-sm rounded-4 h-100">
+                        <div
+                            class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="mb-0 fw-bold text-dark"><i class="fas fa-list-ul me-2"></i>Weekly Logbook Entries
+                            </h6>
+                            <a href="/logbook/<%= internship._id %>" class="btn btn-success btn-sm rounded-pill px-3">
+                                <i class="fas fa-file-excel me-2"></i>Download Excel
+                            </a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="bg-light">
+                                        <tr>
+                                            <th class="px-3 py-3" style="width: 80px;">Week</th>
+                                            <th class="px-3 py-3" style="width: 150px;">Date Range</th>
+                                            <th class="px-3 py-3">Task / Technology</th>
+                                            <th class="px-3 py-3 text-center">Hours</th>
+                                            <th class="px-3 py-3 text-end">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <% if (logbookEntries.length> 0) { %>
+                                            <% logbookEntries.forEach(entry=> { %>
+                                                <tr>
+                                                    <td class="px-3 fw-bold text-center bg-light">
+                                                        <%= entry.weekNo %>
+                                                    </td>
+                                                    <td class="px-3 small text-muted">
+                                                        <div>
+                                                            <%= new Date(entry.startDate).toLocaleDateString() %>
+                                                        </div>
+                                                        <div class="text-center">to</div>
+                                                        <div>
+                                                            <%= new Date(entry.endDate).toLocaleDateString() %>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-3">
+                                                        <div class="fw-bold text-dark mb-1">
+                                                            <%= entry.taskAssigned %>
+                                                        </div>
+                                                        <p class="small text-muted mb-1 text-truncate"
+                                                            style="max-width: 300px;">
+                                                            <%= entry.taskCompleted %>
+                                                        </p>
+                                                        <span class="badge bg-soft-info text-info">
+                                                            <%= entry.technology %>
+                                                        </span>
+                                                    </td>
+                                                    <td class="px-3 text-center fw-bold text-secondary">
+                                                        <%= entry.hours %>
+                                                    </td>
+                                                    <td class="px-3 text-end">
+                                                        <a href="/logbook-manage/delete/<%= entry._id %>"
+                                                            class="btn btn-outline-danger btn-sm border-0"
+                                                            onclick="return confirm('Delete this week entry?')"
+                                                            title="Delete">
+                                                            <i class="fas fa-trash"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                                <% }) %>
+                                                    <% } else { %>
+                                                        <tr>
+                                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                                <i
+                                                                    class="fas fa-clipboard-list fa-3x mb-3 opacity-25"></i>
+                                                                <p>No logbook entries added yet.</p>
+                                                            </td>
+                                                        </tr>
+                                                        <% } %>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const weekInput = document.querySelector('input[name="weekNo"]');
+                    const startDateInput = document.querySelector('input[name="startDate"]');
+                    const endDateInput = document.querySelector('input[name="endDate"]');
+
+                    // Get internship dates from server-side
+                    const internshipStartStr = "<%= internship.startDate %>"; // Expected format: YYYY-MM-DD or DD-MM-YYYY
+                    const internshipEndStr = "<%= internship.endingDate %>";
+
+                    function parseDate(dateStr) {
+                        if (!dateStr) return null;
+                        const parts = dateStr.split('-');
+                        if (parts.length === 3) {
+                            // Check if parts[0] is year (YYYY-MM-DD)
+                            if (parts[0].length === 4) {
+                                return new Date(parts[0], parts[1] - 1, parts[2]);
+                            }
+                            // Assume DD-MM-YYYY
+                            return new Date(parts[2], parts[1] - 1, parts[0]);
+                        }
+                        return new Date(dateStr);
+                    }
+
+                    const internshipStart = parseDate(internshipStartStr);
+                    // internshipEnd might be null/empty, handle gracefully
+                    let internshipEnd = internshipEndStr ? parseDate(internshipEndStr) : null;
+
+                    weekInput.addEventListener('input', function () {
+                        if (!this.value || !internshipStart) return;
+
+                        const weekNo = parseInt(this.value);
+                        if (isNaN(weekNo) || weekNo < 1) return;
+
+                        // Calculate Start Date for the week
+                        // Week 1 starts at internshipStart
+                        // Week 2 starts at internshipStart + 7 days, etc.
+                        const weekStartDate = new Date(internshipStart);
+                        weekStartDate.setDate(weekStartDate.getDate() + (weekNo - 1) * 7);
+
+                        // Calculate End Date (Start Date + 6 days)
+                        const weekEndDate = new Date(weekStartDate);
+                        weekEndDate.setDate(weekEndDate.getDate() + 6);
+
+
+                        // Check if Week Start Date is beyond Internship End Date
+                        if (internshipEnd && weekStartDate > internshipEnd) {
+                            // Calculate max possible weeks
+                            const diffTime = Math.abs(internshipEnd - internshipStart);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            const maxWeeks = Math.ceil(diffDays / 7);
+
+                            // Auto-set the week number to the last valid week
+                            weekInput.value = maxWeeks;
+
+                            // Recalculate dates for maxWeeks
+                            weekStartDate.setTime(internshipStart.getTime());
+                            weekStartDate.setDate(weekStartDate.getDate() + (maxWeeks - 1) * 7);
+
+                            weekEndDate.setTime(weekStartDate.getTime());
+                            weekEndDate.setDate(weekEndDate.getDate() + 6);
+                        }
+
+                        // Check if Week End Date is beyond Internship End Date
+                        if (internshipEnd && weekEndDate > internshipEnd) {
+                            weekEndDate.setTime(internshipEnd.getTime());
+                        }
+
+                        // Helper to format date as YYYY-MM-DD in Local Time
+                        function toLocalDateString(date) {
+                            const year = date.getFullYear();
+                            const month = String(date.getMonth() + 1).padStart(2, '0');
+                            const day = String(date.getDate()).padStart(2, '0');
+                            return `${year}-${month}-${day}`;
+                        }
+
+                        // Update Inputs (Format YYYY-MM-DD for date input)
+                        startDateInput.value = toLocalDateString(weekStartDate);
+                        endDateInput.value = toLocalDateString(weekEndDate);
+
+                        // --- 120 Hours Auto-Distribution Logic ---
+                        // 1. Calculate Total Max Weeks for the internship
+                        let totalWeeks = 1;
+                        if (internshipEnd) {
+                            const diffTime = Math.abs(internshipEnd - internshipStart);
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            totalWeeks = Math.ceil(diffDays / 7);
+                        }
+                        if (totalWeeks < 1) totalWeeks = 1;
+
+                        // 2. Deterministic Random Generator (Seeded by Internship ID)
+                        // This ensures the hours for "Week 1" are always the same for this student
+                        const seedStr = "<%= internship._id %>";
+                        let seed = 0;
+                        for (let i = 0; i < seedStr.length; i++) {
+                            seed = ((seed << 5) - seed) + seedStr.charCodeAt(i);
+                            seed |= 0; // Convert to 32bit integer
+                        }
+
+                        function pseudoRandom(input) {
+                            const x = Math.sin(seed + input) * 10000;
+                            return x - Math.floor(x);
+                        }
+
+                        // 3. Generate Distribution
+                        const targetTotal = 120;
+                        let distribution = [];
+                        let currentSum = 0;
+
+                        // Generate random weights
+                        for (let i = 1; i <= totalWeeks; i++) {
+                            // Base randomness between 0.8 and 1.2 of average
+                            const r = 0.8 + (pseudoRandom(i) * 0.4);
+                            distribution.push(r);
+                            currentSum += r;
+                        }
+
+                        // Normalize to Target Total
+                        let integerDistribution = distribution.map(val => Math.round((val / currentSum) * targetTotal));
+                        let finalSum = integerDistribution.reduce((a, b) => a + b, 0);
+
+                        // Adjust rounding errors to match exactly 120
+                        let diff = targetTotal - finalSum;
+                        // distribute diff to random indices (deterministically)
+                        let i = 0;
+                        while (diff !== 0) {
+                            const idx = Math.floor(pseudoRandom(i + 99) * totalWeeks);
+                            if (diff > 0) {
+                                integerDistribution[idx]++;
+                                diff--;
+                            } else {
+                                if (integerDistribution[idx] > 0) {
+                                    integerDistribution[idx]--;
+                                    diff++;
+                                }
+                            }
+                            i++;
+                        }
+
+                        // 4. Set Hours for Current Week
+                        // Week numbers are 1-based, array is 0-based
+                        const weekIndex = parseInt(weekInput.value) - 1;
+                        if (weekIndex >= 0 && weekIndex < integerDistribution.length) {
+                            document.querySelector('input[name="hours"]').value = integerDistribution[weekIndex];
+                        }
+                    });
+                });
+            </script>
