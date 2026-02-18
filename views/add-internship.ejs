@@ -1,0 +1,367 @@
+<%- include('partials/header') %>
+    <%- include('partials/sidebar') %>
+
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2 class="fw-bold text-dark mb-0">New Application</h2>
+                    <p class="text-muted small">Create a new internship record</p>
+                </div>
+                <a href="/" class="btn btn-light text-muted px-4">
+                    <i class="fas fa-times me-2"></i> Cancel
+                </a>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-9">
+                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                        <div class="card-body p-5">
+
+                            <% if (error) { %>
+                                <div class="alert alert-danger rounded-3 shadow-sm border-0 mb-4" role="alert">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fas fa-exclamation-circle fs-4 me-3"></i>
+                                        <div>
+                                            <%= error %>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% } %>
+
+                                    <form action="/add" method="POST">
+                                        <!-- Section 1: Student Information -->
+                                        <div class="mb-5">
+                                            <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
+                                                <span class="bg-soft-primary p-2 rounded-circle me-3"><i
+                                                        class="fas fa-user"></i></span>
+                                                Student Information
+                                            </h5>
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="text" class="form-control border-0"
+                                                            id="studentName" name="studentName" placeholder="John Doe"
+                                                            value="<%= formData.studentName || '' %>" required>
+                                                        <label for="studentName">Student Name</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="text" class="form-control border-0"
+                                                            id="collegeName" name="collegeName"
+                                                            placeholder="College Name"
+                                                            value="<%= formData.collegeName || '' %>" required>
+                                                        <label for="collegeName">College Name</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="date" class="form-control border-0" id="date"
+                                                            name="date" placeholder="Date"
+                                                            value="<%= formData.date || '' %>" required>
+                                                        <label for="date">Application Date</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="tel" class="form-control border-0"
+                                                            id="studentContactNo" name="studentContactNo"
+                                                            placeholder="1234567890"
+                                                            value="<%= formData.studentContactNo || '' %>" required
+                                                            pattern="[0-9]{10}">
+                                                        <label for="studentContactNo">Student Contact No</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <textarea class="form-control border-0" id="address"
+                                                            name="address" placeholder="Address" style="height: 100px"
+                                                            required><%= formData.address || '' %></textarea>
+                                                        <label for="address">Full Address</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <hr class="text-muted opacity-10 my-4">
+
+                                        <!-- Section 2: Branch & Internship -->
+                                        <div class="mb-5">
+                                            <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
+                                                <span class="bg-soft-primary p-2 rounded-circle me-3"><i
+                                                        class="fas fa-building"></i></span>
+                                                Branch & Internship Details
+                                            </h5>
+                                            <div class="row g-4">
+                                                <!-- Branch -->
+                                                <div class="col-md-6">
+                                                    <div class="shadow-sm rounded bg-white px-3 border d-flex align-items-center"
+                                                        style="height: 58px;">
+                                                        <select class="form-select border-0 p-0" name="branch" required>
+                                                            <option value="" disabled selected>Select Branch</option>
+                                                            <option value="yogichowk" <%=formData.branch==='yogichowk'
+                                                                ? 'selected' : '' %>>Yogichowk</option>
+                                                            <option value="sarthana" <%=formData.branch==='sarthana'
+                                                                ? 'selected' : '' %>>Sarthana</option>
+                                                            <option value="adajan" <%=formData.branch==='adajan'
+                                                                ? 'selected' : '' %>>Adajan</option>
+                                                            <option value="katargam" <%=formData.branch==='katargam'
+                                                                ? 'selected' : '' %>>Katargam</option>
+                                                            <option value="dindoli" <%=formData.branch==='dindoli'
+                                                                ? 'selected' : '' %>>Dindoli</option>
+                                                            <option value="navsari" <%=formData.branch==='navsari'
+                                                                ? 'selected' : '' %>>Navsari</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Position -->
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="text" class="form-control border-0"
+                                                            id="internshipPosition" name="internshipPosition"
+                                                            placeholder="Web Developer"
+                                                            value="<%= formData.internshipPosition || '' %>" required>
+                                                        <label for="internshipPosition">Position / Role</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Start Date -->
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="date" class="form-control border-0" id="startDate"
+                                                            name="startDate" placeholder="Starting Date"
+                                                            value="<%= formData.startDate || '' %>" required>
+                                                        <label for="startDate">Starting Date</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Working Time (Radio Buttons) -->
+                                                <div class="col-md-6">
+                                                    <div class="shadow-sm rounded bg-white px-3 border d-flex align-items-center justify-content-center"
+                                                        style="height: 58px;">
+                                                        <div class="d-flex gap-3">
+                                                            <div class="form-check mb-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="workingTime" id="time6" value="6 hrs/day"
+                                                                    <%=(formData.workingTime==='6 hrs/day' ) ? 'checked'
+                                                                    : '' %> required>
+                                                                <label class="form-check-label small fw-medium"
+                                                                    for="time6">6 Hrs</label>
+                                                            </div>
+                                                            <div class="form-check mb-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="workingTime" id="time4" value="4 hrs/day"
+                                                                    <%=(formData.workingTime==='4 hrs/day' ) ? 'checked'
+                                                                    : '' %>>
+                                                                <label class="form-check-label small fw-medium"
+                                                                    for="time4">4 Hrs</label>
+                                                            </div>
+                                                            <div class="form-check mb-0">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="workingTime" id="time2" value="2 hrs/day"
+                                                                    <%=(formData.workingTime==='2 hrs/day' ) ? 'checked'
+                                                                    : '' %>>
+                                                                <label class="form-check-label small fw-medium"
+                                                                    for="time2">2 Hrs</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Calculation Mode & Dynamic Inputs -->
+                                                <div class="col-12">
+                                                    <div class="bg-light p-3 rounded shadow-sm border mb-3">
+                                                        <label class="fw-bold text-muted small mb-2 d-block">Calculation
+                                                            Mode</label>
+                                                        <div class="d-flex gap-4">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="calcMode" id="modeMonth" value="month"
+                                                                    checked>
+                                                                <label class="form-check-label" for="modeMonth">Month
+                                                                    Wise</label>
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio"
+                                                                    name="calcMode" id="modeHours" value="hours">
+                                                                <label class="form-check-label" for="modeHours">Hours
+                                                                    Wise</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Month Wise: Month Input -->
+                                                <div class="col-md-6" id="monthInputDiv">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="number" class="form-control border-0"
+                                                            id="durationMonths" placeholder="No. of Months" min="1"
+                                                            max="24">
+                                                        <label for="durationMonths">Number of Months</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Hours Wise: Total Hours Input -->
+                                                <div class="col-md-6" id="hoursInputDiv" style="display: none;">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="number" class="form-control border-0"
+                                                            id="totalHours" placeholder="Total Hours">
+                                                        <label for="totalHours">Total Hours</label>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Hidden Actual Duration Field (to store final string like "3 Months" or "120 Hours") -->
+                                                <input type="hidden" name="duration" id="finalDuration"
+                                                    value="<%= formData.duration || '' %>">
+
+                                                <!-- Ending Date -->
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded bg-light">
+                                                        <input type="text" class="form-control border-0 bg-light"
+                                                            id="endingDate" name="endingDate" placeholder="Ending Date"
+                                                            value="<%= formData.endingDate || '' %>" readonly>
+                                                        <label for="endingDate">Ending Date (Auto)</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <hr class="text-muted opacity-10 my-4">
+
+                                        <!-- Section 3: Faculty Details -->
+                                        <div class="mb-4">
+                                            <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
+                                                <span class="bg-soft-primary p-2 rounded-circle me-3"><i
+                                                        class="fas fa-chalkboard-teacher"></i></span>
+                                                Faculty Information
+                                            </h5>
+                                            <div class="row g-4">
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="text" class="form-control border-0"
+                                                            id="internFacultyName" name="internFacultyName"
+                                                            placeholder="Faculty Name"
+                                                            value="<%= formData.internFacultyName || '' %>" required>
+                                                        <label for="internFacultyName">Faculty Name</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="tel" class="form-control border-0"
+                                                            id="facultyContactNo" name="facultyContactNo"
+                                                            placeholder="0987654321"
+                                                            value="<%= formData.facultyContactNo || '' %>" required
+                                                            pattern="[0-9]{10}">
+                                                        <label for="facultyContactNo">Faculty Contact No</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5 pt-3 border-top">
+                                            <button type="submit"
+                                                class="btn btn-primary btn-lg px-5 rounded-pill fw-bold">
+                                                <i class="fas fa-paper-plane me-2"></i> Submit Application
+                                            </button>
+                                        </div>
+                                    </form>
+
+                                    <!-- Auto Calculation Script -->
+                                    <script>
+                                        const startDateInput = document.getElementById('startDate');
+                                        const endingDateInput = document.getElementById('endingDate');
+                                        const workingTimeInputs = document.getElementsByName('workingTime');
+
+                                        // Mode & Dynamic Inputs
+                                        const modeMonth = document.getElementById('modeMonth');
+                                        const modeHours = document.getElementById('modeHours');
+                                        const monthInputDiv = document.getElementById('monthInputDiv');
+                                        const hoursInputDiv = document.getElementById('hoursInputDiv');
+                                        const durationMonthsInput = document.getElementById('durationMonths');
+                                        const totalHoursInput = document.getElementById('totalHours');
+                                        const finalDuration = document.getElementById('finalDuration');
+
+                                        function toggleMode() {
+                                            if (modeHours.checked) {
+                                                monthInputDiv.style.display = 'none';
+                                                hoursInputDiv.style.display = 'block';
+                                                durationMonthsInput.value = ''; // Reset months
+                                            } else {
+                                                monthInputDiv.style.display = 'block';
+                                                hoursInputDiv.style.display = 'none';
+                                                totalHoursInput.value = ''; // Reset hours
+                                            }
+                                            calculate();
+                                        }
+
+                                        function calculate() {
+                                            const startStr = startDateInput.value;
+                                            if (!startStr) return;
+                                            const start = new Date(startStr);
+
+                                            // 1. Get Selected Shift
+                                            let shift = 0;
+                                            for (const radio of workingTimeInputs) {
+                                                if (radio.checked) {
+                                                    shift = parseInt(radio.value);
+                                                    break;
+                                                }
+                                            }
+
+                                            // 2. Mode Logic
+                                            if (modeMonth.checked) {
+                                                const months = parseInt(durationMonthsInput.value);
+                                                if (months && months > 0) {
+                                                    finalDuration.value = months + (months === 1 ? ' Month' : ' Months');
+
+                                                    // Add months
+                                                    start.setMonth(start.getMonth() + months);
+
+                                                    // Handle day overflow (e.g., Jan 31 + 1 mo -> Feb 28/29)
+                                                    // JS setMonth handles this locally but might skip months. 
+                                                    // Standard busines logic: Jan 31 + 1m = Feb 28.
+                                                    // For simple JS:
+                                                    // Note: new Date('2023-01-31').setMonth(1) -> March 2/3.
+                                                    // If we want "start date + N months", we should check day.
+
+                                                    updateDate(start);
+                                                }
+                                            } else {
+                                                // Hours Mode
+                                                const totalHrs = parseInt(totalHoursInput.value);
+                                                if (totalHrs && totalHrs > 0 && shift > 0) {
+                                                    finalDuration.value = totalHrs + ' Hours';
+
+                                                    const days = Math.ceil(totalHrs / shift);
+                                                    start.setDate(start.getDate() + days);
+                                                    updateDate(start);
+                                                }
+                                            }
+                                        }
+
+                                        function updateDate(dateObj) {
+                                            const y = dateObj.getFullYear();
+                                            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+                                            const d = String(dateObj.getDate()).padStart(2, '0');
+                                            endingDateInput.value = `${y}-${m}-${d}`;
+                                        }
+
+                                        // Listeners
+                                        document.querySelectorAll('input[name="calcMode"]').forEach(el => el.addEventListener('change', toggleMode));
+
+                                        startDateInput.addEventListener('change', calculate);
+                                        durationMonthsInput.addEventListener('input', calculate);
+                                        totalHoursInput.addEventListener('input', calculate);
+                                        workingTimeInputs.forEach(r => r.addEventListener('change', calculate));
+
+                                        // Init
+                                        toggleMode();
+                                    </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <%- include('partials/footer') %>

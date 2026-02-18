@@ -1,0 +1,474 @@
+<%- include('partials/header') %>
+    <%- include('partials/sidebar') %>
+
+        <div class="main-content">
+            <div class="d-flex justify-content-between align-items-center mb-5">
+                <div>
+                    <h2 class="fw-bold text-dark mb-1">Dashboard</h2>
+                    <p class="text-muted mb-0">Overview of internship applications</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button type="button" class="btn btn-outline-primary rounded-pill px-4 py-2" data-bs-toggle="modal"
+                        data-bs-target="#uploadModal">
+                        <i class="fas fa-file-excel me-2"></i> Bulk Upload
+                    </button>
+                    <a href="/add" class="btn btn-primary rounded-pill px-4 py-2">
+                        <i class="fas fa-plus me-2"></i> New Application
+                    </a>
+                </div>
+            </div>
+
+            <!-- Upload Feedback -->
+            <% if (typeof uploadResult !=='undefined' && uploadResult) { %>
+                <% if (uploadResult.success> 0) { %>
+                    <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3 mb-4" role="alert">
+                        <div class="d-flex align-items-center">
+                            <i class="fas fa-check-circle fs-4 me-3"></i>
+                            <div>
+                                <strong>Success!</strong>
+                                <%= uploadResult.success %> applications uploaded successfully.
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    <% } %>
+
+                        <% if (uploadResult.failed> 0) { %>
+                            <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3 mb-4"
+                                role="alert">
+                                <div class="d-flex align-items-start">
+                                    <i class="fas fa-exclamation-circle fs-4 me-3 mt-1"></i>
+                                    <div>
+                                        <strong>
+                                            <%= uploadResult.failed %> applications failed to upload:
+                                        </strong>
+                                        <ul class="mb-0 mt-2 small text-danger-emphasis">
+                                            <% uploadResult.errors.forEach(function(err) { %>
+                                                <li>Row <%= err.row %> (<%= err.name %>): <%= err.errors %>
+                                                </li>
+                                                <% }); %>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"
+                                    aria-label="Close"></button>
+                            </div>
+                            <% } %>
+                                <% } %>
+
+                                    <!-- Upload Modal -->
+                                    <div class="modal fade" id="uploadModal" tabindex="-1"
+                                        aria-labelledby="uploadModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow-lg rounded-4">
+                                                <div class="modal-header border-0 pb-0">
+                                                    <h5 class="modal-title fw-bold" id="uploadModalLabel">Upload
+                                                        Internship Data</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <form action="/upload-excel" method="POST"
+                                                    enctype="multipart/form-data">
+                                                    <div class="modal-body py-4">
+                                                        <div class="text-center mb-4">
+                                                            <div class="icon-box bg-soft-primary text-primary mx-auto mb-3"
+                                                                style="width: 60px; height: 60px; line-height: 60px; font-size: 24px;">
+                                                                <i class="fas fa-file-upload"></i>
+                                                            </div>
+                                                            <p class="text-muted small">Select an Excel (.xlsx, .xls) or
+                                                                CSV file to import
+                                                                multiple applications at once.</p>
+                                                            <a href="/download-template"
+                                                                class="btn btn-sm btn-outline-info rounded-pill">
+                                                                <i class="fas fa-download me-1"></i> Download Sample
+                                                                Template
+                                                            </a>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label for="excelFile"
+                                                                class="form-label small fw-bold text-muted">Choose
+                                                                File</label>
+                                                            <input type="file"
+                                                                class="form-control form-control-lg border-2"
+                                                                id="excelFile" name="excelFile"
+                                                                accept=".xlsx, .xls, .csv" required>
+                                                        </div>
+
+                                                        <div class="alert alert-info border-0 rounded-3 small">
+                                                            <i class="fas fa-info-circle me-2"></i> Ensure your file has
+                                                            headers like:
+                                                            <strong>Student Name, Starting Date, Duration, Branch,
+                                                                etc.</strong>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer border-0 pt-0">
+                                                        <button type="button" class="btn btn-light rounded-pill px-4"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit"
+                                                            class="btn btn-primary rounded-pill px-4">Upload
+                                                            Now</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Complete Internship Modal -->
+                                    <div class="modal fade" id="completeInternshipModal" tabindex="-1"
+                                        aria-labelledby="completeInternshipModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow-lg rounded-4">
+                                                <div class="modal-header border-0 pb-0">
+                                                    <h5 class="modal-title fw-bold" id="completeInternshipModalLabel">
+                                                        Complete Internship</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <form id="completeInternshipForm" method="POST">
+                                                    <div class="modal-body py-4">
+                                                        <div class="text-center mb-4">
+                                                            <div class="icon-box bg-soft-success text-success mx-auto mb-3"
+                                                                style="width: 60px; height: 60px; line-height: 60px; font-size: 24px;">
+                                                                <i class="fas fa-check-circle"></i>
+                                                            </div>
+                                                            <h6 class="fw-bold" id="completeStudentName">Student Name
+                                                            </h6>
+                                                            <p class="text-muted small">Update the ending date to mark
+                                                                this internship as completed.</p>
+                                                        </div>
+
+                                                        <div class="mb-3">
+                                                            <label for="endingDate"
+                                                                class="form-label small fw-bold text-muted">Ending
+                                                                Date</label>
+                                                            <input type="date"
+                                                                class="form-control form-control-lg border-2"
+                                                                id="endingDate" name="endingDate" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer border-0 pt-0">
+                                                        <button type="button" class="btn btn-light rounded-pill px-4"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit"
+                                                            class="btn btn-success rounded-pill px-4">Complete
+                                                            Internship</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Stats Cards -->
+                                    <!-- Logbook Selection Modal -->
+                                    <div class="modal fade" id="logbookModal" tabindex="-1"
+                                        aria-labelledby="logbookModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow-lg rounded-4">
+                                                <div class="modal-header border-0 pb-0">
+                                                    <h5 class="modal-title fw-bold" id="logbookModalLabel">Select
+                                                        Internship Course</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body py-4">
+                                                    <div class="text-center mb-4">
+                                                        <div class="icon-box bg-soft-success text-success mx-auto mb-3"
+                                                            style="width: 60px; height: 60px; line-height: 60px; font-size: 24px;">
+                                                            <i class="fas fa-book"></i>
+                                                        </div>
+                                                        <h6 class="fw-bold" id="logbookStudentName">Student Name</h6>
+                                                        <p class="text-muted small">Select the course to download the
+                                                            logbook.</p>
+                                                    </div>
+
+                                                    <div id="logbookList" class="d-grid gap-2">
+                                                        <!-- Internship items will be injected here -->
+                                                        <div class="text-center">
+                                                            <div class="spinner-border text-primary" role="status">
+                                                                <span class="visually-hidden">Loading...</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-4 mb-5">
+                                        <div class="col-md-4">
+                                            <div class="card stat-card shadow-sm p-4 h-100 card-hover">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <h6 class="text-muted text-uppercase fw-bold mb-1"
+                                                            style="font-size: 0.75rem;">Total
+                                                            Applications</h6>
+                                                        <h2 class="fw-bold mb-0 text-dark">
+                                                            <%= stats.total %>
+                                                        </h2>
+                                                    </div>
+                                                    <div class="icon-box bg-gradient-primary text-white shadow">
+                                                        <i class="fas fa-users"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card stat-card shadow-sm p-4 h-100 card-hover">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <h6 class="text-muted text-uppercase fw-bold mb-1"
+                                                            style="font-size: 0.75rem;">6 Hr
+                                                            Shift</h6>
+                                                        <h2 class="fw-bold mb-0 text-dark">
+                                                            <%= stats.shift6 %>
+                                                        </h2>
+                                                    </div>
+                                                    <div class="icon-box bg-gradient-success text-white shadow">
+                                                        <i class="fas fa-clock"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card stat-card shadow-sm p-4 h-100 card-hover">
+                                                <div class="d-flex align-items-center justify-content-between">
+                                                    <div>
+                                                        <h6 class="text-muted text-uppercase fw-bold mb-1"
+                                                            style="font-size: 0.75rem;">4 Hr
+                                                            Shift</h6>
+                                                        <h2 class="fw-bold mb-0 text-dark">
+                                                            <%= stats.shift4 %>
+                                                        </h2>
+                                                    </div>
+                                                    <div class="icon-box bg-gradient-warning text-white shadow">
+                                                        <i class="fas fa-hourglass-half"></i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Faculty Filter & Search -->
+                                    <div class="row mb-4">
+                                        <div class="col-md-4">
+                                            <form action="/" method="GET" id="facultyFilterForm">
+                                                <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                                                    <span class="input-group-text bg-white border-0 ps-4">
+                                                        <i class="fas fa-chalkboard-teacher text-muted"></i>
+                                                    </span>
+                                                    <input type="text" name="faculty" class="form-control border-0 py-2"
+                                                        placeholder="Search by Faculty Name..."
+                                                        value="<%= selectedFaculty %>"
+                                                        onkeypress="if(event.key === 'Enter') this.form.submit()">
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <div class="col-md-8">
+                                            <form action="/" method="GET">
+                                                <% if (typeof selectedFaculty !=='undefined' && selectedFaculty) { %>
+                                                    <input type="hidden" name="faculty" value="<%= selectedFaculty %>">
+                                                    <% } %>
+                                                        <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                                                            <span class="input-group-text bg-white border-0 ps-4">
+                                                                <i class="fas fa-search text-muted"></i>
+                                                            </span>
+                                                            <input type="text" id="dashboardSearch" name="search"
+                                                                class="form-control border-0 py-2"
+                                                                placeholder="Search all records..."
+                                                                value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+                                                            <button type="submit" class="btn btn-white border-0"
+                                                                aria-label="Search">
+                                                                <!-- Hidden submit button or just enter key works -->
+                                                            </button>
+                                                        </div>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    <!-- Table -->
+                                    <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+                                        <div class="card-header bg-white border-bottom py-3">
+                                            <h6 class="mb-0 fw-bold text-dark"><i
+                                                    class="fas fa-list-ul me-2"></i>Internship Applications</h6>
+                                        </div>
+                                        <div class="card-body p-0">
+                                            <div class="table-responsive">
+                                                <table class="table table-hover align-middle mb-0">
+                                                    <thead class="bg-light">
+                                                        <tr>
+                                                            <th class="px-4 py-3 col-student-name">Student Name</th>
+                                                            <th class="px-4 py-3 col-position">Position & Duration</th>
+                                                            <th class="px-4 py-3">Branch</th>
+                                                            <th class="px-4 py-3">Date</th>
+                                                            <th class="px-4 py-3">Faculty Guide</th>
+                                                            <th class="px-4 py-3 text-end col-actions">Actions</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody id="internshipTableBody">
+                                                        <%- include('partials/internship-rows', { internships:
+                                                            internships }) %>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <!-- Premium Pagination Footer -->
+                                        <div class="card-footer bg-white border-top py-3 px-4">
+                                            <div
+                                                class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+                                                <div class="text-muted small order-2 order-md-1">
+                                                    <% const displayLimit=typeof limit !=='undefined' ? limit : 20; %>
+                                                        Showing <span class="fw-bold text-dark">
+                                                            <%= (currentPage - 1) * displayLimit + 1 %>
+                                                        </span>
+                                                        to <span class="fw-bold text-dark">
+                                                            <%= Math.min(currentPage * displayLimit, stats.total) %>
+                                                        </span>
+                                                        of <span class="fw-bold text-dark">
+                                                            <%= stats.total %>
+                                                        </span> results
+                                                </div>
+
+                                                <nav aria-label="Page navigation" class="order-1 order-md-2">
+                                                    <ul
+                                                        class="pagination pagination-sm justify-content-center mb-0 gap-2">
+                                                        <!-- Previous Button -->
+                                                        <li
+                                                            class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
+                                                            <a class="page-link border-0 shadow-sm rounded-3 px-3 py-2 bg-light text-dark"
+                                                                href="?page=<%= currentPage - 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>"
+                                                                aria-label="Previous">
+                                                                <i class="fas fa-chevron-left"></i>
+                                                            </a>
+                                                        </li>
+
+                                                        <!-- Page Numbers -->
+                                                        <% let startPage=Math.max(1, currentPage - 2); let
+                                                            endPage=Math.min(totalPages, currentPage + 2); if
+                                                            (startPage> 1) { %>
+                                                            <li class="page-item"><a
+                                                                    class="page-link border-0 bg-light text-dark"
+                                                                    href="?page=1<%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>">1</a>
+                                                            </li>
+                                                            <% if(startPage> 2) { %> <li class="page-item disabled">
+                                                                    <span class="page-link border-0">...</span>
+                                                                </li>
+                                                                <% } %>
+                                                                    <% } for(let i=startPage; i <=endPage; i++) { %>
+                                                                        <li
+                                                                            class="page-item <%= currentPage === i ? 'active' : '' %>">
+                                                                            <a class="page-link border-0 shadow-sm rounded-3 px-3 py-2 <%= currentPage === i ? 'bg-primary text-white' : 'bg-light text-dark shadow-none' %>"
+                                                                                href="?page=<%= i %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>">
+                                                                                <%= i %>
+                                                                            </a>
+                                                                        </li>
+                                                                        <% } if (endPage < totalPages) { %>
+                                                                            <% if(endPage < totalPages - 1) { %>
+                                                                                <li class="page-item disabled"><span
+                                                                                        class="page-link border-0">...</span>
+                                                                                </li>
+                                                                                <% } %>
+                                                                                    <li class="page-item"><a
+                                                                                            class="page-link border-0 bg-light text-dark"
+                                                                                            href="?page=<%= totalPages %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>">
+                                                                                            <%= totalPages %>
+                                                                                        </a></li>
+                                                                                    <% } %>
+
+                                                                                        <!-- Next Button -->
+                                                                                        <li
+                                                                                            class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
+                                                                                            <a class="page-link border-0 shadow-sm rounded-3 px-3 py-2 bg-light text-dark"
+                                                                                                href="?page=<%= currentPage + 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>"
+                                                                                                aria-label="Next">
+                                                                                                <i
+                                                                                                    class="fas fa-chevron-right"></i>
+                                                                                            </a>
+                                                                                        </li>
+                                                    </ul>
+                                                </nav>
+                                            </div>
+                                        </div>
+                                    </div>
+        </div>
+
+        <script>
+            async function openLogbookModal(contactNo, studentName) {
+                const modal = new bootstrap.Modal(document.getElementById('logbookModal'));
+                const listContainer = document.getElementById('logbookList');
+                document.getElementById('logbookStudentName').textContent = studentName;
+
+                modal.show();
+                listContainer.innerHTML = `
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                `;
+
+                try {
+                    const response = await fetch(`/api/student-internships?contactNo=${contactNo}`);
+                    const internships = await response.json();
+
+                    if (internships.length === 0) {
+                        listContainer.innerHTML = '<div class="alert alert-warning">No internships found.</div>';
+                        return;
+                    }
+
+                    let html = '';
+                    internships.forEach(item => {
+                        html += `
+                            <a href="/logbook/${item._id}" class="btn btn-outline-light text-dark text-start p-3 border shadow-sm mb-2 hover-shadow d-flex justify-content-between align-items-center">
+                                <div>
+                                    <div class="fw-bold text-primary">${item.internshipPosition}</div>
+                                    <div class="small text-muted">
+                                        <i class="far fa-calendar-alt me-1"></i> ${item.startDate} (${item.duration})
+                                    </div>
+                                </div>
+                                <i class="fas fa-download text-muted"></i>
+                            </a>
+                        `;
+                    });
+
+                    listContainer.innerHTML = html;
+
+                } catch (error) {
+                    console.error('Error fetching internships:', error);
+                    listContainer.innerHTML = '<div class="alert alert-danger">Error loading data.</div>';
+                }
+            }
+
+            function openCompleteModal(id, name, currentDate) {
+                const modal = new bootstrap.Modal(document.getElementById('completeInternshipModal'));
+                const form = document.getElementById('completeInternshipForm');
+                document.getElementById('completeStudentName').textContent = name;
+
+                // Set form action
+                form.action = `/complete/${id}`;
+
+                // Set current date if available (convert DD-MM-YYYY to YYYY-MM-DD for input type=date)
+                /* 
+                   Checking format from 'currentDate' passed from EJS. 
+                   If it's already YYYY-MM-DD (from db date object ISO string), use it.
+                   If it is DD-MM-YYYY (stored as string), convert it.
+                */
+
+                // For now, let's just default to today's date if empty, or try to parse
+                // But the requirement is "if i add end date then modify enddate". 
+                // So let's leave it empty or set to today.
+                // Existing endingDate might be in DB. Let's not complicate passing it for now unless requested.
+                // We will just let them pick a NEW date.
+
+                modal.show();
+            }
+
+            function deleteInternship(id) {
+                if (confirm('Are you sure you want to delete this internship?')) {
+                    window.location.href = '/delete/' + id;
+                }
+            }
+        </script>
+
+        <%- include('partials/footer') %>

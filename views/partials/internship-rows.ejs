@@ -1,0 +1,155 @@
+<% if (internships.length> 0) { %>
+    <% internships.forEach(function(item) { let isCompleted=false; const currentDate=new Date(); const
+        parseDate=(dateStr)=> {
+        if (!dateStr) return null;
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+        if (parts[0].length === 4) return new Date(parts[0], parts[1]-1, parts[2]);
+        return new Date(parts[2], parts[1]-1, parts[0]);
+        }
+        return new Date(dateStr);
+        };
+
+        if (item.endingDate) {
+        const endD = parseDate(item.endingDate);
+        if (endD && endD <= currentDate) { isCompleted=true; } } else if (item.startDate && item.duration) { const
+            startD=parseDate(item.startDate); if (startD && !isNaN(startD.getTime())) { let endD=new Date(startD); const
+            durationLower=item.duration.toLowerCase(); if (durationLower.includes('month')) { const
+            months=parseInt(item.duration) || 0; endD.setMonth(endD.getMonth() + months); } else if
+            (durationLower.includes('week')) { const weeks=parseInt(item.duration) || 0; endD.setDate(endD.getDate() +
+            (weeks * 7)); } else if (durationLower.includes('day')) { const days=parseInt(item.duration) || 0;
+            endD.setDate(endD.getDate() + days); } if (endD <=currentDate) { isCompleted=true; } } } %>
+            <tr class="application-row <%= isCompleted ? 'table-danger' : '' %>" <%=isCompleted
+                ? 'style="background-color: #ffebee;"' : '' %>>
+                <td class="px-4">
+                    <div class="d-flex align-items-center">
+                        <div class="avatar-initial rounded-circle bg-soft-primary text-primary fw-bold me-3">
+                            <%= item.studentName.charAt(0).toUpperCase() %>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-dark student-name">
+                                <%= item.studentName %>
+                            </div>
+                            <div class="small text-muted student-contact">
+                                <%= item.studentContactNo %>
+                            </div>
+                            <!-- Status Indicators -->
+                            <div class="d-flex gap-1 mt-1">
+                                <span onclick="toggleStatus('<%= item._id %>', 'joining', this)"
+                                    class="badge <%= item.joiningLetterGiven ? 'bg-success' : 'bg-light text-muted border' %>"
+                                    style="cursor: pointer;" title="Joining Letter Given">J</span>
+                                <span onclick="toggleStatus('<%= item._id %>', 'completion', this)"
+                                    class="badge <%= item.completionLetterGiven ? 'bg-success' : 'bg-light text-muted border' %>"
+                                    style="cursor: pointer;" title="Completion Letter Given">C</span>
+                                <span onclick="toggleStatus('<%= item._id %>', 'logbook', this)"
+                                    class="badge <%= item.logbookGiven ? 'bg-success' : 'bg-light text-muted border' %>"
+                                    style="cursor: pointer;" title="Logbook Given">L</span>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-4">
+                    <div class="fw-semibold text-dark internship-position">
+                        <%= item.internshipPosition %>
+                    </div>
+                    <div class="mt-1">
+                        <% if (item.workingTime==='6 hrs/day' ) { %>
+                            <span class="badge badge-soft-success"><i class="fas fa-clock me-1"></i> 6 Hrs</span>
+
+                            <span class="badge badge-soft-success"><i class="fas fa-clock me-1"></i> 120 Hrs</span>
+                            <% } else { %>
+                                <span class="badge badge-soft-warning"><i class="fas fa-clock me-1"></i> 4 Hrs</span> /
+                                <span class="badge badge-soft-success"><i class="fas fa-clock me-1"></i> 120 Hrs</span>
+                                <% } %>
+                    </div>
+                </td>
+                <td class="px-4">
+                    <span class="badge badge-soft-primary text-capitalize branch-name">
+                        <%= item.branch || '--' %>
+                    </span>
+                </td>
+                <td class="px-4 text-muted font-monospace small">
+                    <%= item.date.toISOString().split('T')[0] %>
+                </td>
+                <td class="px-4">
+                    <div class="small text-dark fw-bold faculty-name">
+                        <%= item.internFacultyName %>
+                    </div>
+                    <div class="small text-muted">
+                        <%= item.facultyContactNo %>
+                    </div>
+                </td>
+                <td class="px-4 text-end">
+                    <div class="d-flex flex-wrap gap-2 justify-content-end" style="width: 80px; margin-left: auto;">
+                        <a href="/view-letter/<%= item._id %>" class="btn btn-sm btn-light text-primary"
+                            data-bs-toggle="tooltip" title="View Application">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="javascript:void(0)"
+                            onclick="openCompleteModal('<%= item._id %>', '<%= item.studentName %>')"
+                            class="btn btn-sm btn-light text-success" data-bs-toggle="tooltip"
+                            title="Complete Internship">
+                            <i class="fas fa-check-circle"></i>
+                        </a>
+                        <a href="/completion-letter/<%= item._id %>" class="btn btn-sm btn-light text-warning"
+                            data-bs-toggle="tooltip" title="Ending Letter">
+                            <i class="fas fa-certificate"></i>
+                        </a>
+                        <a href="/logbook-manage/<%= item._id %>" class="btn btn-sm btn-light text-info"
+                            data-bs-toggle="tooltip" title="Manage Logbook">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <a href="/logbook/<%= item._id %>" class="btn btn-sm btn-light text-success" target="_blank"
+                            data-bs-toggle="tooltip" title="Download Logbook">
+                            <i class="fas fa-file-excel"></i>
+                        </a>
+                        <a href="/edit/<%= item._id %>" class="btn btn-sm btn-light text-secondary"
+                            data-bs-toggle="tooltip" title="Edit">
+                            <i class="fas fa-pen"></i>
+                        </a>
+                        <a href="javascript:void(0)" onclick="deleteInternship('<%= item._id %>')"
+                            class="btn btn-sm btn-light text-danger" data-bs-toggle="tooltip" title="Delete">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            <% }) %>
+                <script>
+                    async function toggleStatus(id, type, btn) {
+                        try {
+                            // Prevent bubbling to row click if any
+                            if (event) event.stopPropagation();
+
+                            const res = await fetch(`/toggle-status/${id}?type=${type}`, { method: 'POST' });
+                            const data = await res.json();
+                            if (data.success) {
+                                // Toggle classes
+                                if (btn.classList.contains('bg-success')) {
+                                    btn.classList.remove('bg-success');
+                                    btn.classList.add('bg-light', 'text-muted', 'border');
+                                } else {
+                                    btn.classList.remove('bg-light', 'text-muted', 'border');
+                                    btn.classList.add('bg-success');
+                                }
+                            } else {
+                                alert('Failed to update status');
+                            }
+                        } catch (err) {
+                            console.error(err);
+                            alert('Error updating status');
+                        }
+                    }
+                </script>
+                <% } else { %>
+                    <tr id="noResultsRow">
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
+                                <p class="mb-0">No records found matching your
+                                    criteria.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    <% } %>

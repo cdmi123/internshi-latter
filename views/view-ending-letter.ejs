@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Completion Certificate - <%- internship.studentName %></title>
+    <link rel="stylesheet" href="/css/latter.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <div class="page">
+        <!-- Watermark -->
+        <div class="watermark">
+            <img src="/logo.png" alt="Watermark">
+        </div>
+
+        <!-- Header -->
+        <header>
+            <div class="logo-section">
+                <img src="/logo.png" alt="Creative Web Infotech" class="company-logo">
+            </div>
+            <div class="contact-info">
+                <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
+                <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
+                        internship.facultyContactNo.slice(5) %></p>
+                <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+            </div>
+        </header>
+
+        <div class="yellow-divider"></div>
+
+        <h2 class="document-title">Internship Completion Certificate</h2>
+
+        <div class="date-section">
+            <p><strong>Date : <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new Date().getMonth() +
+                            1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %></strong></p>
+        </div>
+
+        <div class="recipient-details">
+            <p><strong>To,</strong></p>
+            <p><strong><%- internship.studentName %></strong></p>
+            <p><%- internship.collegeName %></p>
+            <p><strong>Address :</strong>
+                <% let addr=internship.address; if (addr.length> 30) {
+                    let splitIndex = addr.lastIndexOf(' ', 30);
+                    if (splitIndex === -1) splitIndex = 30;
+                    let firstLine = addr.substring(0, splitIndex);
+                    let secondLine = addr.substring(splitIndex).trim();
+                    %>
+                    <%- firstLine %><br><%- secondLine %>
+                            <% } else { %>
+                                <%- addr %>
+                                    <% } %>
+            </p>
+            <p><strong>Mob no :</strong>+91 <%- internship.studentContactNo.slice(0, 5) + ' ' +
+                    internship.studentContactNo.slice(5) %></p>
+        </div>
+
+        <div class="letter-body">
+            <p><strong>Dear <%- internship.studentName %>,</strong></p>
+            <% if (internship.marks && internship.grade) { %>
+                <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
+                            internship.collegeName %></strong>, has successfully completed the internship with grade
+                    <strong><%- internship.grade %></strong> and marks <strong><%- internship.marks %></strong> out of
+                    50 for <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web
+                        Infotech</strong> from <strong>
+                        <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
+                    </strong> to <strong>
+                        <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                            internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
+                    </strong> .
+                </p>
+                <% } else { %>
+                    <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
+                                internship.collegeName %></strong>, has successfully completed an internship as a
+                        <strong><%- internship.internshipPosition %></strong> at <strong>Creative Web Infotech</strong>
+                        from <strong>
+                            <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                                internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
+                        </strong> to <strong>
+                            <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                                internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
+                        </strong> .
+                    </p>
+                    <% } %>
+                        <p>During the internship, the intern demonstrated excellent skills, professional behavior, and a
+                            strong work ethic.</p>
+        </div>
+
+        <div class="internship-details">
+            <p><strong>Details of the Internship:</strong></p>
+            <table>
+                <tr>
+                    <td><strong>Internship Position</strong></td>
+                    <td>: <%- internship.internshipPosition %></td>
+                </tr>
+                <tr>
+                    <td><strong>Duration</strong></td>
+                    <td>: <%- internship.duration %> Hours</td>
+                </tr>
+                <tr>
+                    <td><strong>Starting Date</strong></td>
+                    <td>: <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Ending Date</strong></td>
+                    <td>: <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                            internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Working Time</strong></td>
+                    <td>: <%- internship.workingTime %></td>
+                </tr>
+                <tr>
+                    <td><strong>Mentor</strong></td>
+                    <td>: <%- internship.internFacultyName %></td>
+                </tr>
+            </table>
+        </div>
+
+
+
+        <footer>
+            <div class="signatures" style="margin-top: 50px;">
+                <div class="sign-box">
+                    <div class="line"></div>
+                    <p><strong>Intern Sign</strong></p>
+                </div>
+                <div class="sign-box">
+                    <div class="line"></div>
+                    <p><strong>Creative Web Infotech</strong></p>
+                </div>
+            </div>
+            <div class="footer-line"></div>
+            <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
+            <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
+        </footer>
+    </div>
+
+    <!-- Completion Button -->
+    <div class="no-print" style="position: fixed; top: 20px; right: 20px; z-index: 1000;">
+        <button onclick="openCompletionModal()"
+            style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Completion</button>
+    </div>
+
+    <!-- Styled Modal -->
+    <div id="completionModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-headers">
+                <h2><i class="fas fa-award"></i> Completion Details</h2>
+                <span class="close-btn" onclick="closeCompletionModal()">&times;</span>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="section-label">Certificate Type</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input type="radio" name="completionType" value="withMarks" checked
+                                onchange="toggleMarksInput()">
+                            <span>With Marks</span>
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="completionType" value="withoutMarks"
+                                onchange="toggleMarksInput()">
+                            <span>Without Marks</span>
+                        </label>
+                    </div>
+                </div>
+
+
+
+                <div id="marksInputSection">
+                    <div class="row-flex">
+                        <div class="col-half">
+                            <div class="form-group">
+                                <label for="marks">Marks (out of 50)</label>
+                                <input type="number" id="marks" class="form-control" name="marks" min="0" max="50"
+                                    step="0.01" placeholder="e.g. 45">
+                            </div>
+                        </div>
+                        <div class="col-half">
+                            <div class="form-group">
+                                <label for="grade">Grade</label>
+                                <input type="text" readonly id="grade" class="form-control readonly" name="grade"
+                                    placeholder="-">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button onclick="closeCompletionModal()" class="btn btn-secondary">Cancel</button>
+                <button onclick="saveCompletionData()" class="btn btn-primary">
+                    <i class="fas fa-print"></i> Save & Print
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            z-index: 1001;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* Prevent body scroll if needed */
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 8vh auto;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            font-family: 'Open Sans', sans-serif;
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .modal-headers {
+            background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
+            color: #fff;
+            padding: 20px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-headers h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+        }
+
+        .close-btn {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            transition: all 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #fff;
+            transform: scale(1.1);
+        }
+
+        .modal-body {
+            padding: 25px;
+            background-color: #fff;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #eaedf0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            box-sizing: border-box;
+            background-color: #fcfcfc;
+            color: #333;
+        }
+
+        .form-control:focus {
+            border-color: #4ca1af;
+            background-color: #fff;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(76, 161, 175, 0.1);
+        }
+
+        .form-control.readonly {
+            background-color: #f1f3f5;
+            color: #6c757d;
+            border-color: transparent;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid #eee;
+        }
+
+        .radio-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.2s;
+            font-weight: 600;
+            color: #555;
+            position: relative;
+        }
+
+        .radio-option:hover {
+            background-color: #e9ecef;
+        }
+
+        .radio-option input {
+            transform: scale(1.2);
+            margin-right: 8px;
+            accent-color: #2c3e50;
+        }
+
+        .row-flex {
+            display: flex;
+            gap: 15px;
+        }
+
+        .col-half {
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 20px 25px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            letter-spacing: 0.3px;
+        }
+
+        .btn:active {
+            transform: translateY(2px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #666;
+            border: 2px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background-color: #f1f1f1;
+            border-color: #ccc;
+            color: #333;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(56, 239, 125, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(56, 239, 125, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @media print {
+
+            .no-print,
+            .modal-overlay {
+                display: none !important;
+            }
+        }
+    </style>
+
+    <script>
+        const modal = document.getElementById("completionModal");
+        const marksInput = document.getElementById("marks");
+        const gradeInput = document.getElementById("grade");
+        let currentGrade = '';
+
+        function openCompletionModal() {
+            modal.style.display = "block";
+            // Prevent background scrolling
+            document.body.style.overflow = "hidden";
+        }
+
+        function closeCompletionModal() {
+            modal.style.display = "none";
+            document.body.style.overflow = "auto";
+        }
+
+        window.onclick = function (event) {
+            if (event.target == modal) {
+                closeCompletionModal();
+            }
+        }
+
+        function toggleMarksInput() {
+            const type = document.querySelector('input[name="completionType"]:checked').value;
+            const inputSection = document.getElementById("marksInputSection");
+            if (type === 'withoutMarks') {
+                inputSection.style.display = 'none';
+                marksInput.value = '';
+                gradeInput.value = '';
+            } else {
+                inputSection.style.display = 'block';
+                // slight animation
+                inputSection.style.animation = "fadeIn 0.5s";
+            }
+        }
+
+        marksInput.addEventListener('input', calculateGrade);
+
+        function calculateGrade() {
+            const marks = parseFloat(marksInput.value);
+            if (isNaN(marks)) {
+                gradeInput.value = '';
+                currentGrade = '';
+                return;
+            }
+
+            if (marks >= 47.00 && marks <= 50.00) currentGrade = 'O';
+            else if (marks >= 37.00 && marks <= 46.99) currentGrade = 'E';
+            else if (marks >= 27.00 && marks <= 36.99) currentGrade = 'A';
+            else if (marks >= 20.00 && marks <= 26.99) currentGrade = 'B';
+            else currentGrade = 'Fail/Low';
+
+            gradeInput.value = currentGrade;
+        }
+
+        async function saveCompletionData() {
+            const type = document.querySelector('input[name="completionType"]:checked').value;
+            let marks = null;
+            let grade = null;
+
+
+
+            if (type === 'withMarks') {
+                marks = parseFloat(marksInput.value);
+                grade = gradeInput.value;
+
+                if (isNaN(marks)) {
+                    alert('Please enter valid marks.');
+                    return;
+                }
+                if (!grade) {
+                    alert('Please check the grade.');
+                    return;
+                }
+            }
+
+            // Show loading state
+            const btn = document.querySelector('.btn-primary');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/update-marks/<%= internship._id %>', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ marks, grade })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    location.reload();
+                } else {
+                    alert('Error saving data');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error saving data');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+
+</html>

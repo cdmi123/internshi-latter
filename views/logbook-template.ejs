@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Internship Logbook</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @page {
+            size: A4 landscape;
+            margin: 5mm;
+            /* Minimal margin to maximize space */
+        }
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 10px;
+            color: #333;
+            background-color: white;
+            -webkit-print-color-adjust: exact;
+            /* Ensure colors/borders print */
+            print-color-adjust: exact;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media print {
+            body {
+                width: 297mm;
+                /* A4 width in landscape */
+                height: 210mm;
+                padding: 0;
+            }
+
+            .header,
+            .footer,
+            table {
+                width: 100%;
+            }
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #fecb00;
+            padding-bottom: 15px;
+        }
+
+        .logo {
+            width: 200px;
+            /* Slightly smaller to save space */
+        }
+
+        .contact-info {
+            text-align: left;
+            font-size: 11px;
+            /* Smaller font for better fit */
+            font-weight: bold;
+            line-height: 20px;
+        }
+
+        .contact-info i {
+            margin-right: 5px;
+            color: #000;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            /* Reduced font size for better fit */
+            table-layout: fixed;
+            /* Prevents columns from expanding too much */
+            page-break-inside: auto;
+            /* Allow table to break across pages */
+        }
+
+        tr {
+            page-break-inside: avoid;
+            /* Prevent rows from splitting */
+            page-break-after: auto;
+        }
+
+        thead {
+            display: table-header-group;
+            /* Repeat header on every page */
+        }
+
+        tfoot {
+            display: table-footer-group;
+        }
+
+        th,
+        td {
+            border: 1px solid #000;
+            padding: 5px;
+            /* Reduced padding */
+            vertical-align: top;
+            word-wrap: break-word;
+            /* Ensure text wraps */
+            overflow-wrap: break-word;
+        }
+
+        th {
+            background-color: #fff;
+            font-weight: bold;
+            text-align: left;
+            font-size: 13px;
+        }
+
+        .col-week {
+            width: 8%;
+        }
+
+        .col-date {
+            width: 12%;
+            text-align: center;
+        }
+
+        .col-task-assigned {
+            width: 20%;
+        }
+
+        .col-task-completed {
+            width: 40%;
+        }
+
+        .col-tools {
+            width: 10%;
+        }
+
+        .col-sign {
+            width: 10%;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 20px;
+        }
+
+        .sign-box {
+            text-align: center;
+            width: 200px;
+        }
+
+        .sign-line {
+            border-top: 1px solid #000;
+            margin-bottom: 5px;
+        }
+
+        .sign-text {
+            font-weight: bold;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <div>
+            <!-- Assuming logo is available at public/logo.png -->
+            <img src="<%= logoUrl %>" alt="Creative Web Infotech" class="logo">
+        </div>
+        <div class="contact-info">
+            <div><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</div>
+            <div><i class="fa-solid fa-phone"></i> +91 <%= contactNo %>
+            </div>
+            <div><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="col-week">Week no</th>
+                <th class="col-date">Date(From-To)</th>
+                <th class="col-task-assigned">Task assigned</th>
+                <th class="col-task-completed">Tasks completed</th>
+                <th class="col-tools">Tools</th>
+                <th class="col-hours" style="width: 8%;">Hours</th>
+                <th class="col-sign">Signature</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% weeks.forEach(function(week) { %>
+                <tr>
+                    <td style="text-align: center;">Week no:-<%= week.weekNo %>
+                    </td>
+                    <td style="text-align: center;">
+                        <%= week.startDate %><br>
+                            To<br>
+                            <%= week.endDate %>
+                    </td>
+                    <td style="font-weight: bold;">
+                        <%= week.taskAssigned %>
+                    </td>
+                    <td><%- week.taskCompleted %></td>
+                    <td>
+                        <%= week.tools %>
+                    </td>
+                    <td style="text-align: center;">
+                        <%= week.hours %>
+                    </td>
+                    <td></td>
+                </tr>
+                <% }); %>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <div class="sign-box">
+            <div class="sign-line"></div>
+            <div class="sign-text">Intern Sign</div>
+        </div>
+        <div class="sign-box">
+            <div class="sign-line"></div>
+            <div class="sign-text">Creative Web Infotech</div>
+        </div>
+    </div>
+
+</body>
+
+</html>

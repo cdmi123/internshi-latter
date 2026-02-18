@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        input[type="text"], input[type="date"], input[type="tel"], textarea, select {
+            width: 100%; padding: 0.5rem; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;
+        }
+        button { background-color: #007bff; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        .error { color: red; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <h1>Internship Application Form</h1>
+
+    <% if (error) { %>
+        <div class="error"><%= error %></div>
+    <% } %>
+
+    <form action="/submit" method="POST">
+        <div class="form-group">
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" required>
+        </div>
+
+        <div class="form-group">
+            <label for="studentName">Student Name:</label>
+            <input type="text" id="studentName" name="studentName" required>
+        </div>
+
+        <div class="form-group">
+            <label for="address">Address:</label>
+            <textarea id="address" name="address" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="internshipPosition">Internship Position:</label>
+            <input type="text" id="internshipPosition" name="internshipPosition" required>
+        </div>
+
+        <div class="form-group">
+            <label>Working Time:</label>
+            <div>
+                <label style="display:inline; font-weight:normal;">
+                    <input type="radio" name="workingTime" value="6 hrs/day" required> 6 hrs/day
+                </label>
+                <label style="display:inline; font-weight:normal; margin-left:1rem;">
+                    <input type="radio" name="workingTime" value="4 hrs/day"> 4 hrs/day
+                </label>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="studentContactNo">Student Contact No:</label>
+            <input type="tel" id="studentContactNo" name="studentContactNo" required pattern="[0-9]{10}" title="Ten digit mobile number">
+        </div>
+
+        <div class="form-group">
+            <label for="internFacultyName">Intern Faculty Name:</label>
+            <input type="text" id="internFacultyName" name="internFacultyName" required>
+        </div>
+
+        <div class="form-group">
+            <label for="facultyContactNo">Faculty Contact No:</label>
+            <input type="tel" id="facultyContactNo" name="facultyContactNo" required pattern="[0-9]{10}" title="Ten digit mobile number">
+        </div>
+
+        <button type="submit">Submit Application</button>
+    </form>
+</body>
+</html>
