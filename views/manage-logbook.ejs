@@ -19,11 +19,11 @@
                 <div class="col-lg-4">
                     <div class="card border-0 shadow-sm rounded-4 h-100">
                         <div class="card-header bg-white border-bottom py-3">
-                            <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-plus-circle me-2"></i>Add New Week
+                            <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-plus-circle me-2"></i><span id="formTitle">Add New Week</span>
                             </h6>
                         </div>
                         <div class="card-body">
-                            <form action="/logbook-manage/<%= internship._id %>/add" method="POST">
+                            <form id="logbookForm" action="/logbook-manage/<%= internship._id %>/add" method="POST">
                                 <div class="mb-3">
                                     <label class="form-label small fw-bold text-muted">Week No</label>
                                     <input type="number" name="weekNo" class="form-control" required min="1"
@@ -32,11 +32,11 @@
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="form-label small fw-bold text-muted">Start Date</label>
-                                        <input type="date" readonly name="startDate" class="form-control" required>
+                                        <input type="date" name="startDate" class="form-control" required>
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label small fw-bold text-muted">End Date</label>
-                                        <input type="date" readonly name="endDate" class="form-control" required>
+                                        <input type="date" name="endDate" class="form-control" required>
                                     </div>
                                 </div>
                                 <div class="mb-3">
@@ -58,8 +58,9 @@
                                     <label class="form-label small fw-bold text-muted">No. of Hours Completed</label>
                                     <input type="number" name="hours" class="form-control" value="36" required>
                                 </div>
-                                <div class="d-grid">
-                                    <button type="submit" class="btn btn-primary rounded-pill">Add Entry</button>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" id="submitBtn" class="btn btn-primary rounded-pill">Add Entry</button>
+                                    <button type="button" id="cancelBtn" class="btn btn-outline-secondary rounded-pill d-none" onclick="cancelEdit()">Cancel Edit</button>
                                 </div>
                             </form>
                         </div>
@@ -121,6 +122,10 @@
                                                         <%= entry.hours %>
                                                     </td>
                                                     <td class="px-3 text-end">
+                                                        <button type="button" class="btn btn-outline-primary btn-sm border-0" 
+                                                            onclick='editEntry(<%= JSON.stringify(entry) %>)' title="Edit">
+                                                            <i class="fas fa-edit"></i>
+                                                        </button>
                                                         <a href="/logbook-manage/delete/<%= entry._id %>"
                                                             class="btn btn-outline-danger btn-sm border-0"
                                                             onclick="return confirm('Delete this week entry?')"
@@ -297,4 +302,51 @@
                         }
                     });
                 });
+
+                function editEntry(entry) {
+                    const form = document.getElementById('logbookForm');
+                    const formTitle = document.getElementById('formTitle');
+                    const submitBtn = document.getElementById('submitBtn');
+                    const cancelBtn = document.getElementById('cancelBtn');
+
+                    // Set form action for edit
+                    form.action = '/logbook-manage/edit/' + entry._id;
+                    formTitle.innerText = 'Edit Week ' + entry.weekNo;
+                    submitBtn.innerText = 'Update Entry';
+                    cancelBtn.classList.remove('d-none');
+
+                    // Populate fields
+                    form.querySelector('[name="weekNo"]').value = entry.weekNo;
+                    form.querySelector('[name="taskAssigned"]').value = entry.taskAssigned;
+                    form.querySelector('[name="taskCompleted"]').value = entry.taskCompleted;
+                    form.querySelector('[name="technology"]').value = entry.technology;
+                    form.querySelector('[name="hours"]').value = entry.hours;
+
+                    // Handle dates (convert ISO string to YYYY-MM-DD)
+                    if (entry.startDate) {
+                        form.querySelector('[name="startDate"]').value = new Date(entry.startDate).toISOString().split('T')[0];
+                    }
+                    if (entry.endDate) {
+                        form.querySelector('[name="endDate"]').value = new Date(entry.endDate).toISOString().split('T')[0];
+                    }
+
+                    // Scroll to form
+                    form.scrollIntoView({ behavior: 'smooth' });
+                }
+
+                function cancelEdit() {
+                    const form = document.getElementById('logbookForm');
+                    const formTitle = document.getElementById('formTitle');
+                    const submitBtn = document.getElementById('submitBtn');
+                    const cancelBtn = document.getElementById('cancelBtn');
+
+                    // Reset action to add
+                    form.action = '/logbook-manage/<%= internship._id %>/add';
+                    formTitle.innerText = 'Add New Week';
+                    submitBtn.innerText = 'Add Entry';
+                    cancelBtn.classList.add('d-none');
+
+                    // Reset form
+                    form.reset();
+                }
             </script>

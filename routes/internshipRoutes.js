@@ -44,6 +44,7 @@ router.get('/logbook/:id', internshipController.generateLogbook);
 // Logbook Management
 router.get('/logbook-manage/:id', internshipController.manageLogbook);
 router.post('/logbook-manage/:id/add', internshipController.addLogbookEntry);
+router.post('/logbook-manage/edit/:id', internshipController.updateLogbookEntry);
 router.get('/logbook-manage/delete/:id', internshipController.deleteLogbookEntry);
 
 // Create (Add)

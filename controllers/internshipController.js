@@ -666,6 +666,37 @@ exports.addLogbookEntry = async (req, res) => {
     }
 };
 
+// Update Logbook Entry
+exports.updateLogbookEntry = async (req, res) => {
+    try {
+        const { weekNo, startDate, endDate, taskAssigned, taskCompleted, technology, hours } = req.body;
+        const entryId = req.params.id;
+
+        const entry = await Logbook.findById(entryId);
+        if (!entry) {
+            return res.status(404).send('Logbook entry not found');
+        }
+
+        const internshipId = entry.internshipId;
+
+        await Logbook.findByIdAndUpdate(entryId, {
+            weekNo,
+            startDate,
+            endDate,
+            taskAssigned,
+            taskCompleted,
+            technology,
+            hours
+        });
+
+        res.redirect(`/logbook-manage/${internshipId}`);
+
+    } catch (err) {
+        console.error("Error updating logbook entry:", err);
+        res.status(500).send('Server Error');
+    }
+};
+
 // Delete Logbook Entry
 exports.deleteLogbookEntry = async (req, res) => {
     try {
