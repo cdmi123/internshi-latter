@@ -77,6 +77,10 @@ const internshipSchema = new mongoose.Schema({
     logbookGiven: {
         type: Boolean,
         default: false
+    },
+    showEndingDate: {
+        type: Boolean,
+        default: true
     }
 });
 

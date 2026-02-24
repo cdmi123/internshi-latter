@@ -173,10 +173,10 @@ exports.updateInternship = async (req, res) => {
 
 exports.updateMarks = async (req, res) => {
     try {
-        const { marks, grade, endingDate } = req.body;
+        const { marks, grade, endingDate, showEndingDate } = req.body;
         console.log("updateMarks Request Body:", req.body);
 
-        const updateData = { marks, grade };
+        const updateData = { marks, grade, showEndingDate };
 
         if (endingDate) {
             // Ensure format consistency if needed, but standardizing on what we receive or what we want to store

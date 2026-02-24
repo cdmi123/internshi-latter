@@ -73,10 +73,14 @@
                         Infotech</strong> from <strong>
                         <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
                             internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
-                    </strong> to <strong>
-                        <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
-                            internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
-                    </strong> .
+                    </strong>
+                    <% if (internship.showEndingDate !==false) { %>
+                        to <strong>
+                            <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                                internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
+                        </strong>
+                        <% } %>
+                            .
                 </p>
                 <% } else { %>
                     <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
@@ -85,10 +89,15 @@
                         from <strong>
                             <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
                                 internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
-                        </strong> to <strong>
-                            <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
-                                internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
-                        </strong> .
+                        </strong>
+                        <% if (internship.showEndingDate !==false) { %>
+                            to <strong>
+                                <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                                    internship.endingDate.split('-').reverse().join('-') : internship.endingDate)
+                                    : 'N/A' %>
+                            </strong>
+                            <% } %>
+                                .
                     </p>
                     <% } %>
                         <p>During the internship, the intern demonstrated excellent skills, professional behavior, and a
@@ -112,20 +121,22 @@
                             internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
                     </td>
                 </tr>
-                <tr>
-                    <td><strong>Ending Date</strong></td>
-                    <td>: <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
-                            internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Working Time</strong></td>
-                    <td>: <%- internship.workingTime %></td>
-                </tr>
-                <tr>
-                    <td><strong>Mentor</strong></td>
-                    <td>: <%- internship.internFacultyName %></td>
-                </tr>
+                <% if (internship.showEndingDate !==false) { %>
+                    <tr>
+                        <td><strong>Ending Date</strong></td>
+                        <td>: <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                                internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
+                        </td>
+                    </tr>
+                    <% } %>
+                        <tr>
+                            <td><strong>Working Time</strong></td>
+                            <td>: <%- internship.workingTime %></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Mentor</strong></td>
+                            <td>: <%- internship.internFacultyName %></td>
+                        </tr>
             </table>
         </div>
 
@@ -177,6 +188,15 @@
                             <span>Without Marks</span>
                         </label>
                     </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label class="radio-option"
+                        style="justify-content: flex-start; background: #f8f9fa; border: 1px solid #eee; padding: 12px;">
+                        <input type="checkbox" id="showEndingDate" name="showEndingDate" <%=internship.showEndingDate
+                            !==false ? 'checked' : '' %> style="transform: scale(1.4); margin-right: 12px;">
+                        <span style="font-size: 1rem;">Show Ending Date in Certificate</span>
+                    </label>
                 </div>
 
 
@@ -497,6 +517,7 @@
 
         async function saveCompletionData() {
             const type = document.querySelector('input[name="completionType"]:checked').value;
+            const showEndingDate = document.getElementById('showEndingDate').checked;
             let marks = null;
             let grade = null;
 
@@ -528,7 +549,7 @@
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ marks, grade })
+                    body: JSON.stringify({ marks, grade, showEndingDate })
                 });
 
                 const result = await response.json();
