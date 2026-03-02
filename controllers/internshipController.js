@@ -769,3 +769,60 @@ exports.toggleStatus = async (req, res) => {
         res.status(500).json({ success: false, error: 'Server Error' });
     }
 };
+
+// Public form page
+exports.getPublicForm = (req, res) => {
+    res.render('public-form', {
+        title: 'Internship Application',
+        success: req.query.success === 'true',
+        error: null
+    });
+};
+
+// Handle public form submission
+exports.submitPublicForm = async (req, res) => {
+    try {
+        const { studentName, collegeName, address, studentContactNo, startDate } = req.body;
+
+        // Set default values for required fields not in public form
+        const internshipData = {
+            studentName,
+            collegeName,
+            address,
+            studentContactNo,
+            startDate, // Should be YYYY-MM-DD from form
+            date: new Date(), // Application date
+            internshipPosition: 'Web Developer Intern',
+            workingTime: '6 hrs/day',
+            internFacultyName: 'Administrative Office',
+            facultyContactNo: '0000000000',
+            branch: 'yogichowk',
+            duration: '3 Months',
+            status: 'active'
+        };
+
+        // Auto-calculate ending date (approx 3 months)
+        if (startDate) {
+            const start = new Date(startDate);
+            if (!isNaN(start.getTime())) {
+                start.setMonth(start.getMonth() + 3);
+                const y = start.getFullYear();
+                const m = String(start.getMonth() + 1).padStart(2, '0');
+                const d = String(start.getDate()).padStart(2, '0');
+                internshipData.endingDate = `${y}-${m}-${d}`;
+            }
+        }
+
+        const newInternship = new Internship(internshipData);
+        await newInternship.save();
+
+        res.redirect('/apply?success=true');
+    } catch (err) {
+        console.error("Error in submitPublicForm:", err);
+        res.render('public-form', {
+            title: 'Internship Application',
+            success: false,
+            error: 'Error submitting application. Please try again.'
+        });
+    }
+};

@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const internshipController = require('../controllers/internshipController');
+const authController = require('../controllers/authController');
+const authMiddleware = require('../middleware/authMiddleware');
 const multer = require('multer');
 const path = require('path');
 
@@ -26,49 +28,58 @@ const upload = multer({
     }
 });
 
-// Read (List)
-router.get('/', internshipController.getAllInternships);
+// Auth Routes
+router.get('/login', authController.getLoginForm);
+router.post('/login', authController.login);
+router.get('/logout', authController.logout);
 
-// API: Get Internships by Student Contact
-router.get('/api/student-internships', internshipController.getStudentInternships);
+// Read (List) - PROTECTED
+router.get('/', authMiddleware, internshipController.getAllInternships);
 
-// Read (View Letter)
-router.get('/view-letter/:id', internshipController.viewInternship);
+// API: Get Internships by Student Contact - PROTECTED
+router.get('/api/student-internships', authMiddleware, internshipController.getStudentInternships);
 
-// Read (View Ending Letter)
-router.get('/completion-letter/:id', internshipController.viewEndingLetter);
+// Read (View Letter) - PROTECTED
+router.get('/view-letter/:id', authMiddleware, internshipController.viewInternship);
 
-// Download Logbook
-router.get('/logbook/:id', internshipController.generateLogbook);
+// Read (View Ending Letter) - PROTECTED
+router.get('/completion-letter/:id', authMiddleware, internshipController.viewEndingLetter);
 
-// Logbook Management
-router.get('/logbook-manage/:id', internshipController.manageLogbook);
-router.post('/logbook-manage/:id/add', internshipController.addLogbookEntry);
-router.post('/logbook-manage/edit/:id', internshipController.updateLogbookEntry);
-router.get('/logbook-manage/delete/:id', internshipController.deleteLogbookEntry);
+// Download Logbook - PROTECTED
+router.get('/logbook/:id', authMiddleware, internshipController.generateLogbook);
 
-// Create (Add)
-router.get('/add', internshipController.getAddForm);
-router.post('/add', internshipController.createInternship);
+// Logbook Management - PROTECTED
+router.get('/logbook-manage/:id', authMiddleware, internshipController.manageLogbook);
+router.post('/logbook-manage/:id/add', authMiddleware, internshipController.addLogbookEntry);
+router.post('/logbook-manage/edit/:id', authMiddleware, internshipController.updateLogbookEntry);
+router.get('/logbook-manage/delete/:id', authMiddleware, internshipController.deleteLogbookEntry);
 
-// Excel Upload
-router.get('/download-template', internshipController.downloadTemplate);
-router.post('/upload-excel', upload.single('excelFile'), internshipController.uploadExcel);
+// Create (Add) - PROTECTED
+router.get('/add', authMiddleware, internshipController.getAddForm);
+router.post('/add', authMiddleware, internshipController.createInternship);
 
-// Update (Edit)
-router.get('/edit/:id', internshipController.getEditForm);
-router.post('/edit/:id', internshipController.updateInternship);
+// Excel Upload - PROTECTED
+router.get('/download-template', authMiddleware, internshipController.downloadTemplate);
+router.post('/upload-excel', authMiddleware, upload.single('excelFile'), internshipController.uploadExcel);
 
-// Complete Internship
-router.post('/complete/:id', internshipController.completeInternship);
+// Update (Edit) - PROTECTED
+router.get('/edit/:id', authMiddleware, internshipController.getEditForm);
+router.post('/edit/:id', authMiddleware, internshipController.updateInternship);
 
-// Update Marks
-router.post('/update-marks/:id', internshipController.updateMarks);
+// Complete Internship - PROTECTED
+router.post('/complete/:id', authMiddleware, internshipController.completeInternship);
 
-// Toggle Status (AJAX)
-router.post('/toggle-status/:id', internshipController.toggleStatus);
+// Update Marks - PROTECTED
+router.post('/update-marks/:id', authMiddleware, internshipController.updateMarks);
 
-// Delete
-router.get('/delete/:id', internshipController.deleteInternship);
+// Toggle Status (AJAX) - PROTECTED
+router.post('/toggle-status/:id', authMiddleware, internshipController.toggleStatus);
+
+// Delete - PROTECTED
+router.get('/delete/:id', authMiddleware, internshipController.deleteInternship);
+
+// Public Application Form - PUBLIC
+router.get('/apply', internshipController.getPublicForm);
+router.post('/apply', internshipController.submitPublicForm);
 
 module.exports = router;
