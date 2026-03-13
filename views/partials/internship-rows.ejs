@@ -21,6 +21,9 @@
             endD.setDate(endD.getDate() + days); } if (endD <=currentDate) { isCompleted=true; } } } %>
             <tr class="application-row <%= isCompleted ? 'table-danger' : '' %>" <%=isCompleted
                 ? 'style="background-color: #ffebee;"' : '' %>>
+                <td class="px-4 font-monospace small">
+                    <%= item.idno || '--' %>
+                </td>
                 <td class="px-4">
                     <div class="d-flex align-items-center">
                         <div class="avatar-initial rounded-circle bg-soft-primary text-primary fw-bold me-3">

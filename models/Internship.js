@@ -86,6 +86,10 @@ const internshipSchema = new mongoose.Schema({
     showEndingDate: {
         type: Boolean,
         default: true
+    },
+    idno: {
+        type: String,
+        required: false
     }
 });
 

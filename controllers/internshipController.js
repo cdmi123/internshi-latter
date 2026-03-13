@@ -10,6 +10,25 @@ const logbookTemplates = require('../data/logbookTemplates');
 
 
 // ... existing methods ...
+const getNextIdno = async () => {
+    try {
+        const lastIntern = await Internship.findOne({ 
+            idno: { $regex: /^CWI2026/ },
+            status: { $ne: 'deleted' }
+        }).sort({ idno: -1 });
+        
+        if (!lastIntern || !lastIntern.idno) {
+            return "CWI20261001";
+        }
+        
+        const lastIdNum = parseInt(lastIntern.idno.replace("CWI2026", ""));
+        return `CWI2026${lastIdNum + 1}`;
+    } catch (err) {
+        console.error("Error in getNextIdno:", err);
+        return "CWI2026" + (Date.now() % 10000); // Fallback
+    }
+};
+
 
 // Generate Random Logbook Entries
 exports.generateRandomLogbook = async (req, res) => {
@@ -241,6 +260,7 @@ exports.exportInternships = async (req, res) => {
         const worksheet = workbook.addWorksheet('Internships');
 
         worksheet.columns = [
+            { header: 'ID NO', key: 'idno', width: 15 },
             { header: 'Application Date', key: 'date', width: 20 },
             { header: 'Student Name', key: 'studentName', width: 25 },
             { header: 'Start Date', key: 'startDate', width: 15 },
@@ -262,6 +282,7 @@ exports.exportInternships = async (req, res) => {
 
         internships.forEach((intern) => {
             worksheet.addRow({
+                idno: intern.idno || '',
                 date: intern.date ? intern.date.toLocaleDateString() : '',
                 studentName: intern.studentName,
                 startDate: intern.startDate,
@@ -342,6 +363,7 @@ exports.getAddForm = (req, res) => {
 exports.createInternship = async (req, res) => {
     try {
         const newInternship = new Internship(req.body);
+        newInternship.idno = await getNextIdno();
         await newInternship.save();
         res.redirect('/');
     } catch (err) {
@@ -666,8 +688,21 @@ exports.uploadExcel = async (req, res) => {
         };
 
 
+        let nextIdNum = 0;
+        const lastIntern = await Internship.findOne({ 
+            idno: { $regex: /^CWI2026/ },
+            status: { $ne: 'deleted' }
+        }).sort({ idno: -1 });
+        
+        if (!lastIntern || !lastIntern.idno) {
+            nextIdNum = 1001;
+        } else {
+            nextIdNum = parseInt(lastIntern.idno.replace("CWI2026", "")) + 1;
+        }
+
         for (const row of data) {
             const errors = [];
+
 
             // Normalize Keys (handle case variations)
             const getVal = (keys) => {
@@ -718,8 +753,11 @@ exports.uploadExcel = async (req, res) => {
             if (errors.length > 0) {
                 errorRows.push({ row: rowNumber, name: studentName || 'Unknown', errors: errors.join(', ') });
             } else {
+                const nextId = `CWI2026${nextIdNum++}`;
+                
                 successRows.push({
                     studentName: studentName,
+                    idno: nextId,
                     startDate: startDateFormatted,
                     duration: duration,
                     endingDate: getVal(['Ending Date', 'endingDate']) ? formatDateForDB(parseExcelDate(getVal(['Ending Date', 'endingDate']))) : '',
@@ -734,6 +772,9 @@ exports.uploadExcel = async (req, res) => {
                     status: 'active',
                     date: parseExcelDate(applicationDateRaw) || new Date() // Use provided date or current date
                 });
+                
+                // We need to locally increment for the next row to avoid duplicate IDs in the same batch
+                // But getNextIdno queries the DB. Let's optimize this.
             }
             rowNumber++;
         }

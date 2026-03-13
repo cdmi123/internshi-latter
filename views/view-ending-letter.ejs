@@ -36,26 +36,60 @@
 
         <div class="yellow-divider"></div>
 
-        <h2 class="document-title" style="text-transform: uppercase;">OJT/internship/ Apprenticeship completion certificate</h2>
+        <h2 class="document-title" style="text-transform: uppercase;">OJT/internship/ Apprenticeship completion
+            certificate</h2>
 
-        <div class="date-section">
-            <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0') %>-<%= (new Date().getMonth() + 1).toString().padStart(2, '0') %>-<%= new Date().getFullYear() %></strong><span style="float: right;"><strong>ID No: ________________</strong></span></p>
+        <div class="date-section"
+            style="text-align: left; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
+                                Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %>
+                                    </strong></p>
+            </div>
+            <div style="text-align: right;">
+                <p><strong>ID: <%= internship.idno || '________________' %></strong></p>
+            </div>
         </div>
 
         <div class="letter-body" style="margin-top: 30px; line-height: 1.8;">
             <% if (internship.marks && internship.grade) { %>
-                <p>This is to certify that Ms. / Mr. <strong><%- internship.studentName %></strong> D/o, W/o, S/o. <strong>________________</strong> has successfully completed on the Job/internship/Apprenticeship training course with grade <strong><%- internship.grade %></strong> and marks <strong><%- internship.marks %></strong> out of <strong><%- internship.maxMarks || 50 %></strong> for <strong><%- internship.internshipPosition %></strong> conducted by <strong>Creative Web Infotech</strong> facilitated by <strong><%- internship.collegeName %></strong> from <strong><%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ? internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %></strong>
-                <% if (internship.showEndingDate !== false) { %>
-                    to <strong><%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ? internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %></strong>
-                <% } %>
-                at <strong>Creative Web Infotech, 401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</strong>.</p>
-            <% } else { %>
-                <p>This is to certify that Ms. / Mr. <strong><%- internship.studentName %></strong> D/o, W/o, S/o. <strong>________________</strong> has successfully completed on the Job/internship/Apprenticeship training course for <strong><%- internship.internshipPosition %></strong> conducted by <strong>Creative Web Infotech</strong> facilitated by <strong><%- internship.collegeName %></strong> from <strong><%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ? internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %></strong>
-                <% if (internship.showEndingDate !== false) { %>
-                    to <strong><%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ? internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %></strong>
-                <% } %>
-                at <strong>Creative Web Infotech, 401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</strong>.</p>
-            <% } %>
+                <p>This is to certify that Ms. / Mr. <strong><%- internship.studentName %></strong> has successfully
+                    completed on the Job/internship/Apprenticeship training course with grade <strong><%-
+                            internship.grade %></strong> and marks <strong><%- internship.marks %></strong> out of
+                    <strong><%- internship.maxMarks || 50 %></strong> for <strong><%- internship.internshipPosition
+                            %></strong> conducted by <strong>Creative Web Infotech</strong> facilitated by <strong><%-
+                            internship.collegeName %></strong> from <strong>
+                        <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
+                    </strong>
+                    <% if (internship.showEndingDate !==false) { %>
+                        to <strong>
+                            <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                                internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
+                        </strong>
+                        <% } %>
+                            at <strong>Creative Web Infotech, 401, 4th Floor, City Center Complex, Nr. Yogichowk,
+                                Varachha, Surat, Gujarat INDIA - 395006</strong>.
+                </p>
+                <% } else { %>
+                    <p>This is to certify that Ms. / Mr. <strong><%- internship.studentName %></strong> has successfully completed on the
+                        Job/internship/Apprenticeship training course for <strong><%- internship.internshipPosition
+                                %></strong> conducted by <strong>Creative Web Infotech</strong> facilitated by
+                        <strong><%- internship.collegeName %></strong> from <strong>
+                            <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                                internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
+                        </strong>
+                        <% if (internship.showEndingDate !==false) { %>
+                            to <strong>
+                                <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                                    internship.endingDate.split('-').reverse().join('-') : internship.endingDate)
+                                    : 'N/A' %>
+                            </strong>
+                            <% } %>
+                                at <strong>Creative Web Infotech, 401, 4th Floor, City Center Complex, Nr. Yogichowk,
+                                    Varachha, Surat, Gujarat INDIA - 395006</strong>.
+                    </p>
+                    <% } %>
         </div>
 
         <div style="margin-top: 20px;">
@@ -63,46 +97,89 @@
         </div>
 
         <% if (internship.marks && internship.grade) { %>
-        <div class="internship-details" style="margin-top: 20px;">
-            <p><strong>Grading for performance are as follows:</strong></p>
-            <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px;">
-                <thead>
-                    <tr>
-                        <th style="border: 1px solid #000; padding: 6px; text-align: left; background: #f0f0f0;">Letter Grade</th>
-                        <th style="border: 1px solid #000; padding: 6px; text-align: left; background: #f0f0f0;">Marks (Out of <%= internship.maxMarks || 50 %>)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (internship.maxMarks == 60) { %>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">O (Outstanding)</td><td style="border: 1px solid #000; padding: 6px;">58.2 - 60</td></tr>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">A+ (Excellent)</td><td style="border: 1px solid #000; padding: 6px;">52.2 - 58.19</td></tr>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">A (Very Good)</td><td style="border: 1px solid #000; padding: 6px;">46.2 - 52.19</td></tr>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">B+ (Good)</td><td style="border: 1px solid #000; padding: 6px;">40.2 - 46.19</td></tr>
-                    <% } else if (internship.maxMarks == 100) { %>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">O (Outstanding)</td><td style="border: 1px solid #000; padding: 6px;">97.0 - 100</td></tr>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">A+ (Excellent)</td><td style="border: 1px solid #000; padding: 6px;">87.0 - 96.99</td></tr>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">A (Very Good)</td><td style="border: 1px solid #000; padding: 6px;">77.0 - 86.99</td></tr>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">B+ (Good)</td><td style="border: 1px solid #000; padding: 6px;">67.0 - 76.99</td></tr>
-                    <% } else { %>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">O (Outstanding)</td><td style="border: 1px solid #000; padding: 6px;">48.5 - 50</td></tr>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">A+ (Excellent)</td><td style="border: 1px solid #000; padding: 6px;">43.5 - 48.49</td></tr>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">A (Very Good)</td><td style="border: 1px solid #000; padding: 6px;">38.5 - 43.49</td></tr>
-                        <tr><td style="border: 1px solid #000; padding: 6px;">B+ (Good)</td><td style="border: 1px solid #000; padding: 6px;">33.5 - 38.49</td></tr>
-                    <% } %>
-                </tbody>
-            </table>
-        </div>
-        <% } %>
-
-        <footer>
-            <div class="signatures" style="margin-top: 30px;">
-                <div class="sign-box"></div>
-                <div class="sign-box"><div class="line"></div><p><strong>Creative Web Infotech</strong></p><p style="font-size: 11px; font-weight: normal;">Sign and seal (<%- internship.internFacultyName %>)</p></div>
+            <div class="internship-details" style="margin-top: 20px;">
+                <p><strong>Grading for performance are as follows:</strong></p>
+                <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px;">
+                    <thead>
+                        <tr>
+                            <th style="border: 1px solid #000; padding: 6px; text-align: left; background: #f0f0f0;">
+                                Letter Grade</th>
+                            <th style="border: 1px solid #000; padding: 6px; text-align: left; background: #f0f0f0;">
+                                Marks (Out of <%= internship.maxMarks || 50 %>)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if (internship.maxMarks==60) { %>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 6px;">O (Outstanding)</td>
+                                <td style="border: 1px solid #000; padding: 6px;">58.2 - 60</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 6px;">A+ (Excellent)</td>
+                                <td style="border: 1px solid #000; padding: 6px;">52.2 - 58.19</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 6px;">A (Very Good)</td>
+                                <td style="border: 1px solid #000; padding: 6px;">46.2 - 52.19</td>
+                            </tr>
+                            <tr>
+                                <td style="border: 1px solid #000; padding: 6px;">B+ (Good)</td>
+                                <td style="border: 1px solid #000; padding: 6px;">40.2 - 46.19</td>
+                            </tr>
+                            <% } else if (internship.maxMarks==100) { %>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 6px;">O (Outstanding)</td>
+                                    <td style="border: 1px solid #000; padding: 6px;">97.0 - 100</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 6px;">A+ (Excellent)</td>
+                                    <td style="border: 1px solid #000; padding: 6px;">87.0 - 96.99</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 6px;">A (Very Good)</td>
+                                    <td style="border: 1px solid #000; padding: 6px;">77.0 - 86.99</td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #000; padding: 6px;">B+ (Good)</td>
+                                    <td style="border: 1px solid #000; padding: 6px;">67.0 - 76.99</td>
+                                </tr>
+                                <% } else { %>
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 6px;">O (Outstanding)</td>
+                                        <td style="border: 1px solid #000; padding: 6px;">48.5 - 50</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 6px;">A+ (Excellent)</td>
+                                        <td style="border: 1px solid #000; padding: 6px;">43.5 - 48.49</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 6px;">A (Very Good)</td>
+                                        <td style="border: 1px solid #000; padding: 6px;">38.5 - 43.49</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="border: 1px solid #000; padding: 6px;">B+ (Good)</td>
+                                        <td style="border: 1px solid #000; padding: 6px;">33.5 - 38.49</td>
+                                    </tr>
+                                    <% } %>
+                    </tbody>
+                </table>
             </div>
-            <div class="footer-line"></div>
-            <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
-            <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
-        </footer>
+            <% } %>
+
+                <footer>
+                    <div class="signatures" style="margin-top: 30px;">
+                        <div class="sign-box"></div>
+                        <div class="sign-box">
+                            <div class="line"></div>
+                            <p><strong>Creative Web Infotech</strong></p>
+                            <p style="font-size: 11px; font-weight: normal;">Sign and seal (<%-
+                                    internship.internFacultyName %>)</p>
+                        </div>
+                    </div>
+                    <div class="footer-line"></div>
+                    <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
+                    <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
+                </footer>
     </div>
 
     <!-- Completion Button -->
@@ -153,17 +230,17 @@
                             <div class="form-group">
                                 <label for="maxMarks">Max Marks</label>
                                 <select id="maxMarks" class="form-control" name="maxMarks" onchange="calculateGrade()">
-                                    <option value="50" <%= internship.maxMarks === 50 ? 'selected' : '' %>>50</option>
-                                    <option value="60" <%= internship.maxMarks === 60 ? 'selected' : '' %>>60</option>
-                                    <option value="100" <%= internship.maxMarks === 100 ? 'selected' : '' %>>100</option>
+                                    <option value="50" <%=internship.maxMarks===50 ? 'selected' : '' %>>50</option>
+                                    <option value="60" <%=internship.maxMarks===60 ? 'selected' : '' %>>60</option>
+                                    <option value="100" <%=internship.maxMarks===100 ? 'selected' : '' %>>100</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-third">
                             <div class="form-group">
                                 <label for="marks">Marks</label>
-                                <input type="number" id="marks" class="form-control" name="marks" min="0" 
-                                    step="0.01" placeholder="e.g. 45">
+                                <input type="number" id="marks" class="form-control" name="marks" min="0" step="0.01"
+                                    placeholder="e.g. 45">
                             </div>
                         </div>
                         <div class="col-third">

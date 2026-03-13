@@ -749,10 +749,16 @@
         <h2 class="document-title" style="text-transform: uppercase;">OJT/internship/ Apprenticeship completion
             certificate</h2>
 
-        <div class="date-section">
-            <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new Date().getMonth() +
-                            1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %></strong><span
-                    style="float: right;"></span></p>
+        <div class="date-section"
+            style="text-align: left; display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
+                                Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %>
+                                    </strong></p>
+            </div>
+            <div style="text-align: right;">
+                <p><strong>ID: <%= internship.idno || '________________' %></strong></p>
+            </div>
         </div>
 
         <div class="letter-body" style="margin-top: 30px; line-height: 1.8;">
@@ -776,8 +782,8 @@
                                 Varachha, Surat, Gujarat INDIA - 395006</strong>.
                 </p>
                 <% } else { %>
-                    <p>This is to certify that Ms. / Mr. <strong><%- internship.studentName %></strong> D/o, W/o, S/o.
-                        <strong>________________</strong> has successfully completed on the
+                    <p>This is to certify that Ms. / Mr. <strong><%- internship.studentName %></strong> has successfully
+                        completed on the
                         Job/internship/Apprenticeship training course for <strong><%- internship.internshipPosition
                                 %></strong> conducted by <strong>Creative Web Infotech</strong> facilitated by
                         <strong><%- internship.collegeName %></strong> from <strong>
@@ -938,53 +944,66 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% 
-                    let autoRating = '';
-                    if (internship.grade === 'O' || internship.grade === 'A+') autoRating = '5';
-                    else if (internship.grade === 'A') autoRating = '4';
-                    else if (internship.grade === 'B+') autoRating = '4';
-                    else if (internship.grade) autoRating = '3';
-                    %>
-                    <tr>
-                        <td><strong>1. Technical Skills & Knowledge</strong><br><span
-                                style="font-size:12px;color:#555;">Ability to apply technical knowledge to assigned
-                                tasks.</span></td>
-                        <td class="rating-col"><%= autoRating %></td>
-                    </tr>
-                    <tr>
-                        <td><strong>2. Quality of Work</strong><br><span style="font-size:12px;color:#555;">Accuracy,
-                                thoroughness, and neatness of work produced.</span></td>
-                        <td class="rating-col"><%= autoRating %></td>
-                    </tr>
-                    <tr>
-                        <td><strong>3. Productivity & Time Management</strong><br><span
-                                style="font-size:12px;color:#555;">Ability to complete tasks within assigned
-                                deadlines.</span></td>
-                        <td class="rating-col"><%= autoRating %></td>
-                    </tr>
-                    <tr>
-                        <td><strong>4. Initiative & Problem Solving</strong><br><span
-                                style="font-size:12px;color:#555;">Ability to identify problems and suggest
-                                solutions.</span></td>
-                        <td class="rating-col"><%= autoRating %></td>
-                    </tr>
-                    <tr>
-                        <td><strong>5. Communication Skills</strong><br><span style="font-size:12px;color:#555;">Clarity
-                                in verbal and written communication.</span></td>
-                        <td class="rating-col"><%= autoRating %></td>
-                    </tr>
-                    <tr>
-                        <td><strong>6. Professionalism & Attitude</strong><br><span
-                                style="font-size:12px;color:#555;">Reliability, punctuality, and responsiveness to
-                                feedback.</span></td>
-                        <td class="rating-col"><%= autoRating %></td>
-                    </tr>
-                    <tr>
-                        <td><strong>7. Teamwork & Collaboration</strong><br><span
-                                style="font-size:12px;color:#555;">Ability to work effectively with team members.</span>
-                        </td>
-                        <td class="rating-col"><%= autoRating %></td>
-                    </tr>
+                    <% let autoRating='' ; if (internship.grade==='O' || internship.grade==='A+' ) autoRating='5' ; else
+                        if (internship.grade==='A' ) autoRating='4' ; else if (internship.grade==='B+' ) autoRating='4'
+                        ; else if (internship.grade) autoRating='3' ; %>
+                        <tr>
+                            <td><strong>1. Technical Skills & Knowledge</strong><br><span
+                                    style="font-size:12px;color:#555;">Ability to apply technical knowledge to assigned
+                                    tasks.</span></td>
+                            <td class="rating-col">
+                                <%= autoRating %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>2. Quality of Work</strong><br><span
+                                    style="font-size:12px;color:#555;">Accuracy,
+                                    thoroughness, and neatness of work produced.</span></td>
+                            <td class="rating-col">
+                                <%= autoRating %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>3. Productivity & Time Management</strong><br><span
+                                    style="font-size:12px;color:#555;">Ability to complete tasks within assigned
+                                    deadlines.</span></td>
+                            <td class="rating-col">
+                                <%= autoRating %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>4. Initiative & Problem Solving</strong><br><span
+                                    style="font-size:12px;color:#555;">Ability to identify problems and suggest
+                                    solutions.</span></td>
+                            <td class="rating-col">
+                                <%= autoRating %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>5. Communication Skills</strong><br><span
+                                    style="font-size:12px;color:#555;">Clarity
+                                    in verbal and written communication.</span></td>
+                            <td class="rating-col">
+                                <%= autoRating %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>6. Professionalism & Attitude</strong><br><span
+                                    style="font-size:12px;color:#555;">Reliability, punctuality, and responsiveness to
+                                    feedback.</span></td>
+                            <td class="rating-col">
+                                <%= autoRating %>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>7. Teamwork & Collaboration</strong><br><span
+                                    style="font-size:12px;color:#555;">Ability to work effectively with team
+                                    members.</span>
+                            </td>
+                            <td class="rating-col">
+                                <%= autoRating %>
+                            </td>
+                        </tr>
                 </tbody>
             </table>
         </div>
