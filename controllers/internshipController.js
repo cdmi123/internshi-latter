@@ -6,6 +6,134 @@ const path = require('path');
 const fs = require('fs');
 const puppeteer = require('puppeteer');
 const ejs = require('ejs');
+const logbookTemplates = require('../data/logbookTemplates');
+
+
+// ... existing methods ...
+
+// Generate Random Logbook Entries
+exports.generateRandomLogbook = async (req, res) => {
+    try {
+        console.log('--- Starting Random Logbook Generation ---');
+        const internship = await Internship.findById(req.params.id);
+        if (!internship) {
+            console.error('Internship not found:', req.params.id);
+            return res.status(404).send('Internship not found');
+        }
+
+        const { technology } = req.body;
+        console.log('Selected Technology:', technology);
+        if (!technology || !logbookTemplates[technology]) {
+            console.error('Invalid technology selected:', technology);
+            return res.status(400).send('Invalid technology selected');
+        }
+
+        // Helper to parse dates in various formats
+        const parseDate = (dateStr) => {
+            if (!dateStr) return new Date();
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                if (parts[0].length === 4) return new Date(dateStr); // YYYY-MM-DD
+                return new Date(parts[2], parts[1] - 1, parts[0]); // DD-MM-YYYY
+            }
+            return new Date(dateStr);
+        };
+
+        const start = parseDate(internship.startDate);
+        const end = internship.endingDate ? parseDate(internship.endingDate) : new Date();
+        
+        console.log('Parsed Start Date:', start);
+        console.log('Parsed End Date:', end);
+
+        if (isNaN(start.getTime())) {
+            console.error('Invalid start date string:', internship.startDate);
+            return res.status(400).send('Invalid start date in internship record');
+        }
+
+        // 1. Clear existing entries
+        await Logbook.deleteMany({ internshipId: internship._id });
+
+        // 2. Determine number of weeks
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        let totalWeeks = Math.ceil(diffDays / 7);
+        if (totalWeeks < 1) totalWeeks = 1;
+
+        console.log('Total Weeks calculated:', totalWeeks);
+
+        // 3. Get and shuffle templates
+        let templates = [...logbookTemplates[technology]];
+        for (let i = templates.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [templates[i], templates[j]] = [templates[j], templates[i]];
+        }
+
+        // 4. Generate hours distribution
+        const targetTotal = 120;
+        let distribution = [];
+        let currentSum = 0;
+        for (let i = 1; i <= totalWeeks; i++) {
+            const r = 0.8 + (Math.random() * 0.4);
+            distribution.push(r);
+            currentSum += r;
+        }
+
+        let integerDistribution = distribution.map(val => Math.round((val / currentSum) * targetTotal));
+        let finalSum = integerDistribution.reduce((a, b) => a + b, 0);
+        let diff = targetTotal - finalSum;
+        let k = 0;
+        while (diff !== 0 && k < 100) {
+            const idx = Math.floor(Math.random() * totalWeeks);
+            if (diff > 0) {
+                integerDistribution[idx]++;
+                diff--;
+            } else if (integerDistribution[idx] > 0) {
+                integerDistribution[idx]--;
+                diff++;
+            }
+            k++;
+        }
+
+        // 5. Create entries
+        const bulkEntries = [];
+        for (let i = 0; i < totalWeeks; i++) {
+            const weekNo = i + 1;
+            const weekStart = new Date(start);
+            weekStart.setDate(weekStart.getDate() + (i * 7));
+            
+            const weekEnd = new Date(weekStart);
+            weekEnd.setDate(weekEnd.getDate() + 6);
+            if (internship.endingDate && weekEnd > end) {
+                weekEnd.setTime(end.getTime());
+            }
+
+            const template = templates[i % templates.length];
+
+            bulkEntries.push({
+                internshipId: internship._id,
+                weekNo: weekNo,
+                startDate: weekStart,
+                endDate: weekEnd,
+                taskAssigned: template.task,
+                taskCompleted: template.completed,
+                technology: template.tools,
+                hours: integerDistribution[i] || 36
+            });
+        }
+
+        console.log(`Inserting ${bulkEntries.length} logbook entries...`);
+        await Logbook.insertMany(bulkEntries);
+        console.log('Generation completed successfully.');
+        
+        if (req.headers['content-type'] === 'application/json') {
+            return res.status(200).json({ success: true, message: 'Logbook generated' });
+        }
+        res.redirect(`/logbook-manage/${internship._id}`);
+    } catch (err) {
+        console.error("Error in generateRandomLogbook:", err);
+        res.status(500).send('Server Error');
+    }
+};
 
 
 
@@ -80,6 +208,93 @@ exports.getAllInternships = async (req, res) => {
         });
     } catch (err) {
         console.error("Error in getAllInternships:", err);
+        res.status(500).send('Server Error');
+    }
+};
+
+// Export internships (respecting current filters) to an Excel file
+exports.exportInternships = async (req, res) => {
+    console.log('exportInternships route hit. query:', req.query);
+    try {
+        const selectedFaculty = req.query.faculty || '';
+        let query = { status: { $ne: 'deleted' } };
+
+        if (selectedFaculty) {
+            query.internFacultyName = { $regex: selectedFaculty, $options: 'i' };
+        }
+
+        const searchQuery = req.query.search || '';
+        if (searchQuery) {
+            const searchRegex = { $regex: searchQuery, $options: 'i' };
+            query.$or = [
+                { studentName: searchRegex },
+                { internshipPosition: searchRegex },
+                { collegeName: searchRegex },
+                { studentContactNo: searchRegex },
+                { branch: searchRegex }
+            ];
+        }
+
+        const internships = await Internship.find(query).sort({ _id: -1 });
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Internships');
+
+        worksheet.columns = [
+            { header: 'Application Date', key: 'date', width: 20 },
+            { header: 'Student Name', key: 'studentName', width: 25 },
+            { header: 'Start Date', key: 'startDate', width: 15 },
+            { header: 'Duration', key: 'duration', width: 15 },
+            { header: 'Ending Date', key: 'endingDate', width: 15 },
+            { header: 'College Name', key: 'collegeName', width: 25 },
+            { header: 'Address', key: 'address', width: 30 },
+            { header: 'Position', key: 'internshipPosition', width: 25 },
+            { header: 'Working Time', key: 'workingTime', width: 15 },
+            { header: 'Student Contact', key: 'studentContactNo', width: 15 },
+            { header: 'Faculty Name', key: 'internFacultyName', width: 20 },
+            { header: 'Faculty Contact', key: 'facultyContactNo', width: 15 },
+            { header: 'Branch', key: 'branch', width: 15 },
+            { header: 'Marks', key: 'marks', width: 10 },
+            { header: 'Grade', key: 'grade', width: 10 },
+            { header: 'Status', key: 'status', width: 10 },
+            { header: 'Completion Letter', key: 'completionLetterGiven', width: 15 }
+        ];
+
+        internships.forEach((intern) => {
+            worksheet.addRow({
+                date: intern.date ? intern.date.toLocaleDateString() : '',
+                studentName: intern.studentName,
+                startDate: intern.startDate,
+                duration: intern.duration,
+                endingDate: intern.endingDate || '',
+                collegeName: intern.collegeName || '',
+                address: intern.address,
+                internshipPosition: intern.internshipPosition,
+                workingTime: intern.workingTime,
+                studentContactNo: intern.studentContactNo,
+                internFacultyName: intern.internFacultyName,
+                facultyContactNo: intern.facultyContactNo,
+                branch: intern.branch,
+                marks: intern.marks != null ? intern.marks : '',
+                grade: intern.grade || '',
+                status: intern.status,
+                completionLetterGiven: intern.completionLetterGiven ? 'Yes' : 'No'
+            });
+        });
+
+        res.setHeader(
+            'Content-Type',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        );
+        res.setHeader(
+            'Content-Disposition',
+            'attachment; filename=Internships.xlsx'
+        );
+
+        await workbook.xlsx.write(res);
+        res.end();
+    } catch (err) {
+        console.error('Error exporting internships:', err);
         res.status(500).send('Server Error');
     }
 };
@@ -173,10 +388,10 @@ exports.updateInternship = async (req, res) => {
 
 exports.updateMarks = async (req, res) => {
     try {
-        const { marks, grade, endingDate, showEndingDate } = req.body;
+        const { marks, grade, endingDate, showEndingDate, maxMarks } = req.body;
         console.log("updateMarks Request Body:", req.body);
 
-        const updateData = { marks, grade, showEndingDate };
+        const updateData = { marks, grade, showEndingDate, maxMarks };
 
         if (endingDate) {
             // Ensure format consistency if needed, but standardizing on what we receive or what we want to store
@@ -362,6 +577,27 @@ exports.generateLogbook = async (req, res) => {
     } catch (err) {
         console.error("Logbook PDF Error:", err);
         res.status(500).send('Server Error: ' + err.message);
+    }
+};
+
+// Print All Letters View
+exports.printAllLetters = async (req, res) => {
+    try {
+        const internship = await Internship.findById(req.params.id);
+        if (!internship) {
+            return res.status(404).send('Internship not found');
+        }
+
+        // Fetch associated logbook entries sorted by week number
+        const logbookEntries = await Logbook.find({ internshipId: internship._id }).sort({ weekNo: 1 });
+
+        res.render('print-all-letters', {
+            internship: internship,
+            logbooks: logbookEntries
+        });
+    } catch (err) {
+        console.error("Error in printAllLetters:", err);
+        res.status(500).send('Server Error');
     }
 };
 

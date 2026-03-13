@@ -15,6 +15,18 @@
                     <a href="/add" class="btn btn-primary rounded-pill px-4 py-2">
                         <i class="fas fa-plus me-2"></i> New Application
                     </a>
+                    <%
+    let exportQs = '';
+    if (typeof searchQuery !== 'undefined' && searchQuery) {
+        exportQs += '?search=' + encodeURIComponent(searchQuery);
+    }
+    if (typeof selectedFaculty !== 'undefined' && selectedFaculty) {
+        exportQs += (exportQs ? '&' : '?') + 'faculty=' + encodeURIComponent(selectedFaculty);
+    }
+%>
+                    <a href="/export<%= exportQs %>" class="btn btn-outline-success rounded-pill px-4 py-2">
+                        <i class="fas fa-file-download me-2"></i> Export
+                    </a>
                 </div>
             </div>
 

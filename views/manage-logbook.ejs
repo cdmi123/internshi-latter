@@ -17,6 +17,29 @@
             <div class="row g-4">
                 <!-- Add New Entry Form -->
                 <div class="col-lg-4">
+                    <!-- Auto-Generate Section -->
+                    <div class="card border-0 shadow-sm rounded-4 mb-4" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="card-body text-white">
+                            <h6 class="fw-bold mb-3"><i class="fas fa-magic me-2"></i>Auto-Generate Logbook</h6>
+                            <p class="small opacity-75 mb-3">Generate random weekly entries based on technology for the entire internship duration.</p>
+                            <form id="autoGenerateForm">
+                                <div class="mb-3">
+                                    <select id="autoGenTech" name="technology" class="form-select bg-white bg-opacity-25 text-white border-0" required style="cursor: pointer;">
+                                        <option value="" class="text-dark">Select Technology</option>
+                                        <option value="php" class="text-dark">PHP</option>
+                                        <option value="reactjs_nodejs" class="text-dark">ReactJS + NodeJS</option>
+                                        <option value="ui_ux_designer" class="text-dark">UI / UX Designer</option>
+                                        <option value="web_designer" class="text-dark">Web Designer</option>
+                                        <option value="python" class="text-dark">Python</option>
+                                    </select>
+                                </div>
+                                <button type="button" id="autoGenerateBtn" onclick="handleAutoGenerate()" class="btn btn-light w-100 rounded-pill fw-bold text-primary">
+                                    <i class="fas fa-magic me-2"></i>Generate Now
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
                     <div class="card border-0 shadow-sm rounded-4 h-100">
                         <div class="card-header bg-white border-bottom py-3">
                             <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-plus-circle me-2"></i><span id="formTitle">Add New Week</span>
@@ -123,7 +146,8 @@
                                                     </td>
                                                     <td class="px-3 text-end">
                                                         <button type="button" class="btn btn-outline-primary btn-sm border-0" 
-                                                            onclick='editEntry(<%= JSON.stringify(entry) %>)' title="Edit">
+                                                            onclick="editEntry(JSON.parse(this.getAttribute('data-entry')))"
+                                                            data-entry="<%= JSON.stringify(entry) %>" title="Edit">
                                                             <i class="fas fa-edit"></i>
                                                         </button>
                                                         <a href="/logbook-manage/delete/<%= entry._id %>"
@@ -349,4 +373,46 @@
                     // Reset form
                     form.reset();
                 }
-            </script>
+                async function handleAutoGenerate() {
+                    const tech = document.getElementById('autoGenTech').value;
+                    const btn = document.getElementById('autoGenerateBtn');
+                    
+                    if (!tech) {
+                        alert('Please select a technology first.');
+                        return;
+                    }
+
+                    if (!confirm('This will replace all existing logbook entries for this student. Continue?')) {
+                        return;
+                    }
+
+                    // Show loading state
+                    const originalContent = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+                    btn.disabled = true;
+
+                    try {
+                        const response = await fetch('/logbook-manage/<%= internship._id %>/auto-generate', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ technology: tech })
+                        });
+
+                        if (response.ok) {
+                            window.location.reload();
+                        } else {
+                            const error = await response.text();
+                            alert('Error generating logbook: ' + error);
+                            btn.innerHTML = originalContent;
+                            btn.disabled = false;
+                        }
+                    } catch (err) {
+                        console.error('Error:', err);
+                        alert('Connect error or server failed. Please check console.');
+                        btn.innerHTML = originalContent;
+                        btn.disabled = false;
+                    }
+                }
+            </script>

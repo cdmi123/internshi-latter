@@ -58,6 +58,11 @@ const internshipSchema = new mongoose.Schema({
     marks: {
         type: Number
     },
+    maxMarks: {
+        type: Number,
+        enum: [50, 60, 100],
+        default: 50
+    },
     grade: {
         type: String
     },

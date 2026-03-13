@@ -6,6 +6,12 @@ const authMiddleware = require('../middleware/authMiddleware');
 const multer = require('multer');
 const path = require('path');
 
+// simple logger to show incoming requests
+router.use((req, res, next) => {
+    console.log('Incoming request:', req.method, req.originalUrl);
+    next();
+});
+
 // Configure Multer for Excel uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -45,12 +51,16 @@ router.get('/view-letter/:id', authMiddleware, internshipController.viewInternsh
 // Read (View Ending Letter) - PROTECTED
 router.get('/completion-letter/:id', authMiddleware, internshipController.viewEndingLetter);
 
+// Print All Letters - PROTECTED
+router.get('/print-all/:id', authMiddleware, internshipController.printAllLetters);
+
 // Download Logbook - PROTECTED
 router.get('/logbook/:id', authMiddleware, internshipController.generateLogbook);
 
 // Logbook Management - PROTECTED
 router.get('/logbook-manage/:id', authMiddleware, internshipController.manageLogbook);
 router.post('/logbook-manage/:id/add', authMiddleware, internshipController.addLogbookEntry);
+router.post('/logbook-manage/:id/auto-generate', authMiddleware, internshipController.generateRandomLogbook);
 router.post('/logbook-manage/edit/:id', authMiddleware, internshipController.updateLogbookEntry);
 router.get('/logbook-manage/delete/:id', authMiddleware, internshipController.deleteLogbookEntry);
 
@@ -61,6 +71,10 @@ router.post('/add', authMiddleware, internshipController.createInternship);
 // Excel Upload - PROTECTED
 router.get('/download-template', authMiddleware, internshipController.downloadTemplate);
 router.post('/upload-excel', authMiddleware, upload.single('excelFile'), internshipController.uploadExcel);
+
+// Export internships as Excel - PROTECTED
+console.log('Registering GET /export route');
+router.get('/export', authMiddleware, internshipController.exportInternships);
 
 // Update (Edit) - PROTECTED
 router.get('/edit/:id', authMiddleware, internshipController.getEditForm);
