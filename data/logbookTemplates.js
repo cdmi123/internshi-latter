@@ -58,5 +58,53 @@ module.exports = {
         { "task": "Data Analysis (Pandas)", "completed": "Processed large datasets and performed data cleaning operations using the Pandas library.", "tools": "Python, Pandas" },
         { "task": "OOP in Python", "completed": "Developed a class-based system for managing inventory items with encapsulation and inheritance.", "tools": "Python (OOP)" },
         { "task": "Automated Reporting", "completed": "Created a script to generate summary reports from CSV files and export them to Excel format.", "tools": "Python, Pandas, CSV" }
+    ],
+    "digital_marketing": [
+        { "task": "SEO Fundamentals", "completed": "Conducted keyword research and optimized website metadata to improve search engine rankings.", "tools": "Google Analytics, SEMrush" },
+        { "task": "Social Media Strategy", "completed": "Developed and scheduled a month-long content calendar for Facebook, Instagram, and LinkedIn.", "tools": "Hootsuite, Canva" },
+        { "task": "Email Campaigns", "completed": "Designed and executed automated email marketing drip campaigns to nurture leads.", "tools": "Mailchimp" },
+        { "task": "PPC Advertising", "completed": "Set up and monitored Google Ads campaigns to drive targeted traffic to landing pages.", "tools": "Google Ads" },
+        { "task": "Content Creation", "completed": "Wrote and published SEO-optimized blog posts focusing on industry trends.", "tools": "WordPress" },
+        { "task": "Performance Analytics", "completed": "Analyzed campaign performance using Google Analytics and prepared comprehensive ROI reports.", "tools": "Google Analytics" },
+        { "task": "Conversion Rate Optimization", "completed": "Performed A/B testing on landing pages to increase the conversion rate of incoming traffic.", "tools": "Google Optimize" },
+        { "task": "Competitor Analysis", "completed": "Researched competitor marketing strategies to identify gaps and opportunities.", "tools": "Ahrefs, SimilarWeb" },
+        { "task": "Influencer Outreach", "completed": "Identified and contacted niche influencers to build partnerships and expand brand reach.", "tools": "BuzzSumo" },
+        { "task": "Campaign Management", "completed": "Managed a multifaceted integrated marketing campaign from ideation to execution.", "tools": "Trello, Meta Business Suite" }
+    ],
+    "angular": [
+        { "task": "Angular Architecture", "completed": "Set up the Angular workspace and created modular components, services, and modules.", "tools": "Angular CLI, TypeScript" },
+        { "task": "Data Binding & Directives", "completed": "Implemented property/event binding and used structural directives for dynamic UI rendering.", "tools": "Angular" },
+        { "task": "Routing & Navigation", "completed": "Configured dynamic routing and protected lazy-loaded modules using Route Guards.", "tools": "Angular Router" },
+        { "task": "Reactive Forms", "completed": "Built complex data entry forms with real-time validation using Angular Reactive Forms.", "tools": "Angular Forms" },
+        { "task": "HTTP Client & RxJS", "completed": "Integrated backend APIs utilizing HttpClient and handled asynchronous data streams with RxJS observables.", "tools": "RxJS, Angular HTTPClient" },
+        { "task": "Services & Dependency Injection", "completed": "Created singleton services to share business logic and state across multiple components.", "tools": "Angular Services" },
+        { "task": "State Management", "completed": "Implemented central state management utilizing basic NgRx to handle global application state.", "tools": "NgRx" },
+        { "task": "Material UI Integration", "completed": "Enhanced the user interface using Angular Material design components for consistency.", "tools": "Angular Material" },
+        { "task": "Authentication integration", "completed": "Implemented JWT-based authentication flow including login, logout, and token interceptors.", "tools": "Angular Interceptors" },
+        { "task": "Deployment & Optimization", "completed": "Optimized the application payload using AOT compilation and deployed to the production server.", "tools": "Angular CLI, Firebase/Vercel" }
+    ],
+    "nodejs": [
+        { "task": "Node.js Fundamentals", "completed": "Mastered core Node.js concepts including the event loop, asynchronous programming, and common modules.", "tools": "Node.js" },
+        { "task": "Express Server Setup", "completed": "Initialized and configured an Express.js web server with essential middleware for security and parsing.", "tools": "Express.js" },
+        { "task": "RESTful API Design", "completed": "Designed and developed robust RESTful API endpoints following standard CRUD operations.", "tools": "Node.js, Express" },
+        { "task": "Database Integration", "completed": "Connected to a remote database and executed optimized queries to manage applicatiion data.", "tools": "MongoDB/PostgreSQL" },
+        { "task": "Authentication & Authorization", "completed": "Implemented secure user authentication with JWT and handled password hashing with bcrypt.", "tools": "JWT, bcrypt" },
+        { "task": "File Uploads", "completed": "Developed a secure file upload module to handle images and documents with validation.", "tools": "Multer" },
+        { "task": "Error Handling Middleware", "completed": "Built a centralized error handling middleware to gracefully manage and format API errors.", "tools": "Express Middleware" },
+        { "task": "Data Validation", "completed": "Integrated robust request body validation to ensure data integrity before database insertion.", "tools": "Joi / express-validator" },
+        { "task": "API Documentation", "completed": "Documented all available API routes, parameters, and responses using Swagger.", "tools": "Swagger UI" },
+        { "task": "Deployment & Logging", "completed": "Deployed the backend service to a production environment and implemented request logging.", "tools": "PM2, Morgan, Render" }
+    ],
+    "reactjs": [
+        { "task": "React Foundation", "completed": "Initialized a React application using Vite and structured the initial component hierarchy.", "tools": "React, Vite" },
+        { "task": "Props & State", "completed": "Managed local component state and effectively passed data down the component tree using props.", "tools": "React Hooks" },
+        { "task": "Hooks Implementation", "completed": "Utilized useState, useEffect, and custom hooks to manage lifecycle events and side-effects.", "tools": "React Hooks" },
+        { "task": "React Router setup", "completed": "Implemented client-side routing and protected routes for the application dashboard.", "tools": "React Router v6" },
+        { "task": "Context API", "completed": "Created a global state context to share user authentication status across the application.", "tools": "React Context API" },
+        { "task": "API Integration (Axios)", "completed": "Connected the React frontend to REST APIs utilizing Axios for seamless data synchronization.", "tools": "Axios" },
+        { "task": "Form Handling & Validation", "completed": "Developed interactive forms with real-time input validation and user feedback.", "tools": "React Hook Form / Formik" },
+        { "task": "UI Framework Integration", "completed": "Styled the entire application efficiently using a modern utility-first CSS framework.", "tools": "Tailwind CSS / Material UI" },
+        { "task": "Advanced State Management", "completed": "Implemented Redux Toolkit to manage complex global state slices and asynchronous thunks.", "tools": "Redux Toolkit" },
+        { "task": "Performance Optimization", "completed": "Optimized React rendering performance utilizing React.memo, useMemo, and lazy loading components.", "tools": "React Profiler" }
     ]
 };

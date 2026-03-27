@@ -11,38 +11,61 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Print All Specific Styles */
+        /* Print All Specific Styles - One Page Mode */
         body {
+            display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
             background: #525659;
             padding: 20px 0;
+            margin: 0;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        .print-container {
+            width: 100%;
+            background: #525659;
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         .page {
-            transform: none;
-            /* Show full size vertically so we can see all pages */
-            margin-bottom: 30px;
-            page-break-after: always;
+            position: relative;
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto 30px auto !important;
+            padding: 25mm !important;
+            box-sizing: border-box;
+            background: white;
+            display: flex;
+            flex-direction: column;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-
-            /* Override latter.css fixed heights and overflow */
-            height: auto !important;
-            min-height: 297mm;
-            overflow: visible !important;
+            overflow: hidden;
         }
 
-        .page:last-child {
-            page-break-after: auto;
+        /* Master Footer Styles - now inside each page */
+        .page-footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 11px;
+            color: #333;
+            border-top: 2px solid #f8db02;
+            width: 100%;
         }
 
-        /* Make footer layout in document flow rather than absolute on screen too */
-        footer {
-            position: relative !important;
-            bottom: auto !important;
-            margin-top: auto !important;
-            padding-top: 50px;
+        .page-footer .footer-line {
+            height: 1px;
+            background: #eee;
+            margin-bottom: 5px;
+        }
+
+        .master-footer .footer-line {
+            height: 1px;
+            background: #eee;
+            margin-bottom: 5px;
         }
 
         .print-btn-container {
@@ -65,135 +88,38 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: all 0.3s;
-        }
-
-        .print-btn:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.3);
         }
 
         @page {
             size: A4;
-            margin: 10mm;
+            margin: 0;
         }
 
         @media print {
-            body {
-                background: white;
-                padding: 0;
-                margin: 0;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            .print-btn-container {
-                display: none !important;
-            }
-
-            .page {
+            body { background: white; padding: 0; margin: 0; }
+            .print-btn-container { display: none !important; }
+            .print-container { background: white !important; padding: 0 !important; box-shadow: none !important; margin: 0 !important; }
+            .page { 
                 margin: 0 !important;
                 box-shadow: none !important;
-                width: 100% !important;
-                min-height: 277mm !important;
-                /* A4 height minus 10mm top/bottom margin */
-                height: 277mm !important;
-                /* Explicit A4 height forces the container to stretch and anchor the footer */
-                padding: 0 !important;
-
-                position: relative;
+                border: none !important;
                 page-break-after: always;
-                page-break-inside: avoid;
-
-                display: flex;
-                flex-direction: column;
-                justify-content: space-between;
-                /* Spreads content to fill vertical space */
-                transform: none !important;
+                width: 210mm !important;
+                height: 297mm !important;
             }
-
-            /* The header and footer can stay at the extremes, we rely on flex layout */
-            header {
-                margin-bottom: 20px;
-            }
-
-            /* Push footer to the absolute bottom of the flex container */
-            footer {
-                margin-top: auto !important;
-                padding-top: 20px !important;
-                position: relative !important;
-                bottom: auto !important;
-                left: auto !important;
-                width: 100% !important;
-            }
-
-            /* Enlarge base font size for better print filling */
-            .letter-body,
-            .internship-details,
-            .declaration,
-            .recipient-details {
-                font-size: 16px;
-                line-height: 1.6;
-            }
-
-            /* Logbook specific fixes to allow breaking across pages gracefully */
-            .page.multi-page {
-                display: block;
-                height: auto !important;
-                /* Let multi-page naturally grow past physical limits if needed */
-                min-height: 277mm !important;
-            }
-
-            .page.multi-page footer {
-                padding-top: 10px !important;
-            }
-
-            .print-wrapper-table {
-                width: 100%;
-                border-collapse: collapse;
-                border: none !important;
-                height: 277mm;
-                /* Forces tiny tables to natively push the tfoot to the physical floor */
-            }
-
-            .print-wrapper-table>thead>tr>th,
-            .print-wrapper-table>thead>tr>td,
-            .print-wrapper-table>tbody>tr>td,
-            .print-wrapper-table>tfoot>tr>td {
-                border: none !important;
-                padding: 0 !important;
-                background: transparent !important;
-            }
-
-            .logbook-table {
-                page-break-inside: auto;
-                margin-bottom: 20px;
-            }
-
-            .logbook-table tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-
-            .logbook-table thead {
-                display: table-header-group;
-            }
-
-            .progress-table {
-                page-break-inside: auto;
-                margin-bottom: 20px;
-            }
-
-            .progress-table tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
-
-            .progress-table thead {
-                display: table-header-group;
+            .page:last-child {
+                page-break-after: avoid;
             }
         }
+
+        /* Internal Document Adjustments for scaling readability */
+        .document-title { font-size: 24px !important; margin: 10px 0 !important; }
+        .letter-body p { font-size: 14px !important; margin: 5px 0 !important; }
+        .internship-details table td { padding: 4px !important; font-size: 14px !important; }
+        header { margin-bottom: 10px !important; }
+        .company-logo { height: 50px !important; }
+        .contact-info p { font-size: 10px !important; margin: 2px 0 !important; }
+        .signatures { margin-top: auto !important; padding-bottom: 20px !important; }
 
         /* Progress Report Table */
         .progress-table {
@@ -202,85 +128,40 @@
             font-size: 13px;
             margin-top: 10px;
         }
-
-        .progress-table th,
-        .progress-table td {
+        .progress-table th, .progress-table td {
             border: 1px solid #000;
             padding: 8px;
             text-align: left;
         }
+        .progress-table th { background-color: #f0f0f0; font-weight: bold; }
 
-        .progress-table th {
-            background-color: #f0f0f0;
-            font-weight: bold;
-        }
-
-        /* Logbook specific overrides for A4 Portrait */
+        /* Logbook specific overrides */
         .logbook-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px;
-            margin-top: 20px;
-            table-layout: fixed;
+            font-size: 12px;
+            margin-top: 10px;
         }
-
-        .logbook-table th,
-        .logbook-table td {
+        .logbook-table th, .logbook-table td {
             border: 1px solid #000;
-            padding: 8px;
-            word-wrap: break-word;
+            padding: 6px;
         }
-
-        .logbook-table th {
-            background-color: #f0f0f0;
-            font-weight: bold;
-        }
-
-        .col-week {
-            width: 8%;
-        }
-
-        .col-date {
-            width: 14%;
-            text-align: center;
-        }
-
-        .col-task-assigned {
-            width: 25%;
-        }
-
-        .col-task-completed {
-            width: 35%;
-        }
-
-        .col-tools {
-            width: 18%;
-        }
+        .logbook-table th { background-color: #f0f0f0; font-weight: bold; }
 
         /* Performance Evaluation Table */
         .eval-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 15px;
-            margin-top: 20px;
+            font-size: 14px;
+            margin-top: 10px;
         }
-
-        .eval-table th,
-        .eval-table td {
+        .eval-table th, .eval-table td {
             border: 1px solid #000;
-            padding: 12px;
+            padding: 8px;
             text-align: left;
         }
-
-        .eval-table th {
-            background-color: #f0f0f0;
-            text-align: center;
-        }
-
-        .eval-table .rating-col {
-            text-align: center;
-            width: 15%;
-        }
+        .eval-table th { background-color: #f0f0f0; text-align: center; }
+        .eval-table .rating-col { text-align: center; width: 15%; }
     </style>
 </head>
 
@@ -292,91 +173,91 @@
         </button>
     </div>
 
-    <!-- 1. Offer Letter -->
-    <div class="page">
-        <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
-        <header>
-            <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
-            <div class="contact-info">
-                <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
-                <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
-                        internship.facultyContactNo.slice(5) %></p>
-                <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+    <div class="print-container">
+        <!-- 1. Offer Letter -->
+        <div class="page">
+            <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
+            <header>
+                <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
+                <div class="contact-info">
+                    <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
+                    <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
+                            internship.facultyContactNo.slice(5) %></p>
+                    <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+                </div>
+            </header>
+
+            <div class="yellow-divider"></div>
+            <h2 class="document-title">Internship Offer Letter</h2>
+
+            <div class="date-section">
+                <p><strong>Date : <%= new Date(internship.date).getDate().toString().padStart(2, '0' ) %>-<%= (new
+                                Date(internship.date).getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new
+                                    Date(internship.date).getFullYear() %></strong></p>
             </div>
-        </header>
 
-        <div class="yellow-divider"></div>
-        <h2 class="document-title">Internship Offer Letter</h2>
+            <div class="recipient-details">
+                <p><strong>To,</strong></p>
+                <p><strong><%- internship.studentName %></strong></p>
+                <p><%- internship.collegeName %></p>
+                <p><strong>Address :</strong>
+                    <% let addr=internship.address; if (addr.length> 30) {
+                        let splitIndex = addr.lastIndexOf(' ', 30);
+                        if (splitIndex === -1) splitIndex = 30;
+                        let firstLine = addr.substring(0, splitIndex);
+                        let secondLine = addr.substring(splitIndex).trim();
+                        %>
+                        <%- firstLine %><br><%- secondLine %>
+                                <% } else { %>
+                                    <%- addr %>
+                                        <% } %>
+                </p>
+                <p><strong>Mob no :</strong>+91 <%- internship.studentContactNo.slice(0, 5) + ' ' +
+                        internship.studentContactNo.slice(5) %></p>
+            </div>
 
-        <div class="date-section">
-            <p><strong>Date : <%= new Date(internship.date).getDate().toString().padStart(2, '0' ) %>-<%= (new
-                            Date(internship.date).getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new
-                                Date(internship.date).getFullYear() %></strong></p>
-        </div>
+            <div class="letter-body">
+                <p><strong>Dear <%- internship.studentName %>,</strong></p>
+                <p>It gives me great pleasure to inform you that <strong>Creative Web Infotech</strong> has Join you as an
+                    <strong><%- internship.internshipPosition %></strong> to be based in Surat. This is non-payable
+                    internship, so no stipend will be provided during the internship period.
+                </p>
+            </div>
 
-        <div class="recipient-details">
-            <p><strong>To,</strong></p>
-            <p><strong><%- internship.studentName %></strong></p>
-            <p><%- internship.collegeName %></p>
-            <p><strong>Address :</strong>
-                <% let addr=internship.address; if (addr.length> 30) {
-                    let splitIndex = addr.lastIndexOf(' ', 30);
-                    if (splitIndex === -1) splitIndex = 30;
-                    let firstLine = addr.substring(0, splitIndex);
-                    let secondLine = addr.substring(splitIndex).trim();
-                    %>
-                    <%- firstLine %><br><%- secondLine %>
-                            <% } else { %>
-                                <%- addr %>
-                                    <% } %>
-            </p>
-            <p><strong>Mob no :</strong>+91 <%- internship.studentContactNo.slice(0, 5) + ' ' +
-                    internship.studentContactNo.slice(5) %></p>
-        </div>
+            <div class="internship-details">
+                <p><strong>Details of the Internship are as follow:</strong></p>
+                <table>
+                    <tr>
+                        <td><strong>Internship Position</strong></td>
+                        <td>: <%- internship.internshipPosition %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Duration</strong></td>
+                        <td>: <%- internship.duration %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Starting Date</strong></td>
+                        <td>: <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                                internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Working Time</strong></td>
+                        <td>: <%- internship.workingTime %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Reporting to</strong></td>
+                        <td>: <%- internship.internFacultyName %></td>
+                    </tr>
+                </table>
+            </div>
 
-        <div class="letter-body">
-            <p><strong>Dear <%- internship.studentName %>,</strong></p>
-            <p>It gives me great pleasure to inform you that <strong>Creative Web Infotech</strong> has Join you as an
-                <strong><%- internship.internshipPosition %></strong> to be based in Surat. This is non-payable
-                internship, so no stipend will be provided during the internship period.
-            </p>
-        </div>
+            <div class="declaration">
+                <p><strong>Student declaration and acceptance of offer:</strong></p>
+                <p>I have read the terms and conditions and information regarding my internship offer letter. I affirm that
+                    I accept the offer and will join the above-mentioned company on said date.</p>
+            </div>
 
-        <div class="internship-details">
-            <p><strong>Details of the Internship are as follow:</strong></p>
-            <table>
-                <tr>
-                    <td><strong>Internship Position</strong></td>
-                    <td>: <%- internship.internshipPosition %></td>
-                </tr>
-                <tr>
-                    <td><strong>Duration</strong></td>
-                    <td>: <%- internship.duration %></td>
-                </tr>
-                <tr>
-                    <td><strong>Starting Date</strong></td>
-                    <td>: <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
-                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Working Time</strong></td>
-                    <td>: <%- internship.workingTime %></td>
-                </tr>
-                <tr>
-                    <td><strong>Reporting to</strong></td>
-                    <td>: <%- internship.internFacultyName %></td>
-                </tr>
-            </table>
-        </div>
-
-        <div class="declaration">
-            <p><strong>Student declaration and acceptance of offer:</strong></p>
-            <p>I have read the terms and conditions and information regarding my internship offer letter. I affirm that
-                I accept the offer and will join the above-mentioned company on said date.</p>
-        </div>
-
-        <footer>
             <div class="signatures">
                 <div class="sign-box">
                     <div class="line"></div>
@@ -387,81 +268,82 @@
                     <p><strong>Creative Web Infotech</strong></p>
                 </div>
             </div>
-            <div class="footer-line"></div>
-            <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
-            <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
-        </footer>
-    </div>
+
+            <footer class="page-footer">
+                <div class="footer-line"></div>
+                <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</p>
+                <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
+            </footer>
+        </div>
 
 
-    <!-- 2. Joining Letter -->
-    <div class="page">
-        <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
-        <header>
-            <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
-            <div class="contact-info">
-                <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
-                <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
-                        internship.facultyContactNo.slice(5) %></p>
-                <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+        <!-- 2. Joining Letter -->
+        <div class="page">
+            <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
+            <header>
+                <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
+                <div class="contact-info">
+                    <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
+                    <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
+                            internship.facultyContactNo.slice(5) %></p>
+                    <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+                </div>
+            </header>
+
+            <div class="yellow-divider"></div>
+            <h2 class="document-title">Internship Joining Letter</h2>
+
+            <div class="date-section">
+                <p><strong>Date : <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %></strong>
+                </p>
             </div>
-        </header>
 
-        <div class="yellow-divider"></div>
-        <h2 class="document-title">Internship Joining Letter</h2>
+            <div class="recipient-details">
+                <p><strong>To Whom It May Concern,</strong></p>
+            </div>
 
-        <div class="date-section">
-            <p><strong>Date : <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
-                        internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %></strong>
-            </p>
-        </div>
+            <div class="letter-body">
+                <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
+                            internship.collegeName %></strong>, has officially joined <strong>Creative Web Infotech</strong>
+                    for an internship program.</p>
 
-        <div class="recipient-details">
-            <p><strong>To Whom It May Concern,</strong></p>
-        </div>
-
-        <div class="letter-body">
-            <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
-                        internship.collegeName %></strong>, has officially joined <strong>Creative Web Infotech</strong>
-                for an internship program.</p>
-
-            <p>The student has commenced the internship on <strong>
-                    <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
-                        internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
-                </strong> and is working in the capacity of <strong><%- internship.internshipPosition %></strong>.</p>
-
-            <p>During this period, the intern will be undergoing training and working on practical assignments under the
-                guidance of our technical team. The standard working hours are <strong><%- internship.workingTime
-                        %></strong>.</p>
-
-            <p>We look forward to a mutually beneficial association and wish the intern all the best for their
-                assignments and learning at our organization.</p>
-        </div>
-
-        <div class="internship-details" style="margin-top: 30px;">
-            <table>
-                <tr>
-                    <td><strong>Intern Name</strong></td>
-                    <td>: <%- internship.studentName %></td>
-                </tr>
-                <tr>
-                    <td><strong>Position</strong></td>
-                    <td>: <%- internship.internshipPosition %></td>
-                </tr>
-                <tr>
-                    <td><strong>Joining Date</strong></td>
-                    <td>: <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                <p>The student has commenced the internship on <strong>
+                        <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
                             internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
-                    </td>
-                </tr>
-                <tr>
-                    <td><strong>Mentor</strong></td>
-                    <td>: <%- internship.internFacultyName %></td>
-                </tr>
-            </table>
-        </div>
+                    </strong> and is working in the capacity of <strong><%- internship.internshipPosition %></strong>.</p>
 
-        <footer>
+                <p>During this period, the intern will be undergoing training and working on practical assignments under the
+                    guidance of our technical team. The standard working hours are <strong><%- internship.workingTime
+                            %></strong>.</p>
+
+                <p>We look forward to a mutually beneficial association and wish the intern all the best for their
+                    assignments and learning at our organization.</p>
+            </div>
+
+            <div class="internship-details" style="margin-top: 30px;">
+                <table>
+                    <tr>
+                        <td><strong>Intern Name</strong></td>
+                        <td>: <%- internship.studentName %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Position</strong></td>
+                        <td>: <%- internship.internshipPosition %></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Joining Date</strong></td>
+                        <td>: <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                                internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Mentor</strong></td>
+                        <td>: <%- internship.internFacultyName %></td>
+                    </tr>
+                </table>
+            </div>
+
             <div class="signatures">
                 <div class="sign-box"></div> <!-- Empty for alignment -->
                 <div class="sign-box">
@@ -469,477 +351,289 @@
                     <p><strong>Creative Web Infotech</strong></p>
                 </div>
             </div>
-            <div class="footer-line"></div>
-            <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
-            <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
-        </footer>
-    </div>
 
-
-    <!-- 3. Progress Report -->
-    <div class="page multi-page">
-        <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
-        <table class="print-wrapper-table">
-            <thead>
-                <tr>
-                    <td>
-                        <header>
-                            <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech"
-                                    class="company-logo"></div>
-                            <div class="contact-info">
-                                <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
-                                <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5)
-                                        + ' ' + internship.facultyContactNo.slice(5) %></p>
-                                <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
-                            </div>
-                        </header>
-                        <div class="yellow-divider"></div>
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <h2 class="document-title">Internship Progress Report</h2>
-
-                        <div class="date-section">
-                            <p><strong>Date : <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
-                                            Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new
-                                                Date().getFullYear() %></strong></p>
-                        </div>
-
-                        <div class="internship-details">
-                            <table style="border: none !important;">
-                                <tr>
-                                    <td style="border: none !important; padding:4px 0;"><strong>Intern Name</strong>
-                                    </td>
-                                    <td style="border: none !important; padding:4px 0;">: <%- internship.studentName %>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="border: none !important; padding:4px 0;"><strong>Position</strong></td>
-                                    <td style="border: none !important; padding:4px 0;">: <%-
-                                            internship.internshipPosition %></td>
-                                </tr>
-                                <tr>
-                                    <td style="border: none !important; padding:4px 0;">
-                                        <strong>College/University</strong>
-                                    </td>
-                                    <td style="border: none !important; padding:4px 0;">: <%- internship.collegeName %>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td style="border: none !important; padding:4px 0;"><strong>Mentor</strong></td>
-                                    <td style="border: none !important; padding:4px 0;">: <%-
-                                            internship.internFacultyName %></td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <div class="letter-body" style="margin-top: 20px;">
-                            <p><strong>Overview of Work Completed:</strong></p>
-                            <table class="progress-table">
-                                <thead>
-                                    <tr>
-                                        <th width="15%">Week</th>
-                                        <th width="35%">Tasks Assigned</th>
-                                        <th width="35%">Key Learnings / Outcomes</th>
-                                        <th width="15%">Tools Used</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <% if (logbooks && logbooks.length> 0) { %>
-                                        <% // Show max 5 entries to fit on one page for the Progress Report summary
-                                            const maxEntries=Math.min(logbooks.length, 5); for(let i=0; i<maxEntries;
-                                            i++) { const entry=logbooks[i]; %>
-                                            <tr>
-                                                <td align="center">Week <%= entry.weekNo %>
-                                                </td>
-                                                <td>
-                                                    <%= entry.taskAssigned %>
-                                                </td>
-                                                <td><%- entry.taskCompleted.length> 120 ?
-                                                        entry.taskCompleted.substring(0, 120) + '...' :
-                                                        entry.taskCompleted %></td>
-                                                <td>
-                                                    <%= entry.technology %>
-                                                </td>
-                                            </tr>
-                                            <% } %>
-                                                <% } else { %>
-                                                    <tr>
-                                                        <td colspan="4" align="center">No progress records found.</td>
-                                                    </tr>
-                                                    <% } %>
-                                </tbody>
-                            </table>
-
-                            <% if (logbooks && logbooks.length> 5) { %>
-                                <p style="font-size: 11px; font-style: italic; color: #666; margin-top: 5px;">* Showing
-                                    latest 5 progress entries. Please refer to detailed logbook for complete history.
-                                </p>
-                                <% } %>
-                        </div>
-
-                        <div style="page-break-inside: avoid;">
-                            <div class="declaration" style="margin-top: 20px;">
-                                <p><strong>Mentor Remarks:</strong></p>
-                                <p style="border-bottom: 1px dotted #000; padding-bottom: 20px;"></p>
-                                <p style="border-bottom: 1px dotted #000; padding-bottom: 20px;"></p>
-                            </div>
-
-                            <div class="signatures" style="margin-top: 30px; margin-bottom: 10px;">
-                                <div class="sign-box">
-                                    <div class="line"></div>
-                                    <p><strong>Intern Sign</strong></p>
-                                </div>
-                                <div class="sign-box">
-                                    <div class="line"></div>
-                                    <p><strong>Mentor Sign</strong></p>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td>
-                        <footer>
-                            <div class="footer-line"></div>
-                            <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
-                            <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
-                        </footer>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-
-
-    <!-- 4. Log Book (A4 Portrait Version) -->
-    <div class="page multi-page">
-        <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
-        <table class="print-wrapper-table">
-            <thead>
-                <tr>
-                    <td>
-                        <header>
-                            <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech"
-                                    class="company-logo"></div>
-                            <div class="contact-info">
-                                <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
-                                <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5)
-                                        + ' ' + internship.facultyContactNo.slice(5) %></p>
-                                <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
-                            </div>
-                        </header>
-                        <div class="yellow-divider"></div>
-                    </td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>
-                        <h2 class="document-title">Internship Log Book</h2>
-
-                        <div class="internship-details" style="font-size: 13px; margin-bottom: 10px;">
-                            <table style="border: none !important;">
-                                <tr>
-                                    <td width="120" style="border: none !important; padding:4px 0;"><strong>Intern
-                                            Name</strong></td>
-                                    <td style="border: none !important; padding:4px 0;">: <%- internship.studentName %>
-                                    </td>
-                                    <td width="120" style="border: none !important; padding:4px 0;">
-                                        <strong>Position</strong>
-                                    </td>
-                                    <td style="border: none !important; padding:4px 0;">: <%-
-                                            internship.internshipPosition %></td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <table class="logbook-table">
-                            <thead>
-                                <tr>
-                                    <th class="col-week">Wk No</th>
-                                    <th class="col-date">Date (From-To)</th>
-                                    <th class="col-task-assigned">Task Assigned</th>
-                                    <th class="col-task-completed">Description of Work / Learnings</th>
-                                    <th class="col-tools">Tools/Tech</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (logbooks && logbooks.length> 0) { %>
-                                    <% const formatDate=(dateStr)=> {
-                                        const d = new Date(dateStr);
-                                        return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() +
-                                        1).toString().padStart(2, '0')}-${d.getFullYear()}`;
-                                        };
-
-                                        for(let i=0; i<logbooks.length; i++) { const week=logbooks[i]; %>
-                                            <tr>
-                                                <td align="center">
-                                                    <%= week.weekNo %>
-                                                </td>
-                                                <td align="center" style="font-size: 10px;">
-                                                    <%= formatDate(week.startDate) %><br>To<br>
-                                                        <%= formatDate(week.endDate) %>
-                                                </td>
-                                                <td style="font-weight: bold;">
-                                                    <%= week.taskAssigned %>
-                                                </td>
-                                                <td><%- week.taskCompleted %></td>
-                                                <td>
-                                                    <%= week.technology %>
-                                                </td>
-                                            </tr>
-                                            <% } %>
-                                                <% } else { %>
-                                                    <tr>
-                                                        <td colspan="5" align="center">No logbook entries available.
-                                                        </td>
-                                                    </tr>
-                                                    <% } %>
-                            </tbody>
-                        </table>
-
-                        <div class="signatures" style="margin-top: 40px; margin-bottom: 20px;">
-                            <div class="sign-box">
-                                <div class="line"></div>
-                                <p><strong>Intern Sign</strong></p>
-                            </div>
-                            <div class="sign-box">
-                                <div class="line"></div>
-                                <p><strong>Creative Web Infotech</strong></p>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td>
-                        <footer>
-                            <div class="footer-line"></div>
-                            <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
-                            <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
-                        </footer>
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
-    </div>
-
-
-    <!-- 5. Completion Certificate -->
-    <div class="page">
-        <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
-        <header>
-            <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
-            <div class="contact-info">
-                <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
-                <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
-                        internship.facultyContactNo.slice(5) %></p>
-                <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
-            </div>
-        </header>
-
-        <div class="yellow-divider"></div>
-        <h2 class="document-title" style="text-transform: uppercase;">OJT/internship/ Apprenticeship completion
-            certificate</h2>
-
-        <div class="date-section"
-            style="text-align: left; display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-                <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
-                                Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %>
-                                    </strong></p>
-            </div>
-            <div style="text-align: right;">
-                <p><strong>ID: <%= internship.idno || '________________' %></strong></p>
-            </div>
+            <footer class="page-footer">
+                <div class="footer-line"></div>
+                <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</p>
+                <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
+            </footer>
         </div>
 
-        <div class="letter-body" style="margin-top: 30px; line-height: 1.8;">
-            <% if (internship.marks && internship.grade) { %>
-                <p>This is to certify that D/o, W/o, S/o. <strong><%- internship.studentName %></strong> has
-                    successfully completed on the Job/internship/Apprenticeship training course with grade <strong><%-
-                            internship.grade %></strong> and marks <strong><%- internship.marks %></strong> out of
-                    <strong><%- internship.maxMarks || 50 %></strong> for <strong><%- internship.internshipPosition
-                            %></strong> conducted by <strong>Creative Web Infotech</strong> facilitated by <strong><%-
-                            internship.collegeName %></strong> from <strong>
-                        <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
-                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
-                    </strong>
-                    <% if (internship.showEndingDate !==false) { %>
-                        to <strong>
-                            <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
-                                internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
-                        </strong>
-                        <% } %>
-                            at <strong>Creative Web Infotech, 401, 4th Floor, City Center Complex, Nr. Yogichowk,
-                                Varachha, Surat, Gujarat INDIA - 395006</strong>.
-                </p>
-                <% } else { %>
-                    <p>This is to certify that Ms. / Mr. <strong><%- internship.studentName %></strong> has successfully
-                        completed on the
-                        Job/internship/Apprenticeship training course for <strong><%- internship.internshipPosition
-                                %></strong> conducted by <strong>Creative Web Infotech</strong> facilitated by
-                        <strong><%- internship.collegeName %></strong> from <strong>
-                            <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
-                                internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
-                        </strong>
-                        <% if (internship.showEndingDate !==false) { %>
-                            to <strong>
-                                <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
-                                    internship.endingDate.split('-').reverse().join('-') : internship.endingDate)
-                                    : 'N/A' %>
-                            </strong>
-                            <% } %>
-                                at <strong>Creative Web Infotech, 401, 4th Floor, City Center Complex, Nr. Yogichowk,
-                                    Varachha, Surat, Gujarat INDIA - 395006</strong>.
-                    </p>
-                    <% } %>
-        </div>
 
-        <div style="margin-top: 20px;">
-            <p><strong>Certified by:</strong></p>
-        </div>
+        <!-- 3. Progress Report -->
+        <div class="page">
+            <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
+            <header>
+                <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
+                <div class="contact-info">
+                    <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
+                    <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
+                            internship.facultyContactNo.slice(5) %></p>
+                    <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+                </div>
+            </header>
+            <div class="yellow-divider"></div>
 
-        <% if (internship.marks && internship.grade) { %>
-            <div class="internship-details" style="margin-top: 20px;">
-                <p><strong>Grading for performance are as follows:</strong></p>
-                <table style="width: 100%; border-collapse: collapse; font-size: 14px; margin-top: 10px;">
+            <h2 class="document-title">Internship Progress Report</h2>
+
+            <div class="date-section">
+                <p><strong>Date : <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
+                                Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new
+                                    Date().getFullYear() %></strong></p>
+            </div>
+
+            <div class="internship-details">
+                <table style="border: none !important;">
+                    <tr>
+                        <td style="border: none !important; padding:4px 0;"><strong>Intern Name</strong>
+                        </td>
+                        <td style="border: none !important; padding:4px 0;">: <%- internship.studentName %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: none !important; padding:4px 0;"><strong>Position</strong></td>
+                        <td style="border: none !important; padding:4px 0;">: <%- internship.internshipPosition %></td>
+                    </tr>
+                    <tr>
+                        <td style="border: none !important; padding:4px 0;">
+                            <strong>College/University</strong>
+                        </td>
+                        <td style="border: none !important; padding:4px 0;">: <%- internship.collegeName %>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: none !important; padding:4px 0;"><strong>Mentor</strong></td>
+                        <td style="border: none !important; padding:4px 0;">: <%- internship.internFacultyName %></td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="letter-body" style="margin-top: 20px;">
+                <p><strong>Overview of Work Completed:</strong></p>
+                <table class="progress-table">
                     <thead>
                         <tr>
-                            <th style="border: 1px solid #000; padding: 6px; text-align: left; background: #f0f0f0;">
-                                Letter Grade</th>
-                            <th style="border: 1px solid #000; padding: 6px; text-align: left; background: #f0f0f0;">
-                                Marks (Out of <%= internship.maxMarks || 50 %>)</th>
+                            <th width="15%">Week</th>
+                            <th width="35%">Tasks Assigned</th>
+                            <th width="35%">Key Learnings / Outcomes</th>
+                            <th width="15%">Tools Used</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <% if (internship.maxMarks==60) { %>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 6px;">O (Outstanding)</td>
-                                <td style="border: 1px solid #000; padding: 6px;">58.2 - 60</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 6px;">A+ (Excellent)</td>
-                                <td style="border: 1px solid #000; padding: 6px;">52.2 - 58.19</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 6px;">A (Very Good)</td>
-                                <td style="border: 1px solid #000; padding: 6px;">46.2 - 52.19</td>
-                            </tr>
-                            <tr>
-                                <td style="border: 1px solid #000; padding: 6px;">B+ (Good)</td>
-                                <td style="border: 1px solid #000; padding: 6px;">40.2 - 46.19</td>
-                            </tr>
-                            <% } else if (internship.maxMarks==100) { %>
+                        <% if (logbooks && logbooks.length> 0) { %>
+                            <% // Show max 4 entries to save space
+                                const maxEntries=Math.min(logbooks.length, 4); for(let i=0; i<maxEntries; i++) { const
+                                    entry=logbooks[i]; %>
                                 <tr>
-                                    <td style="border: 1px solid #000; padding: 6px;">O (Outstanding)</td>
-                                    <td style="border: 1px solid #000; padding: 6px;">97.0 - 100</td>
+                                    <td align="center">Week <%= entry.weekNo %>
+                                    </td>
+                                    <td>
+                                        <%= entry.taskAssigned %>
+                                    </td>
+                                    <td><%- entry.taskCompleted.length> 80 ? entry.taskCompleted.substring(0, 80) + '...'
+                                            : entry.taskCompleted %></td>
+                                    <td>
+                                        <%= entry.technology %>
+                                    </td>
                                 </tr>
-                                <tr>
-                                    <td style="border: 1px solid #000; padding: 6px;">A+ (Excellent)</td>
-                                    <td style="border: 1px solid #000; padding: 6px;">87.0 - 96.99</td>
-                                </tr>
-                                <tr>
-                                    <td style="border: 1px solid #000; padding: 6px;">A (Very Good)</td>
-                                    <td style="border: 1px solid #000; padding: 6px;">77.0 - 86.99</td>
-                                </tr>
-                                <tr>
-                                    <td style="border: 1px solid #000; padding: 6px;">B+ (Good)</td>
-                                    <td style="border: 1px solid #000; padding: 6px;">67.0 - 76.99</td>
-                                </tr>
-                                <% } else { %>
-                                    <tr>
-                                        <td style="border: 1px solid #000; padding: 6px;">O (Outstanding)</td>
-                                        <td style="border: 1px solid #000; padding: 6px;">48.5 - 50</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="border: 1px solid #000; padding: 6px;">A+ (Excellent)</td>
-                                        <td style="border: 1px solid #000; padding: 6px;">43.5 - 48.49</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="border: 1px solid #000; padding: 6px;">A (Very Good)</td>
-                                        <td style="border: 1px solid #000; padding: 6px;">38.5 - 43.49</td>
-                                    </tr>
-                                    <tr>
-                                        <td style="border: 1px solid #000; padding: 6px;">B+ (Good)</td>
-                                        <td style="border: 1px solid #000; padding: 6px;">33.5 - 38.49</td>
-                                    </tr>
-                                    <% } %>
+                                <% } %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="4" align="center">No progress records found.</td>
+                                        </tr>
+                                        <% } %>
                     </tbody>
                 </table>
             </div>
-            <% } %>
 
-                <footer>
-                    <div class="signatures" style="margin-top: 30px;">
-                        <div class="sign-box"></div>
-                        <div class="sign-box">
-                            <div class="line"></div>
-                            <p><strong>Creative Web Infotech</strong></p>
-                            <p style="font-size: 11px; font-weight: normal;">Sign and seal (<%-
-                                    internship.internFacultyName %>)</p>
-                        </div>
+            <div style="page-break-inside: avoid; margin-top: auto;">
+                <div class="signatures" style="margin-top: 20px;">
+                    <div class="sign-box">
+                        <div class="line"></div>
+                        <p><strong>Intern Sign</strong></p>
                     </div>
+                    <div class="sign-box">
+                        <div class="line"></div>
+                        <p><strong>Mentor Sign</strong></p>
+                    </div>
+                </div>
+
+                <footer class="page-footer">
                     <div class="footer-line"></div>
-                    <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
-                    <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
+                    <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</p>
+                    <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
                 </footer>
-    </div>
-
-
-    <!-- 6. Performance Evaluation -->
-    <div class="page">
-        <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
-        <header>
-            <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
-            <div class="contact-info">
-                <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
-                <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
-                        internship.facultyContactNo.slice(5) %></p>
-                <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
             </div>
-        </header>
-
-        <div class="yellow-divider"></div>
-        <h2 class="document-title">Intern Performance Evaluation</h2>
-
-        <div class="internship-details">
-            <table>
-                <tr>
-                    <td><strong>Intern Name</strong></td>
-                    <td>: <%- internship.studentName %></td>
-                </tr>
-                <tr>
-                    <td><strong>Position</strong></td>
-                    <td>: <%- internship.internshipPosition %></td>
-                </tr>
-                <tr>
-                    <td><strong>Evaluation Period</strong></td>
-                    <td>: <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
-                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %> to
-                            <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
-                                internship.endingDate.split('-').reverse().join('-') : internship.endingDate)
-                                : 'Present' %>
-                    </td>
-                </tr>
-            </table>
         </div>
 
-        <div class="letter-body" style="margin-top: 20px;">
-            <p><em>Letter Grade: O (Outstanding) = 97% - 100% | A+ (Excellent) = 87% - 96.99% | A (Very Good) = 77% -
-                    86.99% | B+ (Good) = 67% - 76.99%</em></p>
 
-            <table class="eval-table">
+        <!-- 4. Log Book -->
+        <div class="page">
+            <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
+            <header>
+                <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
+                <div class="contact-info">
+                    <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
+                    <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
+                            internship.facultyContactNo.slice(5) %></p>
+                    <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+                </div>
+            </header>
+            <div class="yellow-divider"></div>
+
+            <h2 class="document-title">Internship Log Book</h2>
+
+            <div class="internship-details" style="font-size: 11px; margin-bottom: 5px;">
+                <table style="border: none !important;">
+                    <tr>
+                        <td width="100" style="border: none !important; padding:2px 0;"><strong>Intern
+                                Name</strong></td>
+                        <td style="border: none !important; padding:2px 0;">: <%- internship.studentName %>
+                        </td>
+                        <td width="100" style="border: none !important; padding:2px 0;">
+                            <strong>Position</strong>
+                        </td>
+                        <td style="border: none !important; padding:2px 0;">: <%- internship.internshipPosition %></td>
+                    </tr>
+                </table>
+            </div>
+
+            <table class="logbook-table" style="font-size: 10px;">
                 <thead>
                     <tr>
-                        <th>Performance Criteria</th>
+                        <th class="col-week" style="width: 10%;">Wk</th>
+                        <th class="col-date" style="width: 25%;">Date (From-To)</th>
+                        <th class="col-task-assigned">Task Assigned</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (logbooks && logbooks.length> 0) { %>
+                        <% const formatDate=(dateStr)=> {
+                            const d = new Date(dateStr);
+                            return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() +
+                            1).toString().padStart(2, '0')}-${d.getFullYear()}`;
+                            };
+
+                            // Limit to 8 entries for one-page set
+                            const maxLogEntries = Math.min(logbooks.length, 8);
+                            for(let i=0; i<maxLogEntries; i++) { const week=logbooks[i]; %>
+                                <tr>
+                                    <td align="center">
+                                        <%= week.weekNo %>
+                                    </td>
+                                    <td align="center" style="font-size: 9px;">
+                                        <%= formatDate(week.startDate) %> to
+                                            <%= formatDate(week.endDate) %>
+                                    </td>
+                                    <td style="font-weight: bold;">
+                                        <%= week.taskAssigned %>
+                                    </td>
+                                </tr>
+                                <% } %>
+                                    <% } else { %>
+                                        <tr>
+                                            <td colspan="3" align="center">No logbook entries.</td>
+                                        </tr>
+                                        <% } %>
+                </tbody>
+            </table>
+
+            <div class="signatures" style="margin-top: auto; padding-bottom: 20px;">
+                <div class="sign-box">
+                    <div class="line"></div>
+                    <p><strong>Intern Sign</strong></p>
+                </div>
+                <div class="sign-box">
+                    <div class="line"></div>
+                    <p><strong>Creative Web Infotech</strong></p>
+                </div>
+            </div>
+
+            <footer class="page-footer">
+                <div class="footer-line"></div>
+                <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</p>
+                <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
+            </footer>
+        </div>
+
+
+        <!-- 5. Completion Certificate -->
+        <div class="page">
+            <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
+            <header>
+                <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
+                <div class="contact-info">
+                    <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
+                    <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
+                            internship.facultyContactNo.slice(5) %></p>
+                    <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+                </div>
+            </header>
+
+            <div class="yellow-divider"></div>
+            <h2 class="document-title" style="text-transform: uppercase; font-size: 16px;">Completion Certificate</h2>
+
+            <div class="date-section"
+                style="text-align: left; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
+                                    Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %>
+                                        </strong></p>
+                </div>
+                <div style="text-align: right;">
+                    <p><strong>ID: <%= internship.idno || '________________' %></strong></p>
+                </div>
+            </div>
+
+            <div class="letter-body" style="margin-top: 15px; line-height: 1.5; font-size: 13px;">
+                <p>This is to certify that <strong><%- internship.studentName %></strong> has successfully completed
+                    on the Job/internship/Apprenticeship training course with grade <strong><%- internship.grade %></strong>
+                    and marks <strong><%- internship.marks %></strong> / <strong><%- internship.maxMarks || 50 %></strong> 
+                    for <strong><%- internship.internshipPosition %></strong> from <strong>
+                        <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
+                            internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
+                    </strong> to <strong>
+                            <%= internship.endingDate ? (internship.endingDate.split('-')[0].length===4 ?
+                                internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
+                        </strong> at <strong>Creative Web Infotech</strong>.</p>
+            </div>
+
+            <div class="signatures" style="margin-top: auto; padding-bottom: 20px;">
+                <div class="sign-box"></div>
+                <div class="sign-box">
+                    <div class="line"></div>
+                    <p><strong>Creative Web Infotech</strong></p>
+                </div>
+            </div>
+
+            <footer class="page-footer">
+                <div class="footer-line"></div>
+                <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</p>
+                <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
+            </footer>
+        </div>
+
+
+        <!-- 6. Performance Evaluation -->
+        <div class="page">
+            <div class="watermark"><img src="/logo.png" alt="Watermark"></div>
+            <header>
+                <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
+                <div class="contact-info">
+                    <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
+                    <p><i class="fa-solid fa-phone"></i>+91 <%- internship.facultyContactNo.slice(0, 5) + ' ' +
+                            internship.facultyContactNo.slice(5) %></p>
+                    <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+                </div>
+            </header>
+
+            <div class="yellow-divider"></div>
+            <h2 class="document-title" style="font-size: 16px;">Performance Evaluation</h2>
+
+            <table class="eval-table" style="font-size: 10px; margin-top: 10px;">
+                <thead>
+                    <tr>
+                        <th>Criteria</th>
                         <th class="rating-col">Rating (1-5)</th>
                     </tr>
                 </thead>
@@ -948,96 +642,48 @@
                         if (internship.grade==='A' ) autoRating='4' ; else if (internship.grade==='B+' ) autoRating='4'
                         ; else if (internship.grade) autoRating='3' ; %>
                         <tr>
-                            <td><strong>1. Technical Skills & Knowledge</strong><br><span
-                                    style="font-size:12px;color:#555;">Ability to apply technical knowledge to assigned
-                                    tasks.</span></td>
-                            <td class="rating-col">
-                                <%= autoRating %>
-                            </td>
+                            <td><strong>1. Technical Skills & Knowledge</strong></td>
+                            <td class="rating-col"><%= autoRating %></td>
                         </tr>
                         <tr>
-                            <td><strong>2. Quality of Work</strong><br><span
-                                    style="font-size:12px;color:#555;">Accuracy,
-                                    thoroughness, and neatness of work produced.</span></td>
-                            <td class="rating-col">
-                                <%= autoRating %>
-                            </td>
+                            <td><strong>2. Quality of Work</strong></td>
+                            <td class="rating-col"><%= autoRating %></td>
                         </tr>
                         <tr>
-                            <td><strong>3. Productivity & Time Management</strong><br><span
-                                    style="font-size:12px;color:#555;">Ability to complete tasks within assigned
-                                    deadlines.</span></td>
-                            <td class="rating-col">
-                                <%= autoRating %>
-                            </td>
+                            <td><strong>3. Productivity & Time Management</strong></td>
+                            <td class="rating-col"><%= autoRating %></td>
                         </tr>
                         <tr>
-                            <td><strong>4. Initiative & Problem Solving</strong><br><span
-                                    style="font-size:12px;color:#555;">Ability to identify problems and suggest
-                                    solutions.</span></td>
-                            <td class="rating-col">
-                                <%= autoRating %>
-                            </td>
+                            <td><strong>4. Initiative & Problem Solving</strong></td>
+                            <td class="rating-col"><%= autoRating %></td>
                         </tr>
                         <tr>
-                            <td><strong>5. Communication Skills</strong><br><span
-                                    style="font-size:12px;color:#555;">Clarity
-                                    in verbal and written communication.</span></td>
-                            <td class="rating-col">
-                                <%= autoRating %>
-                            </td>
+                            <td><strong>5. Communication Skills</strong></td>
+                            <td class="rating-col"><%= autoRating %></td>
                         </tr>
                         <tr>
-                            <td><strong>6. Professionalism & Attitude</strong><br><span
-                                    style="font-size:12px;color:#555;">Reliability, punctuality, and responsiveness to
-                                    feedback.</span></td>
-                            <td class="rating-col">
-                                <%= autoRating %>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><strong>7. Teamwork & Collaboration</strong><br><span
-                                    style="font-size:12px;color:#555;">Ability to work effectively with team
-                                    members.</span>
-                            </td>
-                            <td class="rating-col">
-                                <%= autoRating %>
-                            </td>
+                            <td><strong>6. Professionalism & Attitude</strong></td>
+                            <td class="rating-col"><%= autoRating %></td>
                         </tr>
                 </tbody>
             </table>
-        </div>
 
-        <div class="declaration" style="margin-top: 30px;">
-            <p><strong>Overall Feedback / Areas for Improvement:</strong></p>
-            <p style="border-bottom: 1px dotted #000; padding-bottom: 25px; margin-top: 15px;"></p>
-            <p style="border-bottom: 1px dotted #000; padding-bottom: 25px; margin-top: 15px;"></p>
-
-            <% if (internship.marks && internship.grade) { %>
-                <p style="margin-top: 20px;"><strong>Final Evaluation: </strong>Grade: <strong>
-                        <%= internship.grade %>
-                    </strong> | Marks: <strong>
-                        <%= internship.marks %>
-                    </strong> / <strong>
-                        <%= internship.maxMarks || 50 %>
-                    </strong></p>
-                <% } %>
-        </div>
-
-        <footer>
-            <div class="signatures">
-                <div class="sign-box"></div> <!-- Empty for alignment -->
+            <div class="signatures" style="margin-top: auto; padding-bottom: 20px;">
+                <div class="sign-box"></div>
                 <div class="sign-box">
                     <div class="line"></div>
                     <p><strong>Evaluator Signature</strong></p>
-                    <p style="font-size: 11px; font-weight: normal;"><%- internship.internFacultyName %></p>
                 </div>
             </div>
-            <div class="footer-line"></div>
-            <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
-            <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
-        </footer>
+
+            <footer class="page-footer">
+                <div class="footer-line"></div>
+                <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</p>
+                <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
+            </footer>
+        </div>
     </div>
+
 
 </body>
 
