@@ -23,6 +23,9 @@
     if (typeof selectedFaculty !== 'undefined' && selectedFaculty) {
         exportQs += (exportQs ? '&' : '?') + 'faculty=' + encodeURIComponent(selectedFaculty);
     }
+    if (typeof selectedBranch !== 'undefined' && selectedBranch) {
+        exportQs += (exportQs ? '&' : '?') + 'branch=' + encodeURIComponent(selectedBranch);
+    }
 %>
                     <a href="/export<%= exportQs %>" class="btn btn-outline-success rounded-pill px-4 py-2">
                         <i class="fas fa-file-download me-2"></i> Export
@@ -261,42 +264,42 @@
                                         </div>
                                     </div>
 
-                                    <!-- Faculty Filter & Search -->
-                                    <div class="row mb-4">
+                                    <!-- Filters: Faculty, Student / Contact, Branch -->
+                                    <form id="filterForm" class="row mb-4">
+                                        <div class="col-md-4 mb-3 mb-md-0">
+                                            <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                                                <span class="input-group-text bg-white border-0 ps-4">
+                                                    <i class="fas fa-chalkboard-teacher text-muted"></i>
+                                                </span>
+                                                <input type="text" id="facultySearch" name="faculty"
+                                                    class="form-control border-0 py-2"
+                                                    placeholder="Filter by Faculty Name"
+                                                    value="<%= typeof selectedFaculty !== 'undefined' ? selectedFaculty : '' %>">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 mb-3 mb-md-0">
+                                            <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                                                <span class="input-group-text bg-white border-0 ps-4">
+                                                    <i class="fas fa-user text-muted"></i>
+                                                </span>
+                                                <input type="text" id="dashboardSearch" name="search"
+                                                    class="form-control border-0 py-2"
+                                                    placeholder="Student name or contact number"
+                                                    value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+                                            </div>
+                                        </div>
                                         <div class="col-md-4">
-                                            <form action="/" method="GET" id="facultyFilterForm">
-                                                <div class="input-group shadow-sm rounded-pill overflow-hidden">
-                                                    <span class="input-group-text bg-white border-0 ps-4">
-                                                        <i class="fas fa-chalkboard-teacher text-muted"></i>
-                                                    </span>
-                                                    <input type="text" name="faculty" class="form-control border-0 py-2"
-                                                        placeholder="Search by Faculty Name..."
-                                                        value="<%= selectedFaculty %>"
-                                                        onkeypress="if(event.key === 'Enter') this.form.submit()">
-                                                </div>
-                                            </form>
+                                            <div class="input-group shadow-sm rounded-pill overflow-hidden">
+                                                <span class="input-group-text bg-white border-0 ps-4">
+                                                    <i class="fas fa-code-branch text-muted"></i>
+                                                </span>
+                                                <input type="text" id="branchSearch" name="branch"
+                                                    class="form-control border-0 py-2"
+                                                    placeholder="Filter by Branch Name"
+                                                    value="<%= typeof selectedBranch !== 'undefined' ? selectedBranch : '' %>">
+                                            </div>
                                         </div>
-                                        <div class="col-md-8">
-                                            <form action="/" method="GET">
-                                                <% if (typeof selectedFaculty !=='undefined' && selectedFaculty) { %>
-                                                    <input type="hidden" name="faculty" value="<%= selectedFaculty %>">
-                                                    <% } %>
-                                                        <div class="input-group shadow-sm rounded-pill overflow-hidden">
-                                                            <span class="input-group-text bg-white border-0 ps-4">
-                                                                <i class="fas fa-search text-muted"></i>
-                                                            </span>
-                                                            <input type="text" id="dashboardSearch" name="search"
-                                                                class="form-control border-0 py-2"
-                                                                placeholder="Search all records..."
-                                                                value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
-                                                            <button type="submit" class="btn btn-white border-0"
-                                                                aria-label="Search">
-                                                                <!-- Hidden submit button or just enter key works -->
-                                                            </button>
-                                                        </div>
-                                            </form>
-                                        </div>
-                                    </div>
+                                    </form>
 
                                     <!-- Table -->
                                     <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
@@ -350,7 +353,7 @@
                                                         <li
                                                             class="page-item <%= currentPage === 1 ? 'disabled' : '' %>">
                                                             <a class="page-link border-0 shadow-sm rounded-3 px-3 py-2 bg-light text-dark"
-                                                                href="?page=<%= currentPage - 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>"
+                                                                href="?page=<%= currentPage - 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %><%= typeof selectedBranch !== 'undefined' && selectedBranch ? '&branch=' + selectedBranch : '' %>"
                                                                 aria-label="Previous">
                                                                 <i class="fas fa-chevron-left"></i>
                                                             </a>
@@ -362,7 +365,7 @@
                                                             (startPage> 1) { %>
                                                             <li class="page-item"><a
                                                                     class="page-link border-0 bg-light text-dark"
-                                                                    href="?page=1<%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>">1</a>
+                                                                    href="?page=1<%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %><%= typeof selectedBranch !== 'undefined' && selectedBranch ? '&branch=' + selectedBranch : '' %>">1</a>
                                                             </li>
                                                             <% if(startPage> 2) { %> <li class="page-item disabled">
                                                                     <span class="page-link border-0">...</span>
@@ -372,7 +375,7 @@
                                                                         <li
                                                                             class="page-item <%= currentPage === i ? 'active' : '' %>">
                                                                             <a class="page-link border-0 shadow-sm rounded-3 px-3 py-2 <%= currentPage === i ? 'bg-primary text-white' : 'bg-light text-dark shadow-none' %>"
-                                                                                href="?page=<%= i %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>">
+                                                                                href="?page=<%= i %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %><%= typeof selectedBranch !== 'undefined' && selectedBranch ? '&branch=' + selectedBranch : '' %>">
                                                                                 <%= i %>
                                                                             </a>
                                                                         </li>
@@ -384,7 +387,7 @@
                                                                                 <% } %>
                                                                                     <li class="page-item"><a
                                                                                             class="page-link border-0 bg-light text-dark"
-                                                                                            href="?page=<%= totalPages %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>">
+                                                                                            href="?page=<%= totalPages %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %><%= typeof selectedBranch !== 'undefined' && selectedBranch ? '&branch=' + selectedBranch : '' %>">
                                                                                             <%= totalPages %>
                                                                                         </a></li>
                                                                                     <% } %>
@@ -393,7 +396,7 @@
                                                                                         <li
                                                                                             class="page-item <%= currentPage === totalPages ? 'disabled' : '' %>">
                                                                                             <a class="page-link border-0 shadow-sm rounded-3 px-3 py-2 bg-light text-dark"
-                                                                                                href="?page=<%= currentPage + 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %>"
+                                                                                                href="?page=<%= currentPage + 1 %><%= typeof searchQuery !== 'undefined' && searchQuery ? '&search=' + searchQuery : '' %><%= typeof selectedFaculty !== 'undefined' && selectedFaculty ? '&faculty=' + selectedFaculty : '' %><%= typeof selectedBranch !== 'undefined' && selectedBranch ? '&branch=' + selectedBranch : '' %>"
                                                                                                 aria-label="Next">
                                                                                                 <i
                                                                                                     class="fas fa-chevron-right"></i>
@@ -476,6 +479,66 @@
 
                 modal.show();
             }
+
+            async function fetchInternshipRows() {
+                const searchInput = document.getElementById('dashboardSearch');
+                const facultyInput = document.getElementById('facultySearch');
+                const branchInput = document.getElementById('branchSearch');
+                const searchValue = searchInput ? searchInput.value.trim() : '';
+                const facultyValue = facultyInput ? facultyInput.value.trim() : '';
+                const branchValue = branchInput ? branchInput.value.trim() : '';
+                const params = new URLSearchParams();
+                if (searchValue) params.append('search', searchValue);
+                if (facultyValue) params.append('faculty', facultyValue);
+                if (branchValue) params.append('branch', branchValue);
+                params.append('ajax', 'true');
+                params.append('page', '1');
+
+                try {
+                    const response = await fetch(`/?${params.toString()}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to load internships');
+                    }
+                    const html = await response.text();
+                    document.getElementById('internshipTableBody').innerHTML = html;
+                } catch (error) {
+                    console.error('Search error:', error);
+                }
+            }
+
+            const debounce = (fn, delay = 400) => {
+                let timeoutId;
+                return (...args) => {
+                    clearTimeout(timeoutId);
+                    timeoutId = setTimeout(() => fn(...args), delay);
+                };
+            };
+
+            document.addEventListener('DOMContentLoaded', () => {
+                const filterForm = document.getElementById('filterForm');
+                const searchInput = document.getElementById('dashboardSearch');
+                const facultyInput = document.getElementById('facultySearch');
+                const branchInput = document.getElementById('branchSearch');
+
+                if (filterForm) {
+                    filterForm.addEventListener('submit', (event) => {
+                        event.preventDefault();
+                        fetchInternshipRows();
+                    });
+                }
+
+                if (searchInput) {
+                    searchInput.addEventListener('input', debounce(fetchInternshipRows, 400));
+                }
+
+                if (facultyInput) {
+                    facultyInput.addEventListener('input', debounce(fetchInternshipRows, 400));
+                }
+
+                if (branchInput) {
+                    branchInput.addEventListener('input', debounce(fetchInternshipRows, 400));
+                }
+            });
 
             function deleteInternship(id) {
                 if (confirm('Are you sure you want to delete this internship?')) {

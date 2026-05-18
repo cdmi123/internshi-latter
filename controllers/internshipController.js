@@ -165,11 +165,15 @@ exports.getAllInternships = async (req, res) => {
 
         // Faculty Filter Query
         const selectedFaculty = req.query.faculty || '';
+        const selectedBranch = req.query.branch || '';
         let query = { status: { $ne: 'deleted' } };
 
         if (selectedFaculty) {
-            // Use regex for case-insensitive partial match
             query.internFacultyName = { $regex: selectedFaculty, $options: 'i' };
+        }
+
+        if (selectedBranch) {
+            query.branch = { $regex: selectedBranch, $options: 'i' };
         }
 
         const searchQuery = req.query.search || '';
@@ -177,10 +181,7 @@ exports.getAllInternships = async (req, res) => {
             const searchRegex = { $regex: searchQuery, $options: 'i' };
             query.$or = [
                 { studentName: searchRegex },
-                { internshipPosition: searchRegex },
-                { collegeName: searchRegex },
-                { studentContactNo: searchRegex },
-                { branch: searchRegex }
+                { studentContactNo: searchRegex }
             ];
         }
 
@@ -223,6 +224,7 @@ exports.getAllInternships = async (req, res) => {
             limit: limit,
             uniqueFaculties: uniqueFaculties.sort(),
             selectedFaculty: selectedFaculty,
+            selectedBranch: selectedBranch,
             searchQuery: searchQuery
         });
     } catch (err) {
@@ -236,10 +238,15 @@ exports.exportInternships = async (req, res) => {
     console.log('exportInternships route hit. query:', req.query);
     try {
         const selectedFaculty = req.query.faculty || '';
+        const selectedBranch = req.query.branch || '';
         let query = { status: { $ne: 'deleted' } };
 
         if (selectedFaculty) {
             query.internFacultyName = { $regex: selectedFaculty, $options: 'i' };
+        }
+
+        if (selectedBranch) {
+            query.branch = { $regex: selectedBranch, $options: 'i' };
         }
 
         const searchQuery = req.query.search || '';
@@ -247,10 +254,7 @@ exports.exportInternships = async (req, res) => {
             const searchRegex = { $regex: searchQuery, $options: 'i' };
             query.$or = [
                 { studentName: searchRegex },
-                { internshipPosition: searchRegex },
-                { collegeName: searchRegex },
-                { studentContactNo: searchRegex },
-                { branch: searchRegex }
+                { studentContactNo: searchRegex }
             ];
         }
 
