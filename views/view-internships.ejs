@@ -468,6 +468,22 @@
         </div>
 
         <script>
+            async function readFeeApiResponse(response, fallbackMessage) {
+                const contentType = response.headers.get('content-type') || '';
+                if (!contentType.toLowerCase().includes('application/json')) {
+                    if (response.redirected && new URL(response.url).pathname === '/login') {
+                        throw new Error('Your staff session has expired. Please sign in again, then reopen payment history.');
+                    }
+                    throw new Error(`Payment service returned an unexpected response (${response.status}). Refresh the page and try again.`);
+                }
+
+                try {
+                    return await response.json();
+                } catch (error) {
+                    throw new Error(fallbackMessage);
+                }
+            }
+
             async function openLogbookModal(contactNo, studentName) {
                 const modal = new bootstrap.Modal(document.getElementById('logbookModal'));
                 const listContainer = document.getElementById('logbookList');
@@ -584,7 +600,7 @@
 
                 fetch(`/fees/${encodeURIComponent(button.dataset.studentId)}/payments`)
                     .then(async response => {
-                        const result = await response.json();
+                        const result = await readFeeApiResponse(response, 'Unable to read the payment history response.');
                         if (!response.ok || !result.success) {
                             throw new Error(result.error || 'Unable to load payment history.');
                         }
@@ -700,7 +716,7 @@
                         `/fees/${encodeURIComponent(studentId)}/payments/${encodeURIComponent(paymentIndex)}/delete`,
                         { method: 'POST' }
                     );
-                    const result = await response.json();
+                    const result = await readFeeApiResponse(response, 'Unable to read the payment response.');
                     if (!response.ok || !result.success) {
                         throw new Error(result.error || 'Unable to delete payment.');
                     }
@@ -776,7 +792,7 @@
                             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                             body: new URLSearchParams(new FormData(feePaymentForm))
                         });
-                        const result = await response.json();
+                        const result = await readFeeApiResponse(response, 'Unable to read the payment response.');
                         if (!response.ok || !result.success) {
                             throw new Error(result.error || (editingPayment ? 'Unable to update payment.' : 'Unable to save payment.'));
                         }
