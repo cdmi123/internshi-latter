@@ -1,0 +1,68 @@
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>ID No.</th>
+                <th>Student</th>
+                <th>Branch</th>
+                <th class="text-end">Total Fees</th>
+                <th class="text-end">Payment Received</th>
+                <th class="text-end">Fees Unpaid</th>
+                <th>Status</th>
+                <th>Payment Method</th>
+                <th>UPI Account</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (applications.length) { %>
+                <% applications.forEach(application => {
+                    const total = Number(application.totalFees) || 0;
+                    const paid = Number(application.feesPaid) || 0;
+                    const aggregatePaid = Number(application.balancePaid) || 0;
+                    const unpaid = Math.max(total - aggregatePaid, 0);
+                    const paymentStatus = total <= 0
+                        ? 'Fees not entered'
+                        : unpaid === 0
+                            ? 'Paid'
+                            : aggregatePaid > 0
+                                ? 'Partially paid'
+                                : 'Unpaid';
+                    const paymentBadgeClass = paymentStatus === 'Paid'
+                        ? 'bg-success'
+                        : paymentStatus === 'Partially paid'
+                            ? 'bg-warning text-dark'
+                            : paymentStatus === 'Fees not entered'
+                                ? 'bg-secondary'
+                                : 'bg-danger';
+                %>
+                    <tr>
+                        <td><%= application.date ? new Intl.DateTimeFormat('en-CA', {
+                            timeZone: 'Asia/Kolkata',
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                        }).format(new Date(application.date)) : '--' %></td>
+                        <td><%= application.idno || '--' %></td>
+                        <td><%= application.studentName %></td>
+                        <td class="text-capitalize"><%= application.branch %></td>
+                        <td class="text-end">₹<%= total.toFixed(2) %></td>
+                        <td class="text-end text-success fw-semibold">₹<%= paid.toFixed(2) %></td>
+                        <td class="text-end text-danger fw-semibold">₹<%= unpaid.toFixed(2) %></td>
+                        <td>
+                            <span class="badge <%= paymentBadgeClass %>">
+                                <%= paymentStatus %>
+                            </span>
+                        </td>
+                        <td class="text-capitalize"><%= application.paymentMethod === 'legacy' ? 'Existing payment' : application.paymentMethod || '--' %></td>
+                        <td><%= application.accountName || '--' %></td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="10" class="text-center text-muted py-4">No payments found for this date and branch.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>

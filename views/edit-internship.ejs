@@ -73,6 +73,15 @@
                                                         <label for="studentContactNo">Student Contact No</label>
                                                     </div>
                                                 </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="number" class="form-control border-0"
+                                                            id="totalFees" name="totalFees" placeholder="Total Fees"
+                                                            value="<%= internship.totalFees ?? 0 %>" min="0"
+                                                            step="0.01" required>
+                                                        <label for="totalFees">Total Fees (₹)</label>
+                                                    </div>
+                                                </div>
                                                 <div class="col-12">
                                                     <div class="form-floating shadow-sm rounded">
                                                         <textarea class="form-control border-0" id="address"
@@ -97,20 +106,20 @@
                                                 <div class="col-md-6">
                                                     <div class="shadow-sm rounded bg-white px-3 border d-flex align-items-center"
                                                         style="height: 58px;">
-                                                        <select class="form-select border-0 p-0" name="branch" required>
-                                                            <option value="yogichowk" <%=internship.branch==='yogichowk'
-                                                                ? 'selected' : '' %>>Yogichowk</option>
-                                                            <option value="sarthana" <%=internship.branch==='sarthana'
-                                                                ? 'selected' : '' %>>Sarthana</option>
-                                                            <option value="adajan" <%=internship.branch==='adajan'
-                                                                ? 'selected' : '' %>>Adajan</option>
-                                                            <option value="katargam" <%=internship.branch==='katargam'
-                                                                ? 'selected' : '' %>>Katargam</option>
-                                                            <option value="dindoli" <%=internship.branch==='dindoli'
-                                                                ? 'selected' : '' %>>Dindoli</option>
-                                                            <option value="navsari" <%=internship.branch==='navsari'
-                                                                ? 'selected' : '' %>>Navsari</option>
-                                                        </select>
+                                                        <% if (branch) { %>
+                                                            <input type="hidden" name="branch" value="<%= branch %>">
+                                                            <span class="text-muted small">Branch: <%= branch.charAt(0).toUpperCase() + branch.slice(1) %></span>
+                                                        <% } else if (['yogichowk', 'adajan', 'katargam', 'navsari'].includes(internship.branch)) { %>
+                                                            <select class="form-select border-0 p-0" name="branch" required>
+                                                                <option value="yogichowk" <%=internship.branch==='yogichowk' ? 'selected' : '' %>>Yogichowk</option>
+                                                                <option value="adajan" <%=internship.branch==='adajan' ? 'selected' : '' %>>Adajan</option>
+                                                                <option value="katargam" <%=internship.branch==='katargam' ? 'selected' : '' %>>Katargam</option>
+                                                                <option value="navsari" <%=internship.branch==='navsari' ? 'selected' : '' %>>Navsari</option>
+                                                            </select>
+                                                        <% } else { %>
+                                                            <input type="hidden" name="branch" value="<%= internship.branch %>">
+                                                            <span class="text-muted small">Existing branch retained</span>
+                                                        <% } %>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">

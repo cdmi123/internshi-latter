@@ -23,7 +23,18 @@ exports.login = async (req, res) => {
         }
 
         req.session.userId = user._id;
-        res.redirect('/');
+        req.session.branch = user.branch || null;
+        req.session.username = user.username;
+        req.session.save((err) => {
+            if (err) {
+                console.error('Error saving login session:', err);
+                return res.status(500).render('login', {
+                    title: 'Staff Login',
+                    error: 'Unable to start your session. Please try again.'
+                });
+            }
+            res.redirect('/');
+        });
     } catch (err) {
         console.error('Login error:', err);
         res.render('login', {

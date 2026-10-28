@@ -19,6 +19,15 @@
             (durationLower.includes('week')) { const weeks=parseInt(item.duration) || 0; endD.setDate(endD.getDate() +
             (weeks * 7)); } else if (durationLower.includes('day')) { const days=parseInt(item.duration) || 0;
             endD.setDate(endD.getDate() + days); } if (endD <=currentDate) { isCompleted=true; } } } %>
+            <% const feesNeedFullPayment = item.date &&
+                new Intl.DateTimeFormat('en-CA', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }).format(new Date(item.date)) > '2026-09-01' &&
+                ((Number(item.totalFees) || 0) <= 0 ||
+                    (Number(item.feesPaid) || 0) < (Number(item.totalFees) || 0)); %>
             <tr class="application-row <%= isCompleted ? 'table-danger' : '' %>" <%=isCompleted
                 ? 'style="background-color: #ffebee;"' : '' %>>
                 <td class="px-4 font-monospace small">
@@ -71,6 +80,17 @@
                         <%= item.branch || '--' %>
                     </span>
                 </td>
+                <td class="px-4 text-end">
+                    <% const totalFees = Number(item.totalFees) || 0; %>
+                    <% const pendingFees = Math.max(totalFees - (Number(item.feesPaid) || 0), 0); %>
+                    <% if (totalFees <= 0) { %>
+                        <span class="badge bg-secondary-subtle text-secondary">Not set</span>
+                    <% } else if (pendingFees === 0) { %>
+                        <span class="badge bg-success-subtle text-success">Paid</span>
+                    <% } else { %>
+                        <span class="fw-semibold text-danger">₹<%= pendingFees.toFixed(2) %></span>
+                    <% } %>
+                </td>
                 <td class="px-4 text-muted font-monospace small">
                     <%= item.date.toISOString().split('T')[0] %>
                 </td>
@@ -84,6 +104,17 @@
                 </td>
                 <td class="px-4 text-end">
                     <div class="d-flex flex-wrap gap-2 justify-content-end" style="width: 80px; margin-left: auto;">
+                        <% if ((Number(item.totalFees) || 0) > 0) { %>
+                            <button type="button" class="btn btn-sm btn-light text-success"
+                                data-student-id="<%= item._id %>"
+                                data-student-name="<%= item.studentName %>"
+                                data-total-fees="<%= Number(item.totalFees) || 0 %>"
+                                data-fees-paid="<%= Number(item.feesPaid) || 0 %>"
+                                onclick="openFeePaymentModal(this)" data-bs-toggle="tooltip"
+                                title="Add paid fees">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        <% } %>
                         <a href="/view-letter/<%= item._id %>" class="btn btn-sm btn-light text-primary"
                             data-bs-toggle="tooltip" title="View Application">
                             <i class="fas fa-eye"></i>
@@ -94,18 +125,27 @@
                             title="Complete Internship">
                             <i class="fas fa-check-circle"></i>
                         </a>
-                        <a href="/completion-letter/<%= item._id %>" class="btn btn-sm btn-light text-warning"
-                            data-bs-toggle="tooltip" title="Ending Letter">
-                            <i class="fas fa-certificate"></i>
-                        </a>
+                        <% if (feesNeedFullPayment) { %>
+                            <button type="button" class="btn btn-sm btn-light text-muted" disabled
+                                data-bs-toggle="tooltip" title="Pay full fees to print letters other than the offer letter">
+                                <i class="fas fa-certificate"></i>
+                            </button>
+                        <% } else { %>
+                            <a href="/completion-letter/<%= item._id %>" class="btn btn-sm btn-light text-warning"
+                                data-bs-toggle="tooltip" title="Ending Letter">
+                                <i class="fas fa-certificate"></i>
+                            </a>
+                        <% } %>
                         <a href="/logbook-manage/<%= item._id %>" class="btn btn-sm btn-light text-info"
                             data-bs-toggle="tooltip" title="Manage Logbook">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <a href="/print-all/<%= item._id %>" class="btn btn-sm btn-light text-primary" target="_blank"
-                            data-bs-toggle="tooltip" title="Print All Documents">
-                            <i class="fas fa-print"></i>
-                        </a>
+                        <% if (!feesNeedFullPayment) { %>
+                            <a href="/print-all/<%= item._id %>" class="btn btn-sm btn-light text-primary" target="_blank"
+                                data-bs-toggle="tooltip" title="Print All Documents">
+                                <i class="fas fa-print"></i>
+                            </a>
+                        <% } %>
                         <a href="/logbook/<%= item._id %>" class="btn btn-sm btn-light text-success" target="_blank"
                             data-bs-toggle="tooltip" title="Download Logbook">
                             <i class="fas fa-file-excel"></i>
@@ -150,7 +190,7 @@
                 </script>
                 <% } else { %>
                     <tr id="noResultsRow">
-                        <td colspan="6" class="text-center py-5">
+                        <td colspan="8" class="text-center py-5">
                             <div class="text-muted">
                                 <i class="fas fa-inbox fa-3x mb-3 opacity-25"></i>
                                 <p class="mb-0">No records found matching your

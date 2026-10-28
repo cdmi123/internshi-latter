@@ -8,6 +8,46 @@ const puppeteer = require('puppeteer');
 const ejs = require('ejs');
 const logbookTemplates = require('../data/logbookTemplates');
 
+const internshipBranches = ['yogichowk', 'adajan', 'katargam', 'navsari'];
+const feeLetterCutoffDate = '2026-09-01';
+const getIndiaDateKey = (date) => new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Kolkata',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+}).format(date);
+const isAfterFeeCutoff = (date) => {
+    if (!date) return false;
+    const parsedDate = new Date(date);
+    return !Number.isNaN(parsedDate.getTime()) &&
+        getIndiaDateKey(parsedDate) > feeLetterCutoffDate;
+};
+const getIndiaMonthKey = (date) => getIndiaDateKey(date).slice(0, 7);
+const getIndiaDateStart = (dateKey) => {
+    const [year, month, day] = dateKey.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day) - 330 * 60 * 1000);
+};
+const getTotalFeesFromForm = (body) => {
+    if (body.totalFees == null || String(body.totalFees).trim() === '') {
+        return { error: 'Enter total fees before submitting.' };
+    }
+    const totalFees = Number(body.totalFees);
+    if (!Number.isFinite(totalFees) || totalFees <= 0) {
+        return { error: 'Total fees must be greater than zero.' };
+    }
+    return { totalFees };
+};
+const requiresFullFeesForLetters = (internship) => {
+    if (!internship || !internship.date) return false;
+    const totalFees = Number(internship.totalFees) || 0;
+    const feesPaid = Number(internship.feesPaid) || 0;
+    return isAfterFeeCutoff(internship.date) &&
+        (totalFees <= 0 || feesPaid < totalFees);
+};
+const rejectRestrictedLetter = (res) => res.status(403).send(
+    'This document is available after full fees are paid. The offer letter is still available.'
+);
+const getBranchScope = (req) => req.session.branch ? { branch: req.session.branch } : {};
 
 // ... existing methods ...
 const getNextIdno = async () => {
@@ -165,14 +205,14 @@ exports.getAllInternships = async (req, res) => {
 
         // Faculty Filter Query
         const selectedFaculty = req.query.faculty || '';
-        const selectedBranch = req.query.branch || '';
-        let query = { status: { $ne: 'deleted' } };
+        const selectedBranch = req.session.branch || req.query.branch || '';
+        let query = { status: { $ne: 'deleted' }, ...getBranchScope(req) };
 
         if (selectedFaculty) {
             query.internFacultyName = { $regex: selectedFaculty, $options: 'i' };
         }
 
-        if (selectedBranch) {
+        if (selectedBranch && !req.session.branch) {
             query.branch = { $regex: selectedBranch, $options: 'i' };
         }
 
@@ -205,7 +245,10 @@ exports.getAllInternships = async (req, res) => {
         }
 
         // Get Unique Faculties for Dropdown (from ACTIVE records only)
-        const uniqueFaculties = await Internship.distinct('internFacultyName', { status: { $ne: 'deleted' } });
+        const uniqueFaculties = await Internship.distinct('internFacultyName', {
+            status: { $ne: 'deleted' },
+            ...getBranchScope(req)
+        });
 
         // Calculate Stats for all active records
         const allActiveInternships = await Internship.find(query);
@@ -238,14 +281,14 @@ exports.exportInternships = async (req, res) => {
     console.log('exportInternships route hit. query:', req.query);
     try {
         const selectedFaculty = req.query.faculty || '';
-        const selectedBranch = req.query.branch || '';
-        let query = { status: { $ne: 'deleted' } };
+        const selectedBranch = req.session.branch || req.query.branch || '';
+        let query = { status: { $ne: 'deleted' }, ...getBranchScope(req) };
 
         if (selectedFaculty) {
             query.internFacultyName = { $regex: selectedFaculty, $options: 'i' };
         }
 
-        if (selectedBranch) {
+        if (selectedBranch && !req.session.branch) {
             query.branch = { $regex: selectedBranch, $options: 'i' };
         }
 
@@ -347,6 +390,9 @@ exports.viewEndingLetter = async (req, res) => {
         if (!internship) {
             return res.status(404).send('Internship not found');
         }
+        if (requiresFullFeesForLetters(internship)) {
+            return rejectRestrictedLetter(res);
+        }
         res.render('view-ending-letter', {
             internship: internship
         });
@@ -360,13 +406,39 @@ exports.getAddForm = (req, res) => {
     res.render('add-internship', {
         title: 'Add Internship',
         error: null,
-        formData: {}
+        formData: { branch: req.session.branch || '' },
+        branch: req.session.branch || null
     });
 };
 
 exports.createInternship = async (req, res) => {
+    const branch = req.session.branch || req.body.branch;
+    const formData = { ...req.body, branch };
+    const feeValues = getTotalFeesFromForm(req.body);
+    if (feeValues.error) {
+        return res.status(400).render('add-internship', {
+            title: 'Add Internship',
+            error: feeValues.error,
+            formData,
+            branch: req.session.branch || null
+        });
+    }
+    if (!internshipBranches.includes(branch)) {
+        return res.status(400).render('add-internship', {
+            title: 'Add Internship',
+            error: 'Select a valid branch.',
+            formData,
+            branch: req.session.branch || null
+        });
+    }
+
     try {
-        const newInternship = new Internship(req.body);
+        const newInternship = new Internship({
+            ...formData,
+            totalFees: feeValues.totalFees,
+            feesPaid: 0,
+            feePayments: []
+        });
         newInternship.idno = await getNextIdno();
         await newInternship.save();
         res.redirect('/');
@@ -375,7 +447,8 @@ exports.createInternship = async (req, res) => {
         res.render('add-internship', {
             title: 'Add Internship',
             error: 'Error saving data. Please check inputs.',
-            formData: req.body
+            formData,
+            branch: req.session.branch || null
         });
     }
 };
@@ -399,7 +472,49 @@ exports.getEditForm = async (req, res) => {
 
 exports.updateInternship = async (req, res) => {
     try {
-        await Internship.findByIdAndUpdate(req.params.id, req.body);
+        const internship = await Internship.findById(req.params.id);
+        if (!internship) {
+            return res.status(404).send('Internship not found');
+        }
+        const submittedBranch = req.session.branch || req.body.branch;
+        if (submittedBranch && submittedBranch !== internship.branch && !internshipBranches.includes(submittedBranch)) {
+            return res.status(400).render('edit-internship', {
+                title: 'Edit Internship',
+                internship: { ...internship.toObject(), ...req.body },
+                error: 'Select one of the currently available branches.'
+            });
+        }
+
+        const feeValues = getTotalFeesFromForm(req.body);
+        if (feeValues.error) {
+            return res.status(400).render('edit-internship', {
+                title: 'Edit Internship',
+                internship: {
+                    ...internship.toObject(),
+                    totalFees: req.body.totalFees
+                },
+                error: feeValues.error
+            });
+        }
+        if (feeValues.totalFees < (Number(internship.feesPaid) || 0)) {
+            return res.status(400).render('edit-internship', {
+                title: 'Edit Internship',
+                internship: { ...internship.toObject(), totalFees: req.body.totalFees },
+                error: 'Total fees cannot be less than the fees already paid.'
+            });
+        }
+
+        const updateData = {
+            ...req.body,
+            ...(req.session.branch ? { branch: req.session.branch } : {}),
+            totalFees: feeValues.totalFees
+        };
+        delete updateData.feesPaid;
+        delete updateData.feePayments;
+        if (!internshipBranches.includes(internship.branch) && updateData.branch === internship.branch) {
+            delete updateData.branch;
+        }
+        await Internship.findByIdAndUpdate(req.params.id, updateData, { runValidators: true });
         res.redirect('/');
     } catch (err) {
         console.error(err);
@@ -409,6 +524,285 @@ exports.updateInternship = async (req, res) => {
             internship: internship,
             error: 'Error updating data.'
         });
+    }
+};
+
+exports.addFeePayment = async (req, res) => {
+    try {
+        const amount = Number(req.body.amount);
+        const method = req.body.method;
+        const accountName = typeof req.body.accountName === 'string'
+            ? req.body.accountName.trim()
+            : '';
+
+        if (!Number.isFinite(amount) || amount <= 0) {
+            return res.status(400).json({ success: false, error: 'Enter a payment amount greater than zero.' });
+        }
+        if (!['cash', 'upi'].includes(method)) {
+            return res.status(400).json({ success: false, error: 'Choose Cash or UPI.' });
+        }
+        if (method === 'upi' && !accountName) {
+            return res.status(400).json({ success: false, error: 'Enter the UPI account name.' });
+        }
+
+        const internship = await Internship.findById(req.params.id);
+        if (!internship) {
+            return res.status(404).json({ success: false, error: 'Student registration not found.' });
+        }
+
+        const currentTotalFees = Number(internship.totalFees) || 0;
+        const currentFeesPaid = Number(internship.feesPaid) || 0;
+        if (currentTotalFees <= 0 || currentFeesPaid + amount > currentTotalFees) {
+            return res.status(400).json({
+                success: false,
+                error: currentTotalFees <= 0
+                    ? 'Set total fees before adding a payment.'
+                    : `Payment exceeds the remaining balance of ₹${(currentTotalFees - currentFeesPaid).toFixed(2)}.`
+            });
+        }
+
+        const payments = internship.feePayments || [];
+        const recordedPayments = payments.reduce((sum, payment) => sum + (Number(payment.amount) || 0), 0);
+        const legacyPaidAmount = Math.max(currentFeesPaid - recordedPayments, 0);
+        const newPayments = [];
+        if (legacyPaidAmount > 0) {
+            newPayments.push({
+                amount: legacyPaidAmount,
+                method: 'legacy',
+                accountName: '',
+                paidAt: internship.date || new Date()
+            });
+        }
+        newPayments.push({
+            amount,
+            method,
+            accountName: method === 'upi' ? accountName : '',
+            paidAt: new Date()
+        });
+
+        const paymentFilter = {
+            _id: internship._id,
+            totalFees: currentTotalFees,
+            $or: currentFeesPaid === 0
+                ? [{ feesPaid: 0 }, { feesPaid: { $exists: false } }]
+                : [{ feesPaid: currentFeesPaid }]
+        };
+        const updateResult = await Internship.updateOne(
+            paymentFilter,
+            {
+                $inc: { feesPaid: amount },
+                $push: { feePayments: { $each: newPayments } }
+            },
+            { runValidators: true }
+        );
+        if (updateResult.matchedCount !== 1) {
+            return res.status(409).json({
+                success: false,
+                error: 'This registration changed while recording the payment. Refresh and try again.'
+            });
+        }
+
+        return res.json({
+            success: true,
+            feesPaid: currentFeesPaid + amount,
+            remainingFees: currentTotalFees - currentFeesPaid - amount
+        });
+    } catch (err) {
+        console.error('Error adding fee payment:', err);
+        return res.status(500).json({ success: false, error: 'Unable to save the payment.' });
+    }
+};
+
+exports.getFeePaymentHistory = async (req, res) => {
+    try {
+        const internship = await Internship.findById(req.params.id)
+            .select('date totalFees feesPaid feePayments');
+        if (!internship) {
+            return res.status(404).json({ success: false, error: 'Student registration not found.' });
+        }
+
+        const payments = (internship.feePayments || []).map((payment, paymentIndex) => ({
+            amount: Number(payment.amount) || 0,
+            method: payment.method,
+            accountName: payment.accountName || '',
+            paidAt: payment.paidAt,
+            paymentIndex,
+            legacy: false
+        }));
+        const recordedAmount = payments.reduce((total, payment) => total + payment.amount, 0);
+        const legacyAmount = Math.max((Number(internship.feesPaid) || 0) - recordedAmount, 0);
+        if (legacyAmount > 0) {
+            payments.unshift({
+                amount: legacyAmount,
+                method: 'legacy',
+                accountName: '',
+                paidAt: internship.date,
+                paymentIndex: 'legacy',
+                legacy: true
+            });
+        }
+
+        return res.json({
+            success: true,
+            totalFees: Number(internship.totalFees) || 0,
+            feesPaid: Number(internship.feesPaid) || 0,
+            payments: payments.sort((a, b) => new Date(b.paidAt) - new Date(a.paidAt))
+        });
+    } catch (err) {
+        console.error('Error loading fee payment history:', err);
+        return res.status(500).json({ success: false, error: 'Unable to load payment history.' });
+    }
+};
+
+exports.deleteFeePayment = async (req, res) => {
+    try {
+        const internship = await Internship.findById(req.params.id)
+            .select('date feesPaid feePayments');
+        if (!internship) {
+            return res.status(404).json({ success: false, error: 'Student registration not found.' });
+        }
+
+        const currentFeesPaid = Number(internship.feesPaid) || 0;
+        const payments = internship.feePayments || [];
+        const paymentIndex = req.params.paymentIndex;
+        let nextPayments = payments;
+        let paymentAmount;
+
+        if (paymentIndex === 'legacy') {
+            const recordedAmount = payments.reduce(
+                (total, payment) => total + (Number(payment.amount) || 0),
+                0
+            );
+            paymentAmount = Math.max(currentFeesPaid - recordedAmount, 0);
+        } else {
+            const index = Number(paymentIndex);
+            if (!Number.isInteger(index) || index < 0 || index >= payments.length) {
+                return res.status(404).json({ success: false, error: 'Payment entry not found.' });
+            }
+            paymentAmount = Number(payments[index].amount) || 0;
+            nextPayments = [...payments];
+            nextPayments.splice(index, 1);
+        }
+
+        if (paymentAmount <= 0 || paymentAmount > currentFeesPaid) {
+            return res.status(404).json({ success: false, error: 'Payment entry not found.' });
+        }
+
+        const updateResult = await Internship.updateOne(
+            { _id: internship._id, feesPaid: currentFeesPaid },
+            {
+                $set: {
+                    feesPaid: currentFeesPaid - paymentAmount,
+                    feePayments: nextPayments
+                }
+            }
+        );
+        if (updateResult.matchedCount !== 1) {
+            return res.status(409).json({
+                success: false,
+                error: 'This payment history changed. Refresh and try again.'
+            });
+        }
+
+        return res.json({
+            success: true,
+            feesPaid: currentFeesPaid - paymentAmount
+        });
+    } catch (err) {
+        console.error('Error deleting fee payment:', err);
+        return res.status(500).json({ success: false, error: 'Unable to delete the payment.' });
+    }
+};
+
+exports.getFeeCollectionReport = async (req, res) => {
+    try {
+        const now = new Date();
+        const currentMonth = getIndiaMonthKey(now);
+        const monthPattern = /^\d{4}-(0[1-9]|1[0-2])$/;
+        const datePattern = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
+        if (req.query.month && (typeof req.query.month !== 'string' || !monthPattern.test(req.query.month))) {
+            return res.status(400).send('Invalid month. Use YYYY-MM.');
+        }
+        if (req.query.date && (typeof req.query.date !== 'string' || !datePattern.test(req.query.date))) {
+            return res.status(400).send('Invalid date. Use YYYY-MM-DD.');
+        }
+        const selectedMonth = req.query.month || currentMonth;
+        const selectedDate = req.query.date || getIndiaDateKey(now);
+        const selectedBranch = req.session.branch || req.query.branch || '';
+
+        if (selectedBranch && (typeof selectedBranch !== 'string' || !internshipBranches.includes(selectedBranch))) {
+            return res.status(400).send('Invalid branch');
+        }
+
+        const [selectedYear, selectedMonthNumber, selectedDay] = selectedDate.split('-').map(Number);
+        const parsedSelectedDate = new Date(Date.UTC(selectedYear, selectedMonthNumber - 1, selectedDay));
+        if (getIndiaDateKey(parsedSelectedDate) !== selectedDate) {
+            return res.status(400).send('Invalid date. Use a valid calendar date.');
+        }
+
+        const registrationsQuery = {
+            status: { $ne: 'deleted' },
+        };
+        if (req.session.branch || selectedBranch) registrationsQuery.branch = selectedBranch;
+        const registrations = await Internship.find(registrationsQuery)
+            .select('idno studentName branch date totalFees feesPaid feePayments')
+            .sort({ date: 1, studentName: 1 });
+
+        const paymentRows = [];
+        registrations.forEach((registration) => {
+            const paymentHistory = registration.feePayments || [];
+            const recordedPaid = paymentHistory.reduce(
+                (sum, payment) => sum + (Number(payment.amount) || 0),
+                0
+            );
+            const legacyPaid = Math.max((Number(registration.feesPaid) || 0) - recordedPaid, 0);
+            const payments = [...paymentHistory];
+            if (legacyPaid > 0) {
+                payments.push({
+                    amount: legacyPaid,
+                    method: 'legacy',
+                    accountName: '',
+                    paidAt: registration.date
+                });
+            }
+            payments.forEach((payment) => {
+                if (!payment.paidAt || !(Number(payment.amount) > 0)) return;
+                paymentRows.push({
+                    idno: registration.idno,
+                    studentName: registration.studentName,
+                    branch: registration.branch,
+                    date: payment.paidAt,
+                    totalFees: Number(registration.totalFees) || 0,
+                    feesPaid: Number(payment.amount),
+                    balancePaid: Number(registration.feesPaid) || 0,
+                    paymentMethod: payment.method,
+                    accountName: payment.accountName || ''
+                });
+            });
+        });
+        const rowDate = (row) => getIndiaDateKey(new Date(row.date));
+        const selectedDateApplications = paymentRows
+            .filter(row => rowDate(row) === selectedDate)
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+        const applications = paymentRows
+            .filter(row => rowDate(row).startsWith(`${selectedMonth}-`))
+            .sort((a, b) => new Date(a.date) - new Date(b.date));
+        const sumPaidFees = (rows) => rows.reduce((total, row) => total + row.feesPaid, 0);
+
+        res.render('fee-collection-report', {
+            title: 'Fee Collection Report',
+            applications,
+            todayApplications: selectedDateApplications,
+            monthlyPaidTotal: sumPaidFees(applications),
+            todayPaidTotal: sumPaidFees(selectedDateApplications),
+            selectedMonth,
+            selectedDate,
+            selectedBranch,
+            branches: req.session.branch ? [req.session.branch] : internshipBranches
+        });
+    } catch (err) {
+        console.error('Error loading fee collection report:', err);
+        res.status(500).send('Server Error');
     }
 };
 
@@ -463,7 +857,8 @@ exports.getStudentInternships = async (req, res) => {
 
         const internships = await Internship.find({
             studentContactNo: contactNo,
-            status: { $ne: 'deleted' }
+            status: { $ne: 'deleted' },
+            ...getBranchScope(req)
         }).select('studentName internshipPosition startDate duration _id');
 
         res.json(internships);
@@ -613,6 +1008,9 @@ exports.printAllLetters = async (req, res) => {
         if (!internship) {
             return res.status(404).send('Internship not found');
         }
+        if (requiresFullFeesForLetters(internship)) {
+            return rejectRestrictedLetter(res);
+        }
 
         // Fetch associated logbook entries sorted by week number
         const logbookEntries = await Logbook.find({ internshipId: internship._id }).sort({ weekNo: 1 });
@@ -743,7 +1141,14 @@ exports.uploadExcel = async (req, res) => {
             if (!duration) errors.push("Missing Duration");
 
             // Branch
-            const branchRaw = (branch || 'yogichowk').toString().toLowerCase().trim();
+            const inputBranch = branch ? branch.toString().toLowerCase().trim() : '';
+            const branchRaw = req.session.branch || inputBranch || 'yogichowk';
+            if (req.session.branch && inputBranch && inputBranch !== req.session.branch) {
+                errors.push(`Branch must be ${req.session.branch}`);
+            }
+            if (!internshipBranches.includes(branchRaw)) {
+                errors.push(`Invalid Branch: ${branchRaw}`);
+            }
 
             // Working Time
             let workingTime = '6 hrs/day';
@@ -800,15 +1205,16 @@ exports.uploadExcel = async (req, res) => {
         // Re-fetching data for the view
         const page = 1;
         const limit = 20;
-        const totalRecords = await Internship.countDocuments({ status: { $ne: 'deleted' } });
-        const internships = await Internship.find({ status: { $ne: 'deleted' } })
+        const scopedQuery = { status: { $ne: 'deleted' }, ...getBranchScope(req) };
+        const totalRecords = await Internship.countDocuments(scopedQuery);
+        const internships = await Internship.find(scopedQuery)
             .sort({ _id: -1 })
             .limit(limit);
         const totalPages = Math.ceil(totalRecords / limit);
-        const uniqueFaculties = await Internship.distinct('internFacultyName', { status: { $ne: 'deleted' } });
+        const uniqueFaculties = await Internship.distinct('internFacultyName', scopedQuery);
 
         // Stats
-        const allActive = await Internship.find({ status: { $ne: 'deleted' } });
+        const allActive = await Internship.find(scopedQuery);
         const stats = {
             total: totalRecords,
             shift6: allActive.filter(i => i.workingTime === '6 hrs/day').length,
@@ -824,6 +1230,7 @@ exports.uploadExcel = async (req, res) => {
             limit: limit,
             uniqueFaculties: uniqueFaculties.sort(),
             selectedFaculty: '',
+            selectedBranch: req.session.branch || '',
             uploadResult: {
                 success: successRows.length,
                 failed: errorRows.length,
@@ -1056,14 +1463,16 @@ exports.getPublicForm = (req, res) => {
     res.render('public-form', {
         title: 'Internship Application',
         success: req.query.success === 'true',
-        error: null
+        error: null,
+        applicationId: req.query.applicationId || null,
+        formData: {}
     });
 };
 
 // Handle public form submission
 exports.submitPublicForm = async (req, res) => {
     try {
-        const { studentName, collegeName, address, studentContactNo, startDate } = req.body;
+        const { studentName, collegeName, address, studentContactNo, startDate, internshipPosition } = req.body;
 
         // Set default values for required fields not in public form
         const internshipData = {
@@ -1073,7 +1482,7 @@ exports.submitPublicForm = async (req, res) => {
             studentContactNo,
             startDate, // Should be YYYY-MM-DD from form
             date: new Date(), // Application date
-            internshipPosition: 'Web Developer Intern',
+            internshipPosition,
             workingTime: '6 hrs/day',
             internFacultyName: 'Administrative Office',
             facultyContactNo: '0000000000',
@@ -1095,15 +1504,18 @@ exports.submitPublicForm = async (req, res) => {
         }
 
         const newInternship = new Internship(internshipData);
+        newInternship.idno = await getNextIdno();
         await newInternship.save();
 
-        res.redirect('/apply?success=true');
+        res.redirect(`/apply?success=true&applicationId=${encodeURIComponent(newInternship.idno)}`);
     } catch (err) {
         console.error("Error in submitPublicForm:", err);
         res.render('public-form', {
             title: 'Internship Application',
             success: false,
-            error: 'Error submitting application. Please try again.'
+            error: 'Error submitting application. Please check your details and try again.',
+            applicationId: null,
+            formData: req.body
         });
     }
 };

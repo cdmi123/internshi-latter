@@ -174,6 +174,57 @@
                                         </div>
                                     </div>
 
+                                    <div class="modal fade" id="feePaymentModal" tabindex="-1"
+                                        aria-labelledby="feePaymentModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered">
+                                            <div class="modal-content border-0 shadow-lg rounded-4">
+                                                <div class="modal-header border-0 pb-0">
+                                                    <h5 class="modal-title fw-bold" id="feePaymentModalLabel">Add Fee Payment</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                                </div>
+                                                <form id="feePaymentForm">
+                                                    <div class="modal-body py-4">
+                                                        <h6 class="fw-bold" id="feePaymentStudentName"></h6>
+                                                        <p class="small text-muted mb-3">
+                                                            Remaining: <strong id="feePaymentRemaining"></strong>
+                                                        </p>
+                                                        <div class="mb-4">
+                                                            <h6 class="fw-semibold">Payment History</h6>
+                                                            <div id="feePaymentHistory" class="small text-muted">
+                                                                Loading payment history...
+                                                            </div>
+                                                        </div>
+                                                        <div id="feePaymentError" class="alert alert-danger d-none" role="alert"></div>
+                                                        <div class="form-floating mb-3">
+                                                            <input type="number" class="form-control" id="paymentAmount"
+                                                                name="amount" min="0.01" step="0.01" required>
+                                                            <label for="paymentAmount">Paid Amount (₹)</label>
+                                                        </div>
+                                                        <div class="form-floating mb-3">
+                                                            <select class="form-select" id="paymentMethod" name="method" required>
+                                                                <option value="cash">Cash</option>
+                                                                <option value="upi">UPI</option>
+                                                            </select>
+                                                            <label for="paymentMethod">Payment Method</label>
+                                                        </div>
+                                                        <div class="form-floating d-none" id="upiAccountGroup">
+                                                            <input type="text" class="form-control" id="upiAccountName"
+                                                                name="accountName" placeholder="UPI account name">
+                                                            <label for="upiAccountName">UPI Account Name</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer border-0 pt-0">
+                                                        <button type="button" class="btn btn-light rounded-pill px-4"
+                                                            data-bs-dismiss="modal">Cancel</button>
+                                                        <button type="submit" class="btn btn-primary rounded-pill px-4"
+                                                            id="saveFeePaymentButton">Save Payment</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     <!-- Stats Cards -->
                                     <!-- Logbook Selection Modal -->
                                     <div class="modal fade" id="logbookModal" tabindex="-1"
@@ -296,6 +347,7 @@
                                                 <input type="text" id="branchSearch" name="branch"
                                                     class="form-control border-0 py-2"
                                                     placeholder="Filter by Branch Name"
+                                                    <%= branch ? 'readonly' : '' %>
                                                     value="<%= typeof selectedBranch !== 'undefined' ? selectedBranch : '' %>">
                                             </div>
                                         </div>
@@ -316,6 +368,7 @@
                                                             <th class="px-4 py-3 col-student-name">Student Name</th>
                                                             <th class="px-4 py-3 col-position">Position & Duration</th>
                                                             <th class="px-4 py-3">Branch</th>
+                                                            <th class="px-4 py-3 text-end">P.Fees</th>
                                                             <th class="px-4 py-3">Date</th>
                                                             <th class="px-4 py-3">Faculty Guide</th>
                                                             <th class="px-4 py-3 text-end col-actions">Actions</th>
@@ -480,6 +533,116 @@
                 modal.show();
             }
 
+            function openFeePaymentModal(button) {
+                const form = document.getElementById('feePaymentForm');
+                const amountInput = document.getElementById('paymentAmount');
+                const paymentMethod = document.getElementById('paymentMethod');
+                const accountGroup = document.getElementById('upiAccountGroup');
+                const accountInput = document.getElementById('upiAccountName');
+                const errorBox = document.getElementById('feePaymentError');
+                const totalFees = Number(button.dataset.totalFees);
+                const feesPaid = Number(button.dataset.feesPaid);
+                const remaining = Math.max(totalFees - feesPaid, 0);
+                const historyContainer = document.getElementById('feePaymentHistory');
+                const saveButton = document.getElementById('saveFeePaymentButton');
+
+                form.dataset.studentId = button.dataset.studentId;
+                amountInput.max = remaining.toFixed(2);
+                amountInput.disabled = remaining <= 0;
+                amountInput.value = '';
+                paymentMethod.value = 'cash';
+                paymentMethod.disabled = remaining <= 0;
+                accountInput.value = '';
+                accountInput.disabled = remaining <= 0;
+                accountInput.required = false;
+                accountGroup.classList.add('d-none');
+                errorBox.classList.add('d-none');
+                errorBox.textContent = '';
+                saveButton.disabled = remaining <= 0;
+                document.getElementById('feePaymentStudentName').textContent = button.dataset.studentName;
+                document.getElementById('feePaymentRemaining').textContent = `₹${remaining.toFixed(2)}`;
+                historyContainer.textContent = 'Loading payment history...';
+                bootstrap.Modal.getOrCreateInstance(document.getElementById('feePaymentModal')).show();
+
+                fetch(`/fees/${encodeURIComponent(button.dataset.studentId)}/payments`)
+                    .then(async response => {
+                        const result = await response.json();
+                        if (!response.ok || !result.success) {
+                            throw new Error(result.error || 'Unable to load payment history.');
+                        }
+                        historyContainer.replaceChildren();
+                        if (!result.payments.length) {
+                            historyContainer.textContent = 'No payments recorded yet.';
+                            return;
+                        }
+
+                        const table = document.createElement('table');
+                        table.className = 'table table-sm table-striped align-middle mb-0';
+                        table.innerHTML = '<thead><tr><th>Date</th><th>Mode</th><th class="text-end">Amount</th><th>UPI Account</th><th></th></tr></thead>';
+                        const tbody = document.createElement('tbody');
+                        result.payments.forEach(payment => {
+                            const row = document.createElement('tr');
+                            const dateCell = document.createElement('td');
+                            const methodCell = document.createElement('td');
+                            const amountCell = document.createElement('td');
+                            const accountCell = document.createElement('td');
+                            const actionCell = document.createElement('td');
+                            dateCell.textContent = payment.paidAt
+                                ? new Intl.DateTimeFormat('en-CA', {
+                                    timeZone: 'Asia/Kolkata',
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit'
+                                }).format(new Date(payment.paidAt))
+                                : '--';
+                            methodCell.textContent = payment.method === 'legacy'
+                                ? 'Existing payment'
+                                : payment.method.toUpperCase();
+                            amountCell.className = 'text-end text-success fw-semibold';
+                            amountCell.textContent = `₹${Number(payment.amount).toFixed(2)}`;
+                            accountCell.textContent = payment.accountName || '--';
+                            const deleteButton = document.createElement('button');
+                            deleteButton.type = 'button';
+                            deleteButton.className = 'btn btn-sm btn-outline-danger';
+                            deleteButton.textContent = 'Delete';
+                            deleteButton.setAttribute('aria-label', 'Delete this fee payment');
+                            deleteButton.addEventListener('click', () => deleteFeePayment(
+                                button.dataset.studentId,
+                                payment.paymentIndex
+                            ));
+                            actionCell.appendChild(deleteButton);
+                            row.append(dateCell, methodCell, amountCell, accountCell, actionCell);
+                            tbody.appendChild(row);
+                        });
+                        table.appendChild(tbody);
+                        historyContainer.appendChild(table);
+                    })
+                    .catch(error => {
+                        historyContainer.textContent = error.message;
+                    });
+            }
+
+            async function deleteFeePayment(studentId, paymentIndex) {
+                if (!confirm('Delete this payment and add its amount back to pending fees?')) return;
+
+                const errorBox = document.getElementById('feePaymentError');
+                errorBox.classList.add('d-none');
+                try {
+                    const response = await fetch(
+                        `/fees/${encodeURIComponent(studentId)}/payments/${encodeURIComponent(paymentIndex)}/delete`,
+                        { method: 'POST' }
+                    );
+                    const result = await response.json();
+                    if (!response.ok || !result.success) {
+                        throw new Error(result.error || 'Unable to delete payment.');
+                    }
+                    window.location.reload();
+                } catch (error) {
+                    errorBox.textContent = error.message;
+                    errorBox.classList.remove('d-none');
+                }
+            }
+
             async function fetchInternshipRows() {
                 const searchInput = document.getElementById('dashboardSearch');
                 const facultyInput = document.getElementById('facultySearch');
@@ -515,6 +678,44 @@
             };
 
             document.addEventListener('DOMContentLoaded', () => {
+                const paymentMethodInput = document.getElementById('paymentMethod');
+                const upiAccountGroup = document.getElementById('upiAccountGroup');
+                const upiAccountInput = document.getElementById('upiAccountName');
+                const feePaymentForm = document.getElementById('feePaymentForm');
+                const feePaymentError = document.getElementById('feePaymentError');
+                const savePaymentButton = document.getElementById('saveFeePaymentButton');
+
+                paymentMethodInput.addEventListener('change', () => {
+                    const isUpi = paymentMethodInput.value === 'upi';
+                    upiAccountGroup.classList.toggle('d-none', !isUpi);
+                    upiAccountInput.required = isUpi;
+                    if (!isUpi) upiAccountInput.value = '';
+                });
+
+                feePaymentForm.addEventListener('submit', async (event) => {
+                    event.preventDefault();
+                    feePaymentError.classList.add('d-none');
+                    savePaymentButton.disabled = true;
+
+                    try {
+                        const response = await fetch(`/fees/${feePaymentForm.dataset.studentId}/pay`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: new URLSearchParams(new FormData(feePaymentForm))
+                        });
+                        const result = await response.json();
+                        if (!response.ok || !result.success) {
+                            throw new Error(result.error || 'Unable to save payment.');
+                        }
+                        window.location.reload();
+                    } catch (error) {
+                        feePaymentError.textContent = error.message;
+                        feePaymentError.classList.remove('d-none');
+                    } finally {
+                        savePaymentButton.disabled = false;
+                    }
+                });
+
                 const filterForm = document.getElementById('filterForm');
                 const searchInput = document.getElementById('dashboardSearch');
                 const facultyInput = document.getElementById('facultySearch');

@@ -279,6 +279,7 @@
 
 <body>
 
+    <% const applicationFormData = typeof formData === 'undefined' || !formData ? {} : formData; %>
 
     <div class="form-container">
         <div class="form-card position-relative">
@@ -289,8 +290,11 @@
                         <i class="fas fa-check"></i>
                     </div>
                     <h3 class="fw-bold text-dark">Submitted Successfully!</h3>
-                    <p class="text-muted mb-4">Your internship application has been received. We will contact you soon.
+                    <p class="text-muted mb-2">Your internship application has been received. We will contact you soon.
                     </p>
+                    <% if (applicationId) { %>
+                        <p class="fw-semibold text-primary mb-4">Application ID: <%= applicationId %></p>
+                    <% } %>
                     <a href="/apply" class="btn btn-outline-primary rounded-pill px-4">
                         <i class="fas fa-plus me-2"></i> Submit Another Response
                     </a>
@@ -319,7 +323,7 @@
 
                                     <div class="form-floating mb-4">
                                         <input type="text" class="form-control" id="studentName" name="studentName"
-                                            placeholder="Full Name" required>
+                                            placeholder="Full Name" value="<%= applicationFormData.studentName || '' %>" required>
                                         <label for="studentName"><i class="fas fa-user me-2 text-primary"></i> Full
                                             Name</label>
                                     </div>
@@ -328,7 +332,8 @@
                                         <div class="col-md-6 mb-4">
                                             <div class="form-floating">
                                                 <input type="tel" class="form-control" id="studentContactNo"
-                                                    name="studentContactNo" placeholder="Contact Number" required
+                                                    name="studentContactNo" placeholder="Contact Number"
+                                                    value="<%= applicationFormData.studentContactNo || '' %>" required
                                                     pattern="[0-9]{10}">
                                                 <label for="studentContactNo"><i
                                                         class="fas fa-phone me-2 text-primary"></i> Contact No</label>
@@ -337,7 +342,8 @@
                                         <div class="col-md-6 mb-4">
                                             <div class="form-floating">
                                                 <input type="text" class="form-control" id="collegeName"
-                                                    name="collegeName" placeholder="College Name" required>
+                                                    name="collegeName" placeholder="College Name"
+                                                    value="<%= applicationFormData.collegeName || '' %>" required>
                                                 <label for="collegeName"><i
                                                         class="fas fa-university me-2 text-primary"></i> College
                                                     Name</label>
@@ -347,7 +353,8 @@
 
                                     <div class="form-floating mb-4">
                                         <textarea class="form-control" id="address" name="address"
-                                            placeholder="Residential Address" required></textarea>
+                                            placeholder="Residential Address"
+                                            required><%= applicationFormData.address || '' %></textarea>
                                         <label for="address"><i class="fas fa-map-marker-alt me-2 text-primary"></i>
                                             Full Address</label>
                                     </div>
@@ -355,8 +362,16 @@
                                     <div class="section-title">Internship Preferences</div>
 
                                     <div class="form-floating mb-4">
+                                        <input type="text" class="form-control" id="internshipPosition"
+                                            name="internshipPosition" placeholder="Position / Role"
+                                            value="<%= applicationFormData.internshipPosition || '' %>" required>
+                                        <label for="internshipPosition"><i
+                                                class="fas fa-briefcase me-2 text-primary"></i> Position / Role</label>
+                                    </div>
+
+                                    <div class="form-floating mb-4">
                                         <input type="date" class="form-control" id="startDate" name="startDate"
-                                            placeholder="Joining Date" required>
+                                            placeholder="Joining Date" value="<%= applicationFormData.startDate || '' %>" required>
                                         <label for="startDate"><i class="fas fa-calendar-alt me-2 text-primary"></i>
                                             Preferred Joining Date</label>
                                     </div>

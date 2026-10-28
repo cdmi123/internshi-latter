@@ -1,5 +1,28 @@
 const mongoose = require('mongoose');
 
+const feePaymentSchema = new mongoose.Schema({
+    amount: {
+        type: Number,
+        required: true,
+        min: 0.01
+    },
+    method: {
+        type: String,
+        enum: ['cash', 'upi', 'legacy'],
+        required: true
+    },
+    accountName: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    paidAt: {
+        type: Date,
+        required: true,
+        default: Date.now
+    }
+}, { _id: false });
+
 const internshipSchema = new mongoose.Schema({
     date: {
         type: Date,
@@ -52,8 +75,22 @@ const internshipSchema = new mongoose.Schema({
     },
     branch: {
         type: String,
-        enum: ['yogichowk', 'sarthana', 'adajan', 'katargam', 'dindoli', 'navsari'],
+        enum: ['yogichowk', 'adajan', 'katargam', 'navsari'],
         required: true
+    },
+    totalFees: {
+        type: Number,
+        min: 0,
+        default: 0
+    },
+    feesPaid: {
+        type: Number,
+        min: 0,
+        default: 0
+    },
+    feePayments: {
+        type: [feePaymentSchema],
+        default: []
     },
     marks: {
         type: Number
