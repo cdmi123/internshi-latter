@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Employee Document Verification | Creative Web Infotech</title>
+    <link rel="stylesheet" href="/css/verification.css">
+</head>
+
+<body>
+    <header class="verification-topbar">
+        <div class="verification-topbar-inner">
+            <a class="verification-brand" href="/verify" aria-label="Creative Web Infotech verification home">
+                <img src="/logo.png" alt="Creative Web Infotech">
+            </a>
+            <div class="verification-secure">
+                <span class="verification-secure-mark" aria-hidden="true">&#10003;</span>
+                <span class="verification-secure-label">Official verification portal</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="verification-main">
+        <section class="verification-intro" aria-labelledby="verification-title">
+            <span class="verification-eyebrow">Creative Web Infotech</span>
+            <h1 id="verification-title">Employee document verification</h1>
+            <p>Confirm the authenticity of internship documents issued by Creative Web Infotech using the employee ID.</p>
+        </section>
+
+        <section class="verification-card" aria-labelledby="lookup-title">
+            <div class="verification-card-heading">
+                <span class="verification-card-icon" aria-hidden="true">&#128269;</span>
+                <div>
+                    <h2 id="lookup-title">Verify an employee record</h2>
+                    <p>Enter the ID printed on the employee's document.</p>
+                </div>
+            </div>
+
+            <form class="verification-form" action="/verify" method="post">
+                <label for="employeeId">Employee ID</label>
+                <div class="verification-form-row">
+                    <input id="employeeId" name="studentId" type="text" maxlength="50"
+                        placeholder="e.g. CWI20261458" value="<%= studentId %>" autocomplete="off"
+                        autocapitalize="characters" spellcheck="false" required>
+                    <button class="verification-submit" type="submit">
+                        Verify documents <span aria-hidden="true">&rarr;</span>
+                    </button>
+                </div>
+                <p class="verification-form-hint">Enter the complete ID exactly as it appears on the document.</p>
+            </form>
+
+            <% if (error) { %>
+                <p class="verification-error" role="alert"><%= error %></p>
+            <% } %>
+        </section>
+
+        <footer class="verification-page-footer">
+            <strong>Creative Web Infotech</strong><br>
+            Secure document verification service
+        </footer>
+    </main>
+</body>
+
+</html>

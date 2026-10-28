@@ -7,6 +7,7 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 const ejs = require('ejs');
 const logbookTemplates = require('../data/logbookTemplates');
+const { calculateEndDate, extendEndDateForSundays } = require('../utils/internshipDates');
 
 const internshipBranches = ['yogichowk', 'adajan', 'katargam', 'navsari'];
 const feeLetterCutoffDate = '2026-09-01';
@@ -313,7 +314,7 @@ exports.exportInternships = async (req, res) => {
         worksheet.columns = [
             { header: 'ID NO', key: 'idno', width: 15 },
             { header: 'Application Date', key: 'date', width: 20 },
-            { header: 'Student Name', key: 'studentName', width: 25 },
+            { header: 'Employee Name', key: 'studentName', width: 25 },
             { header: 'Start Date', key: 'startDate', width: 15 },
             { header: 'Duration', key: 'duration', width: 15 },
             { header: 'Ending Date', key: 'endingDate', width: 15 },
@@ -321,7 +322,7 @@ exports.exportInternships = async (req, res) => {
             { header: 'Address', key: 'address', width: 30 },
             { header: 'Position', key: 'internshipPosition', width: 25 },
             { header: 'Working Time', key: 'workingTime', width: 15 },
-            { header: 'Student Contact', key: 'studentContactNo', width: 15 },
+            { header: 'Employee Contact', key: 'studentContactNo', width: 15 },
             { header: 'Faculty Name', key: 'internFacultyName', width: 20 },
             { header: 'Faculty Contact', key: 'facultyContactNo', width: 15 },
             { header: 'Branch', key: 'branch', width: 15 },
@@ -379,7 +380,8 @@ exports.viewInternship = async (req, res) => {
             return res.status(404).send('Internship not found');
         }
         res.render('view-letter', {
-            internship: internship
+            internship,
+            verificationMode: false
         });
     } catch (err) {
         console.error(err);
@@ -406,9 +408,73 @@ exports.viewEndingLetter = async (req, res) => {
     }
 };
 
+exports.getLetterVerification = (req, res) => {
+    res.set({
+        'Cache-Control': 'no-store',
+        'X-Robots-Tag': 'noindex, nofollow'
+    });
+    res.render('letter-verification', { error: null, studentId: '' });
+};
+
+exports.verifyStudentLetters = async (req, res) => {
+    res.set({
+        'Cache-Control': 'no-store',
+        'X-Robots-Tag': 'noindex, nofollow'
+    });
+    try {
+        const studentId = typeof req.body.studentId === 'string'
+            ? req.body.studentId.trim().toUpperCase()
+            : '';
+
+        if (!studentId || studentId.length > 50) {
+            return res.status(400).render('letter-verification', {
+                error: 'Enter a valid employee ID.',
+                studentId
+            });
+        }
+
+        const internship = await Internship.findOne({
+            idno: studentId,
+            status: { $ne: 'deleted' }
+        });
+        if (!internship) {
+            return res.status(404).render('letter-verification', {
+                error: 'No active employee was found with this ID. Please check the ID and try again.',
+                studentId
+            });
+        }
+        const totalFees = Number(internship.totalFees) || 0;
+        const feesPaid = Number(internship.feesPaid) || 0;
+        const hasAccessToAllLetters = internship.isFree ||
+            (totalFees > 0 && feesPaid >= totalFees);
+        const documents = hasAccessToAllLetters
+            ? [
+                'Internship Offer Letter',
+                'Internship Joining Letter',
+                'Internship Progress Report',
+                'Internship Log Book',
+                'Internship Completion Certificate',
+                'Performance Evaluation'
+            ]
+            : ['Internship Offer Letter'];
+
+        return res.render('letter-verification-results', {
+            internship,
+            documents
+        });
+    } catch (err) {
+        console.error('Error verifying employee letters:', err);
+        return res.status(500).render('letter-verification', {
+            error: 'Unable to load the letters right now. Please try again later.',
+            studentId: typeof req.body.studentId === 'string' ? req.body.studentId.trim() : ''
+        });
+    }
+};
+
 exports.getAddForm = (req, res) => {
     res.render('add-internship', {
         title: 'Add Internship',
+        pageStylesheet: '/css/application-form.css',
         error: null,
         formData: { branch: req.session.branch || '' },
         branches: internshipBranches,
@@ -423,6 +489,7 @@ exports.createInternship = async (req, res) => {
     if (feeValues.error) {
         return res.status(400).render('add-internship', {
             title: 'Add Internship',
+            pageStylesheet: '/css/application-form.css',
             error: feeValues.error,
             formData,
             branches: internshipBranches,
@@ -432,6 +499,7 @@ exports.createInternship = async (req, res) => {
     if (!internshipBranches.includes(branch)) {
         return res.status(400).render('add-internship', {
             title: 'Add Internship',
+            pageStylesheet: '/css/application-form.css',
             error: 'Select a valid branch.',
             formData,
             branches: internshipBranches,
@@ -442,6 +510,8 @@ exports.createInternship = async (req, res) => {
     try {
         const newInternship = new Internship({
             ...formData,
+            endingDate: calculateEndDate(formData.startDate, formData.duration, formData.workingTime) ||
+                formData.endingDate,
             totalFees: feeValues.totalFees,
             isFree: feeValues.isFree,
             feesPaid: 0,
@@ -454,6 +524,7 @@ exports.createInternship = async (req, res) => {
         console.error(err);
         res.render('add-internship', {
             title: 'Add Internship',
+            pageStylesheet: '/css/application-form.css',
             error: 'Error saving data. Please check inputs.',
             formData,
             branches: internshipBranches,
@@ -517,7 +588,9 @@ exports.updateInternship = async (req, res) => {
             ...req.body,
             ...(req.session.branch ? { branch: req.session.branch } : {}),
             totalFees: feeValues.totalFees,
-            isFree: feeValues.isFree
+            isFree: feeValues.isFree,
+            endingDate: calculateEndDate(req.body.startDate, req.body.duration, req.body.workingTime) ||
+                req.body.endingDate
         };
         delete updateData.feesPaid;
         delete updateData.feePayments;
@@ -567,7 +640,7 @@ exports.addFeePayment = async (req, res) => {
 
         const internship = await Internship.findById(req.params.id);
         if (!internship) {
-            return res.status(404).json({ success: false, error: 'Student registration not found.' });
+            return res.status(404).json({ success: false, error: 'Employee registration not found.' });
         }
         if (internship.isFree) {
             return res.status(400).json({ success: false, error: 'This is a free internship; fees cannot be added.' });
@@ -641,7 +714,7 @@ exports.getFeePaymentHistory = async (req, res) => {
         const internship = await Internship.findById(req.params.id)
             .select('date totalFees feesPaid feePayments');
         if (!internship) {
-            return res.status(404).json({ success: false, error: 'Student registration not found.' });
+            return res.status(404).json({ success: false, error: 'Employee registration not found.' });
         }
 
         const payments = (internship.feePayments || []).map((payment, paymentIndex) => ({
@@ -682,7 +755,7 @@ exports.deleteFeePayment = async (req, res) => {
         const internship = await Internship.findById(req.params.id)
             .select('date feesPaid feePayments');
         if (!internship) {
-            return res.status(404).json({ success: false, error: 'Student registration not found.' });
+            return res.status(404).json({ success: false, error: 'Employee registration not found.' });
         }
 
         const currentFeesPaid = Number(internship.feesPaid) || 0;
@@ -771,7 +844,7 @@ exports.updateFeePayment = async (req, res) => {
         const internship = await Internship.findById(req.params.id)
             .select('totalFees feesPaid feePayments isFree');
         if (!internship) {
-            return res.status(404).json({ success: false, error: 'Student registration not found.' });
+            return res.status(404).json({ success: false, error: 'Employee registration not found.' });
         }
         if (internship.isFree) {
             return res.status(400).json({ success: false, error: 'This is a free internship; fees cannot be edited.' });
@@ -906,6 +979,17 @@ exports.getFeeCollectionReport = async (req, res) => {
             .filter(row => rowDate(row).startsWith(`${selectedMonth}-`))
             .sort((a, b) => new Date(a.date) - new Date(b.date));
         const sumPaidFees = (rows) => rows.reduce((total, row) => total + row.feesPaid, 0);
+        const getPaymentTotals = (rows) => rows.reduce((totals, row) => {
+            if (row.paymentMethod === 'cash') {
+                totals.cash += row.feesPaid;
+            } else if (row.paymentMethod === 'upi') {
+                totals.upi += row.feesPaid;
+            } else {
+                totals.other += row.feesPaid;
+            }
+            totals.total += row.feesPaid;
+            return totals;
+        }, { cash: 0, upi: 0, other: 0, total: 0 });
 
         res.render('fee-collection-report', {
             title: 'Fee Collection Report',
@@ -913,6 +997,8 @@ exports.getFeeCollectionReport = async (req, res) => {
             todayApplications: selectedDateApplications,
             monthlyPaidTotal: sumPaidFees(applications),
             todayPaidTotal: sumPaidFees(selectedDateApplications),
+            todayPaymentTotals: getPaymentTotals(selectedDateApplications),
+            monthlyPaymentTotals: getPaymentTotals(applications),
             selectedMonth,
             selectedDate,
             selectedBranch,
@@ -1135,7 +1221,8 @@ exports.printAllLetters = async (req, res) => {
 
         res.render('print-all-letters', {
             internship: internship,
-            logbooks: logbookEntries
+            logbooks: logbookEntries,
+            verificationMode: false
         });
     } catch (err) {
         console.error("Error in printAllLetters:", err);
@@ -1232,7 +1319,7 @@ exports.uploadExcel = async (req, res) => {
                 return null;
             };
 
-            const studentName = getVal(['Student Name', 'studentName', 'Name']);
+            const studentName = getVal(['Employee Name', 'Student Name', 'studentName', 'Name']);
             const applicationDateRaw = getVal(['Application Date', 'applicationDate', 'Date']);
             const startDateRaw = getVal(['Starting Date', 'startDate', 'Start Date']);
             const duration = getVal(['Duration', 'duration']);
@@ -1240,7 +1327,7 @@ exports.uploadExcel = async (req, res) => {
             const workingTimeRaw = getVal(['Working Time', 'workingTime']);
 
             // Validations
-            if (!studentName) errors.push("Missing Student Name");
+            if (!studentName) errors.push("Missing Employee Name");
 
             // Strict Date Validation
             let startDateFormatted = null;
@@ -1287,12 +1374,17 @@ exports.uploadExcel = async (req, res) => {
                     idno: nextId,
                     startDate: startDateFormatted,
                     duration: duration,
-                    endingDate: getVal(['Ending Date', 'endingDate']) ? formatDateForDB(parseExcelDate(getVal(['Ending Date', 'endingDate']))) : '',
+                    endingDate: getVal(['Ending Date', 'endingDate'])
+                        ? extendEndDateForSundays(
+                            startDateFormatted,
+                            formatDateForDB(parseExcelDate(getVal(['Ending Date', 'endingDate'])))
+                        )
+                        : '',
                     collegeName: getVal(['College Name', 'collegeName']) || '',
                     address: getVal(['Full Address', 'address']) || 'Surat',
                     internshipPosition: getVal(['Internship Position', 'internshipPosition']) || 'Intern',
                     workingTime: workingTime,
-                    studentContactNo: getVal(['Student Contact No', 'studentContactNo', 'Contact']) || '0000000000',
+                    studentContactNo: getVal(['Employee Contact No', 'Student Contact No', 'studentContactNo', 'Contact']) || '0000000000',
                     internFacultyName: getVal(['Faculty Name', 'internFacultyName', 'Faculty']) || 'TBD',
                     facultyContactNo: getVal(['Faculty Contact No', 'facultyContactNo']) || '0000000000',
                     branch: branchRaw,
@@ -1373,7 +1465,7 @@ exports.downloadTemplate = async (req, res) => {
 
         worksheet.columns = [
             { header: 'Application Date', key: 'applicationDate', width: 15 },
-            { header: 'Student Name', key: 'studentName', width: 25 },
+            { header: 'Employee Name', key: 'studentName', width: 25 },
             { header: 'Starting Date', key: 'startDate', width: 15 },
             { header: 'Duration', key: 'duration', width: 15 },
             { header: 'Ending Date', key: 'endingDate', width: 15 },
@@ -1381,7 +1473,7 @@ exports.downloadTemplate = async (req, res) => {
             { header: 'Full Address', key: 'address', width: 30 },
             { header: 'Internship Position', key: 'internshipPosition', width: 25 },
             { header: 'Working Time', key: 'workingTime', width: 15 },
-            { header: 'Student Contact No', key: 'studentContactNo', width: 15 },
+            { header: 'Employee Contact No', key: 'studentContactNo', width: 15 },
             { header: 'Faculty Name', key: 'internFacultyName', width: 20 },
             { header: 'Faculty Contact No', key: 'facultyContactNo', width: 15 },
             { header: 'Branch', key: 'branch', width: 15 }
@@ -1620,17 +1712,7 @@ exports.submitPublicForm = async (req, res) => {
             status: 'active'
         };
 
-        // Auto-calculate ending date (approx 3 months)
-        if (startDate) {
-            const start = new Date(startDate);
-            if (!isNaN(start.getTime())) {
-                start.setMonth(start.getMonth() + 3);
-                const y = start.getFullYear();
-                const m = String(start.getMonth() + 1).padStart(2, '0');
-                const d = String(start.getDate()).padStart(2, '0');
-                internshipData.endingDate = `${y}-${m}-${d}`;
-            }
-        }
+        internshipData.endingDate = calculateEndDate(startDate, internshipData.duration, internshipData.workingTime);
 
         const newInternship = new Internship(internshipData);
         newInternship.idno = await getNextIdno();

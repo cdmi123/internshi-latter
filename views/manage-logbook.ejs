@@ -274,7 +274,7 @@
                         if (totalWeeks < 1) totalWeeks = 1;
 
                         // 2. Deterministic Random Generator (Seeded by Internship ID)
-                        // This ensures the hours for "Week 1" are always the same for this student
+                        // This ensures the hours for "Week 1" are always the same for this employee
                         const seedStr = "<%= internship._id %>";
                         let seed = 0;
                         for (let i = 0; i < seedStr.length; i++) {
@@ -386,7 +386,7 @@
                         return;
                     }
 
-                    if (!confirm('This will replace all existing logbook entries for this student. Continue?')) {
+                    if (!confirm('This will replace all existing logbook entries for this employee. Continue?')) {
                         return;
                     }
 

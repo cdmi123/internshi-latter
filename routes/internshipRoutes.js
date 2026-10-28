@@ -43,13 +43,15 @@ router.get('/logout', authController.logout);
 // Public applications are not tied to a staff branch account.
 router.get('/apply', internshipController.getPublicForm);
 router.post('/apply', internshipController.submitPublicForm);
+router.get('/verify', internshipController.getLetterVerification);
+router.post('/verify', internshipController.verifyStudentLetters);
 
 router.use(authMiddleware, branchAccessMiddleware);
 
 // Read (List) - PROTECTED
 router.get('/', internshipController.getAllInternships);
 
-// API: Get Internships by Student Contact - PROTECTED
+// API: Get Internships by Employee Contact - PROTECTED
 router.get('/api/student-internships', internshipController.getStudentInternships);
 
 // Read (View Letter) - PROTECTED

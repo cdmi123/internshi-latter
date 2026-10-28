@@ -28,11 +28,7 @@ body {
 /* CROSS WATERMARK */
 .watermark {
     position: absolute;
-    top: 50%;
-    left: 50%;
-
-    transform: translate(-50%, -50%);
-
+    inset: 0;
     width: 100%;
     height: 100%;
 
@@ -48,8 +44,8 @@ body {
     top: 50%;
     left: 50%;
 
-    width: 420px;
-    height: 420px;
+    width: 360px;
+    height: 360px;
 
     transform:
         translate(-50%, -50%) rotate(-35deg);
@@ -59,7 +55,7 @@ body {
     background-position: center;
     background-size: contain;
 
-    opacity: 0.05;
+    opacity: 0.12;
 }
 
 /* CONTENT */
@@ -109,6 +105,17 @@ header {
     text-align: right;
     margin-bottom: 24px;
     font-size: 14px;
+}
+
+.document-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    text-align: left;
+}
+
+.document-meta p:last-child {
+    text-align: right;
 }
 
 .recipient-details {

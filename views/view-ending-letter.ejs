@@ -16,7 +16,7 @@
 <body>
 
     <div class="page">
-        <!-- Watermark -->
+        <div class="watermark"></div>
 
         <!-- Header -->
         <header>
@@ -36,16 +36,11 @@
         <h2 class="document-title" style="text-transform: uppercase;">OJT/internship/ Apprenticeship completion
             certificate</h2>
 
-        <div class="date-section"
-            style="text-align: left; display: flex; justify-content: space-between; align-items: flex-start;">
-            <div>
-                <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
-                                Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %>
-                    </strong></p>
-            </div>
-            <div style="text-align: right;">
-                <p><strong>ID: <%= internship.idno || '________________' %></strong></p>
-            </div>
+        <div class="date-section document-meta">
+            <p><strong>ID : <%= internship.idno || 'N/A' %></strong></p>
+            <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
+                            Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %>
+                </strong></p>
         </div>
 
         <div class="letter-body" style="margin-top: 20px; line-height: 1.5;">

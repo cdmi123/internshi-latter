@@ -15,6 +15,7 @@
         }
 
         body {
+            position: relative;
             font-family: 'Open Sans', sans-serif;
             margin: 0;
             padding: 10px;
@@ -25,6 +26,20 @@
             print-color-adjust: exact;
             width: 100%;
             box-sizing: border-box;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            z-index: 0;
+            width: 320px;
+            height: 320px;
+            background: url('/logo.png') center / contain no-repeat;
+            opacity: 0.06;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            pointer-events: none;
         }
 
         @media print {
@@ -43,6 +58,8 @@
         }
 
         .header {
+            position: relative;
+            z-index: 1;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -70,6 +87,8 @@
         }
 
         table {
+            position: relative;
+            z-index: 1;
             width: 100%;
             border-collapse: collapse;
             font-size: 12px;
@@ -139,6 +158,8 @@
         }
 
         .footer {
+            position: relative;
+            z-index: 1;
             display: flex;
             justify-content: space-between;
             margin-top: 50px;

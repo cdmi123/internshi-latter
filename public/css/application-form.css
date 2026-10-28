@@ -1,0 +1,396 @@
+.application-page {
+    --application-navy: #14264b;
+    --application-blue: #3156c8;
+    --application-muted: #64748b;
+    max-width: 1540px;
+    margin-right: auto;
+    color: #17233c;
+}
+
+.application-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin: 0 auto 1.5rem;
+    max-width: 1240px;
+}
+
+.application-eyebrow,
+.application-card-kicker {
+    color: var(--application-blue);
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+}
+
+.application-heading h1 {
+    margin: 0.35rem 0 0.25rem;
+    color: var(--application-navy);
+    font-size: clamp(1.7rem, 3vw, 2.2rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+}
+
+.application-heading p {
+    margin: 0;
+    color: var(--application-muted);
+    font-size: 0.94rem;
+}
+
+.application-cancel {
+    border: 1px solid #dce3f0;
+    border-radius: 0.75rem;
+    background: #fff;
+    color: #475569;
+    font-weight: 600;
+    padding: 0.7rem 1rem;
+    white-space: nowrap;
+}
+
+.application-cancel:hover {
+    border-color: #b8c5e0;
+    background: #f8faff;
+    color: var(--application-navy);
+}
+
+.application-hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2rem;
+    max-width: 1240px;
+    min-height: 170px;
+    margin: 0 auto 1.5rem;
+    overflow: hidden;
+    border-radius: 1.25rem;
+    background: linear-gradient(115deg, #14264b 0%, #1b3972 58%, #3156c8 100%);
+    box-shadow: 0 14px 32px rgb(22 44 91 / 14%);
+    padding: 1.8rem 2rem;
+    color: #fff;
+}
+
+.application-brand {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.application-logo {
+    display: grid;
+    width: 76px;
+    height: 76px;
+    flex: 0 0 76px;
+    place-items: center;
+    border-radius: 1rem;
+    background: #fff;
+    padding: 0.45rem;
+}
+
+.application-logo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.application-company-name {
+    font-size: clamp(0.9rem, 1.7vw, 1.2rem);
+    font-weight: 800;
+    letter-spacing: 0.04em;
+}
+
+.application-company-caption {
+    margin-top: 0.4rem;
+    color: #c6d5ff;
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+}
+
+.application-hero-copy {
+    position: relative;
+    z-index: 1;
+    max-width: 355px;
+    border-left: 1px solid rgb(255 255 255 / 28%);
+    padding-left: 1.6rem;
+}
+
+.application-hero-copy span {
+    color: #d7e2ff;
+    font-size: 0.68rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+}
+
+.application-hero-copy p {
+    margin: 0.55rem 0 0;
+    color: #fff;
+    font-size: 0.93rem;
+    line-height: 1.6;
+}
+
+.application-hero-decoration {
+    position: absolute;
+    right: 34%;
+    bottom: -3rem;
+    color: rgb(255 255 255 / 6%);
+    font-size: 11rem;
+    transform: rotate(-12deg);
+}
+
+.application-card {
+    overflow: hidden;
+    border: 1px solid #e6ebf4;
+    border-radius: 1.25rem;
+    background: #fff;
+    box-shadow: 0 16px 42px rgb(28 43 75 / 8%);
+}
+
+.application-card-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    border-bottom: 1px solid #edf0f6;
+    background: linear-gradient(180deg, #fff 0%, #fbfcff 100%);
+    padding: 1.5rem 2.25rem;
+}
+
+.application-card-heading h2 {
+    margin: 0.35rem 0 0.25rem;
+    color: var(--application-navy);
+    font-size: 1.2rem;
+    font-weight: 750;
+}
+
+.application-card-heading p {
+    margin: 0;
+    color: var(--application-muted);
+    font-size: 0.83rem;
+}
+
+.application-secure-label {
+    flex: 0 0 auto;
+    border: 1px solid #dce7ff;
+    border-radius: 999px;
+    background: #f4f7ff;
+    color: #3156a8;
+    font-size: 0.76rem;
+    font-weight: 700;
+    padding: 0.55rem 0.85rem;
+}
+
+.application-card-body {
+    padding: 2rem 2.25rem 2.25rem;
+}
+
+.application-section-title {
+    color: var(--application-navy) !important;
+    font-size: 1rem;
+    letter-spacing: -0.01em;
+}
+
+.application-section-title > span {
+    display: grid;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    place-items: center;
+    border-radius: 0.8rem !important;
+    background: #eff4ff !important;
+    color: var(--application-blue);
+    padding: 0 !important;
+}
+
+.application-page .form-floating {
+    overflow: hidden;
+    border: 1px solid #e1e7f0;
+    border-radius: 0.75rem !important;
+    background: #fff;
+    box-shadow: none !important;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.application-page .form-floating:focus-within {
+    border-color: #7893e4;
+    box-shadow: 0 0 0 3px rgb(49 86 200 / 10%) !important;
+}
+
+.application-page .form-floating > .form-control {
+    border: 0;
+    background-color: transparent;
+    box-shadow: none;
+}
+
+.application-page .form-floating > label {
+    color: #68758a;
+}
+
+.application-page .form-floating > .form-control:focus ~ label,
+.application-page .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: #526ba9;
+}
+
+.application-page .form-control,
+.application-page .form-select {
+    color: #17233c;
+}
+
+.fee-type-options {
+    min-height: 58px;
+    border: 1px solid #e1e7f0;
+    border-radius: 0.75rem;
+    background: #fff;
+    padding: 0.75rem 1rem;
+}
+
+.fee-type-options .form-check {
+    margin: 0;
+}
+
+.fee-total-input {
+    min-height: 58px;
+    border-color: #e1e7f0;
+    border-radius: 0.75rem;
+    padding: 0.75rem 1rem;
+}
+
+.fee-total-input:focus {
+    border-color: #7893e4;
+    box-shadow: 0 0 0 3px rgb(49 86 200 / 10%);
+}
+
+.application-page .form-check-input:checked {
+    border-color: var(--application-blue);
+    background-color: var(--application-blue);
+}
+
+.application-page hr {
+    margin: 1.8rem 0 !important;
+    color: #d9e0ec !important;
+    opacity: 1 !important;
+}
+
+.application-page [style*="height: 58px"] {
+    border-color: #e1e7f0 !important;
+    border-radius: 0.75rem !important;
+    box-shadow: none !important;
+}
+
+.application-page #monthInputDiv .form-floating,
+.application-page #hoursInputDiv .form-floating,
+.application-page .form-floating.bg-light {
+    background: #f7f9fc;
+}
+
+.application-page .application-submit-row {
+    border-top: 1px solid #edf0f6;
+}
+
+.application-submit-note {
+    color: #718096;
+    font-size: 0.78rem;
+}
+
+.application-submit {
+    min-height: 50px;
+    box-shadow: 0 8px 18px rgb(49 86 200 / 20%);
+}
+
+@media (max-width: 767.98px) {
+    .application-page {
+        padding: 1.25rem 1rem;
+    }
+
+    .application-heading {
+        align-items: flex-start;
+        margin-bottom: 1.1rem;
+    }
+
+    .application-heading p {
+        max-width: 240px;
+        font-size: 0.86rem;
+    }
+
+    .application-cancel {
+        padding: 0.6rem 0.75rem;
+        font-size: 0.82rem;
+    }
+
+    .application-hero {
+        min-height: 0;
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 1.2rem;
+        margin-bottom: 1rem;
+        border-radius: 1rem;
+        padding: 1.2rem;
+    }
+
+    .application-logo {
+        width: 60px;
+        height: 60px;
+        flex-basis: 60px;
+        border-radius: 0.8rem;
+    }
+
+    .application-company-caption {
+        font-size: 0.57rem;
+        letter-spacing: 0.08em;
+    }
+
+    .application-hero-copy {
+        max-width: none;
+        border-top: 1px solid rgb(255 255 255 / 25%);
+        border-left: 0;
+        padding: 0.9rem 0 0;
+    }
+
+    .application-hero-copy p {
+        max-width: 360px;
+        font-size: 0.85rem;
+    }
+
+    .application-hero-decoration {
+        right: -1rem;
+        bottom: -3.5rem;
+        font-size: 9rem;
+    }
+
+    .application-card {
+        border-radius: 1rem;
+    }
+
+    .application-card-heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.9rem;
+        padding: 1.25rem 1.2rem;
+    }
+
+    .application-card-body {
+        padding: 1.35rem 1.2rem 1.5rem;
+    }
+
+    .application-page .row.g-4 {
+        --bs-gutter-y: 1rem;
+    }
+
+    .application-submit-row {
+        align-items: stretch !important;
+        flex-direction: column;
+    }
+
+    .application-submit-note {
+        order: 2;
+        line-height: 1.5;
+    }
+
+    .application-submit {
+        width: 100%;
+    }
+}

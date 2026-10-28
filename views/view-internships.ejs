@@ -113,7 +113,7 @@
                                                         <div class="alert alert-info border-0 rounded-3 small">
                                                             <i class="fas fa-info-circle me-2"></i> Ensure your file has
                                                             headers like:
-                                                            <strong>Student Name, Starting Date, Duration, Branch,
+                                                            <strong>Employee Name, Starting Date, Duration, Branch,
                                                                 etc.</strong>
                                                         </div>
                                                     </div>
@@ -147,7 +147,7 @@
                                                                 style="width: 60px; height: 60px; line-height: 60px; font-size: 24px;">
                                                                 <i class="fas fa-check-circle"></i>
                                                             </div>
-                                                            <h6 class="fw-bold" id="completeStudentName">Student Name
+                                                            <h6 class="fw-bold" id="completeEmployeeName">Employee Name
                                                             </h6>
                                                             <p class="text-muted small">Update the ending date to mark
                                                                 this internship as completed.</p>
@@ -185,7 +185,7 @@
                                                 </div>
                                                 <form id="feePaymentForm">
                                                     <div class="modal-body py-4">
-                                                        <h6 class="fw-bold" id="feePaymentStudentName"></h6>
+                                                        <h6 class="fw-bold" id="feePaymentEmployeeName"></h6>
                                                         <p class="small text-muted mb-3">
                                                             Remaining: <strong id="feePaymentRemaining"></strong>
                                                         </p>
@@ -248,7 +248,7 @@
                                                             style="width: 60px; height: 60px; line-height: 60px; font-size: 24px;">
                                                             <i class="fas fa-book"></i>
                                                         </div>
-                                                        <h6 class="fw-bold" id="logbookStudentName">Student Name</h6>
+                                                        <h6 class="fw-bold" id="logbookEmployeeName">Employee Name</h6>
                                                         <p class="text-muted small">Select the course to download the
                                                             logbook.</p>
                                                     </div>
@@ -320,7 +320,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Filters: Faculty, Student / Contact, Branch -->
+                                    <!-- Filters: Faculty, Employee / Contact, Branch -->
                                     <form id="filterForm" class="row mb-4">
                                         <div class="col-md-4 mb-3 mb-md-0">
                                             <div class="input-group shadow-sm rounded-pill overflow-hidden">
@@ -340,7 +340,7 @@
                                                 </span>
                                                 <input type="text" id="dashboardSearch" name="search"
                                                     class="form-control border-0 py-2"
-                                                    placeholder="Student name or contact number"
+                                                    placeholder="Employee name or contact number"
                                                     value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
                                             </div>
                                         </div>
@@ -370,7 +370,7 @@
                                                     <thead class="bg-light">
                                                         <tr>
                                                             <th class="px-4 py-3">ID NO</th>
-                                                            <th class="px-4 py-3 col-student-name">Student Name</th>
+                                                            <th class="px-4 py-3 col-student-name">Employee Name</th>
                                                             <th class="px-4 py-3 col-position">Position & Duration</th>
                                                             <th class="px-4 py-3">Branch</th>
                                                             <th class="px-4 py-3 text-end">P.Fees</th>
@@ -471,7 +471,7 @@
             async function openLogbookModal(contactNo, studentName) {
                 const modal = new bootstrap.Modal(document.getElementById('logbookModal'));
                 const listContainer = document.getElementById('logbookList');
-                document.getElementById('logbookStudentName').textContent = studentName;
+                document.getElementById('logbookEmployeeName').textContent = studentName;
 
                 modal.show();
                 listContainer.innerHTML = `
@@ -517,7 +517,7 @@
             function openCompleteModal(id, name, currentDate) {
                 const modal = new bootstrap.Modal(document.getElementById('completeInternshipModal'));
                 const form = document.getElementById('completeInternshipForm');
-                document.getElementById('completeStudentName').textContent = name;
+                document.getElementById('completeEmployeeName').textContent = name;
 
                 // Set form action
                 form.action = `/complete/${id}`;
@@ -577,7 +577,7 @@
                 document.getElementById('feePaymentModalLabel').textContent = 'Add Fee Payment';
                 saveButton.textContent = 'Save Payment';
                 saveButton.disabled = remaining <= 0;
-                document.getElementById('feePaymentStudentName').textContent = button.dataset.studentName;
+                document.getElementById('feePaymentEmployeeName').textContent = button.dataset.studentName;
                 document.getElementById('feePaymentRemaining').textContent = `₹${remaining.toFixed(2)}`;
                 historyContainer.textContent = 'Loading payment history...';
                 bootstrap.Modal.getOrCreateInstance(document.getElementById('feePaymentModal')).show();

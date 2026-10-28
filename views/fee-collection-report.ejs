@@ -83,13 +83,37 @@
             </button>
         </div>
         <div class="card-body px-4">
-            <div class="bg-light rounded-3 p-3 mb-3">
-                <div class="small text-muted">Paid fees collected on selected date</div>
-                <div class="fs-4 fw-bold text-success">₹<%= Number(reportTodayPaidTotal || 0).toFixed(2) %></div>
+            <div class="row g-3 mb-3">
+                <div class="col-12 col-md-<%= todayPaymentTotals.other > 0 ? '3' : '4' %>">
+                    <div class="bg-light rounded-3 p-3 h-100">
+                        <div class="small text-muted">Cash collected</div>
+                        <div class="fs-4 fw-bold text-success">₹<%= Number(todayPaymentTotals.cash || 0).toFixed(2) %></div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-<%= todayPaymentTotals.other > 0 ? '3' : '4' %>">
+                    <div class="bg-light rounded-3 p-3 h-100">
+                        <div class="small text-muted">UPI collected</div>
+                        <div class="fs-4 fw-bold text-primary">₹<%= Number(todayPaymentTotals.upi || 0).toFixed(2) %></div>
+                    </div>
+                </div>
+                <% if (todayPaymentTotals.other > 0) { %>
+                    <div class="col-12 col-md-3">
+                        <div class="bg-light rounded-3 p-3 h-100">
+                            <div class="small text-muted">Existing / other payments</div>
+                            <div class="fs-4 fw-bold text-secondary">₹<%= Number(todayPaymentTotals.other).toFixed(2) %></div>
+                        </div>
+                    </div>
+                <% } %>
+                <div class="col-12 col-md-<%= todayPaymentTotals.other > 0 ? '3' : '4' %>">
+                    <div class="bg-light rounded-3 p-3 h-100">
+                        <div class="small text-muted">Total collected on selected date</div>
+                        <div class="fs-4 fw-bold text-dark">₹<%= Number(todayPaymentTotals.total || reportTodayPaidTotal || 0).toFixed(2) %></div>
+                    </div>
+                </div>
             </div>
             <div class="collapse" id="todayPayments">
                 <div class="pt-2">
-                    <h6 class="fw-semibold mb-3">Student fee details for <%= reportSelectedDate %></h6>
+                    <h6 class="fw-semibold mb-3">Employee fee details for <%= reportSelectedDate %></h6>
                     <%- include('partials/fee-collection-rows', { applications: todayApplications }) %>
                 </div>
             </div>
@@ -101,9 +125,33 @@
             <h5 class="fw-bold mb-0">Monthly Collection: <%= selectedMonth %></h5>
         </div>
         <div class="card-body px-4">
-            <div class="bg-light rounded-3 p-3">
-                <div class="small text-muted">Paid fees collected this month</div>
-                <div class="fs-4 fw-bold text-success">₹<%= Number(reportMonthlyPaidTotal || 0).toFixed(2) %></div>
+            <div class="row g-3">
+                <div class="col-12 col-md-<%= monthlyPaymentTotals.other > 0 ? '3' : '4' %>">
+                    <div class="bg-light rounded-3 p-3 h-100">
+                        <div class="small text-muted">Cash collected this month</div>
+                        <div class="fs-4 fw-bold text-success">₹<%= Number(monthlyPaymentTotals.cash || 0).toFixed(2) %></div>
+                    </div>
+                </div>
+                <div class="col-12 col-md-<%= monthlyPaymentTotals.other > 0 ? '3' : '4' %>">
+                    <div class="bg-light rounded-3 p-3 h-100">
+                        <div class="small text-muted">UPI collected this month</div>
+                        <div class="fs-4 fw-bold text-primary">₹<%= Number(monthlyPaymentTotals.upi || 0).toFixed(2) %></div>
+                    </div>
+                </div>
+                <% if (monthlyPaymentTotals.other > 0) { %>
+                    <div class="col-12 col-md-3">
+                        <div class="bg-light rounded-3 p-3 h-100">
+                            <div class="small text-muted">Existing / other payments</div>
+                            <div class="fs-4 fw-bold text-secondary">₹<%= Number(monthlyPaymentTotals.other).toFixed(2) %></div>
+                        </div>
+                    </div>
+                <% } %>
+                <div class="col-12 col-md-<%= monthlyPaymentTotals.other > 0 ? '3' : '4' %>">
+                    <div class="bg-light rounded-3 p-3 h-100">
+                        <div class="small text-muted">Total collected this month</div>
+                        <div class="fs-4 fw-bold text-dark">₹<%= Number(monthlyPaymentTotals.total || reportMonthlyPaidTotal || 0).toFixed(2) %></div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

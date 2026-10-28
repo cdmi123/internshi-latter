@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Verified Documents | Creative Web Infotech</title>
+    <link rel="stylesheet" href="/css/verification.css">
+</head>
+
+<body class="verification-mode">
+    <header class="verification-topbar">
+        <div class="verification-topbar-inner">
+            <a class="verification-brand" href="/verify" aria-label="Creative Web Infotech verification home">
+                <img src="/logo.png" alt="Creative Web Infotech">
+            </a>
+            <div class="verification-secure">
+                <span class="verification-secure-mark" aria-hidden="true">&#10003;</span>
+                <span class="verification-secure-label">Official verification portal</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="verification-main">
+        <section class="verification-intro" aria-labelledby="verification-title">
+            <span class="verification-eyebrow">Record lookup complete</span>
+            <h1 id="verification-title">Document verification</h1>
+            <p>This record was matched against the documents issued by Creative Web Infotech.</p>
+        </section>
+
+        <section class="verification-card" aria-labelledby="employee-name">
+            <div class="verification-result-top">
+                <div class="verification-match">
+                    <span class="verification-match-icon" aria-hidden="true">&#10003;</span>
+                    <div>
+                        <h2>Record found</h2>
+                        <p>Employee details matched successfully</p>
+                    </div>
+                </div>
+                <span class="verification-record-label">Official company record</span>
+            </div>
+
+            <div class="verification-employee">
+                <div>
+                    <span class="verification-employee-label">Employee name</span>
+                    <h2 class="verification-employee-name" id="employee-name"><%= internship.studentName %></h2>
+                </div>
+                <div class="verification-employee-id">
+                    <span class="verification-employee-label">Employee ID</span>
+                    <strong><%= internship.idno || 'N/A' %></strong>
+                </div>
+            </div>
+
+            <div class="verification-documents">
+                <div class="verification-documents-heading">
+                    <h2>Verified documents</h2>
+                    <span><%= documents.length %> document<%= documents.length === 1 ? '' : 's' %></span>
+                </div>
+                <ul class="verification-document-list" aria-label="Verified documents">
+                    <% documents.forEach((documentName) => { %>
+                        <li class="verification-document">
+                            <span class="verification-document-name">
+                                <span class="verification-document-icon" aria-hidden="true">&#128196;</span>
+                                <%= documentName %>
+                            </span>
+                            <span class="verification-badge" aria-label="Verified">
+                                <span class="verification-badge-check" aria-hidden="true">&#10003;</span>
+                                Verified
+                            </span>
+                        </li>
+                    <% }); %>
+                </ul>
+            </div>
+
+            <div class="verification-card-footer">
+                <p>Verification provided by<br><strong>Creative Web Infotech</strong></p>
+                <a class="verification-another" href="/verify">Verify another employee ID</a>
+            </div>
+        </section>
+
+        <footer class="verification-page-footer">
+            This page confirms document records only. It does not display or provide copies of the documents.
+        </footer>
+    </main>
+
+    <script src="/js/verification-guard.js"></script>
+</body>
+
+</html>

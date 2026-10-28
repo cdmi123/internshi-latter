@@ -12,7 +12,7 @@ mongoose.connect('mongodb+srv://cdmi:123@cluster0.rarib.mongodb.net/internship_d
 
     worksheet.columns = [
         { header: 'Application Date', key: 'date', width: 20 },
-        { header: 'Student Name', key: 'studentName', width: 25 },
+        { header: 'Employee Name', key: 'studentName', width: 25 },
         { header: 'Start Date', key: 'startDate', width: 15 },
         { header: 'Duration', key: 'duration', width: 15 },
         { header: 'Ending Date', key: 'endingDate', width: 15 },
@@ -20,7 +20,7 @@ mongoose.connect('mongodb+srv://cdmi:123@cluster0.rarib.mongodb.net/internship_d
         { header: 'Address', key: 'address', width: 30 },
         { header: 'Position', key: 'internshipPosition', width: 25 },
         { header: 'Working Time', key: 'workingTime', width: 15 },
-        { header: 'Student Contact', key: 'studentContactNo', width: 15 },
+        { header: 'Employee Contact', key: 'studentContactNo', width: 15 },
         { header: 'Faculty Name', key: 'internFacultyName', width: 20 },
         { header: 'Faculty Contact', key: 'facultyContactNo', width: 15 },
         { header: 'Branch', key: 'branch', width: 15 },

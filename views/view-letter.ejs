@@ -1,10 +1,11 @@
+<% const isVerificationMode = typeof verificationMode !== 'undefined' && verificationMode; %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Internship Offer Letter</title>
+    <title><%= isVerificationMode ? 'Verified Offer Letter' : 'Internship Offer Letter' %></title>
 
     <link rel="stylesheet" href="/css/latter.css">
 
@@ -14,11 +15,105 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <% if (isVerificationMode) { %>
+        <style>
+            body.verification-mode {
+                background: #e9eef5;
+            }
+
+            body.verification-away {
+                visibility: hidden !important;
+            }
+
+            .verification-banner {
+                position: relative;
+                z-index: 3;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 20px;
+                width: min(210mm, calc(100% - 32px));
+                margin: 20px auto;
+                padding: 16px 22px;
+                border-radius: 12px;
+                background: #fff;
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.14);
+            }
+
+            .verification-brand {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+            }
+
+            .verification-brand img {
+                width: 150px;
+                height: auto;
+            }
+
+            .verification-brand h1 {
+                margin: 0 0 4px;
+                color: #17365d;
+                font-size: 18px;
+            }
+
+            .verification-brand p {
+                margin: 0;
+                color: #526174;
+                font-size: 13px;
+            }
+
+            .verification-back {
+                padding: 10px 16px;
+                border-radius: 7px;
+                background: #17365d;
+                color: #fff;
+                font-size: 14px;
+                font-weight: 700;
+                text-decoration: none;
+                white-space: nowrap;
+            }
+
+            .page.verification-page::after {
+                content: 'VERIFIED';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                z-index: 3;
+                color: rgba(23, 54, 93, 0.12);
+                font-size: 68px;
+                font-weight: 800;
+                letter-spacing: 8px;
+                white-space: nowrap;
+                transform: translate(-50%, -50%) rotate(-35deg);
+                pointer-events: none;
+                user-select: none;
+            }
+
+            @media print {
+                body.verification-mode {
+                    display: none !important;
+                }
+            }
+        </style>
+    <% } %>
 </head>
 
-<body>
+<body class="<%= isVerificationMode ? 'verification-mode' : '' %>">
+    <% if (isVerificationMode) { %>
+        <div class="verification-banner">
+            <div class="verification-brand">
+                <img src="/logo.png" alt="Creative Web Infotech">
+                <div>
+                    <h1>Document Verification</h1>
+                    <p>Verified offer letter for Employee ID: <strong><%= internship.idno %></strong></p>
+                </div>
+            </div>
+            <a class="verification-back" href="/verify">Verify another ID</a>
+        </div>
+    <% } %>
 
-    <div class="page">
+    <div class="page<%= isVerificationMode ? ' verification-page' : '' %>">
 
         <!-- Watermark -->
         <div class="watermark"></div>
@@ -41,7 +136,8 @@
 
         <h2 class="document-title">INTERNSHIP OFFER LETTER</h2>
 
-        <div class="date-section">
+        <div class="date-section document-meta">
+            <p><strong>ID : <%= internship.idno || 'N/A' %></strong></p>
             <p>
                 <strong>
                     Date :
@@ -123,7 +219,7 @@
         </div>
 
         <div class="declaration">
-            <p><strong>Student declaration and acceptance of offer:</strong></p>
+            <p><strong>Employee declaration and acceptance of offer:</strong></p>
 
             <p>
                 I have read the terms and conditions and information regarding my internship offer letter.
@@ -160,6 +256,10 @@
         </footer>
 
     </div>
+
+    <% if (isVerificationMode) { %>
+        <script src="/js/verification-guard.js"></script>
+    <% } %>
 
 </body>
 

@@ -29,12 +29,12 @@
                                 <% } %>
 
                                     <form action="/edit/<%= internship._id %>" method="POST">
-                                        <!-- Section 1: Student Information -->
+                                        <!-- Section 1: Employee Information -->
                                         <div class="mb-5">
                                             <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
                                                 <span class="bg-soft-primary p-2 rounded-circle me-3"><i
                                                         class="fas fa-user"></i></span>
-                                                Student Information
+                                                Employee Information
                                             </h5>
                                             <div class="row g-4">
                                                 <div class="col-md-6">
@@ -42,7 +42,7 @@
                                                         <input type="text" class="form-control border-0"
                                                             id="studentName" name="studentName" placeholder="John Doe"
                                                             value="<%= internship.studentName %>" required>
-                                                        <label for="studentName">Student Name</label>
+                                                        <label for="studentName">Employee Name</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
@@ -70,7 +70,7 @@
                                                             placeholder="1234567890"
                                                             value="<%= internship.studentContactNo %>" required
                                                             pattern="[0-9]{10}">
-                                                        <label for="studentContactNo">Student Contact No</label>
+                                                        <label for="studentContactNo">Employee Contact No</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
@@ -153,7 +153,7 @@
                                                     <div class="form-floating shadow-sm rounded">
                                                         <input type="date" class="form-control border-0" id="startDate"
                                                             name="startDate" placeholder="Starting Date"
-                                                            value="<%= internship.startDate ? new Date(internship.startDate).toISOString().split('T')[0] : '' %>"
+                                                            value="<%= internship.startDate ? (internship.startDate.split('-')[0].length === 4 ? internship.startDate : internship.startDate.split('-').reverse().join('-')) : '' %>"
                                                             required>
                                                         <label for="startDate">Starting Date</label>
                                                     </div>
@@ -356,6 +356,13 @@
                                         }
 
                                         function updateDate(dateObj) {
+                                            const start = new Date(startDateInput.value + 'T00:00:00');
+                                            const daySpan = Math.round((dateObj - start) / 86400000);
+                                            const firstSundayOffset = 7 - start.getDay();
+                                            const sundays = daySpan >= firstSundayOffset
+                                                ? Math.floor((daySpan - firstSundayOffset) / 7) + 1
+                                                : 0;
+                                            dateObj.setDate(dateObj.getDate() + sundays);
                                             const y = dateObj.getFullYear();
                                             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
                                             const d = String(dateObj.getDate()).padStart(2, '0');

@@ -1,24 +1,33 @@
 <%- include('partials/header') %>
     <%- include('partials/sidebar') %>
 
-        <div class="main-content">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+        <main class="main-content application-page">
+            <div class="application-heading">
                 <div>
-                    <h2 class="fw-bold text-dark mb-0">New Application</h2>
-                    <p class="text-muted small">Create a new internship record</p>
+                    <div class="application-eyebrow"><i class="fas fa-briefcase me-2"></i>EMPLOYEE ONBOARDING</div>
+                    <h1>New Application</h1>
+                    <p>Register an employee for an internship program</p>
                 </div>
-                <a href="/" class="btn btn-light text-muted px-4">
+                <a href="/" class="btn application-cancel">
                     <i class="fas fa-times me-2"></i> Cancel
                 </a>
             </div>
 
             <div class="row justify-content-center">
-                <div class="col-lg-9">
-                    <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                        <div class="card-body p-5">
+                <div class="col-12 col-xl-11">
+                    <div class="card application-card">
+                        <div class="application-card-heading">
+                            <div>
+                                <span class="application-card-kicker">APPLICATION DETAILS</span>
+                                <h2>Employee information</h2>
+                                <p>Fields marked as required must be completed before submission.</p>
+                            </div>
+                            <div class="application-secure-label"><i class="fas fa-shield-alt me-2"></i>Company record</div>
+                        </div>
+                        <div class="card-body application-card-body">
 
                             <% if (error) { %>
-                                <div class="alert alert-danger rounded-3 shadow-sm border-0 mb-4" role="alert">
+                                <div class="alert alert-danger rounded-3 border-0 mb-4" role="alert">
                                     <div class="d-flex align-items-center">
                                         <i class="fas fa-exclamation-circle fs-4 me-3"></i>
                                         <div>
@@ -29,12 +38,12 @@
                                 <% } %>
 
                                     <form action="/add" method="POST">
-                                        <!-- Section 1: Student Information -->
+                                        <!-- Section 1: Employee Information -->
                                         <div class="mb-5">
-                                            <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
+                                            <h5 class="application-section-title text-primary fw-bold mb-4 d-flex align-items-center">
                                                 <span class="bg-soft-primary p-2 rounded-circle me-3"><i
                                                         class="fas fa-user"></i></span>
-                                                Student Information
+                                                Employee Information
                                             </h5>
                                             <div class="row g-4">
                                                 <div class="col-md-6">
@@ -42,7 +51,7 @@
                                                         <input type="text" class="form-control border-0"
                                                             id="studentName" name="studentName" placeholder="John Doe"
                                                             value="<%= formData.studentName || '' %>" required>
-                                                        <label for="studentName">Student Name</label>
+                                                        <label for="studentName">Employee Name</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
@@ -69,12 +78,12 @@
                                                             placeholder="1234567890"
                                                             value="<%= formData.studentContactNo || '' %>" required
                                                             pattern="[0-9]{10}">
-                                                        <label for="studentContactNo">Student Contact No</label>
+                                                        <label for="studentContactNo">Employee Contact No</label>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label fw-semibold">Internship Fee Type</label>
-                                                    <div class="d-flex gap-3 align-items-center mb-2">
+                                                    <label class="form-label fw-semibold mb-2" for="feeTypePaid">Internship Type</label>
+                                                    <div class="fee-type-options d-flex flex-wrap gap-3 align-items-center">
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="radio" name="isFree"
                                                                 id="feeTypePaid" value="false"
@@ -88,12 +97,14 @@
                                                             <label class="form-check-label" for="feeTypeFree">Free internship</label>
                                                         </div>
                                                     </div>
-                                                    <div class="form-floating shadow-sm rounded" id="totalFeesGroup">
-                                                        <input type="number" class="form-control border-0"
-                                                            id="totalFees" name="totalFees" placeholder="Total Fees"
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div id="totalFeesGroup">
+                                                        <label class="form-label fw-semibold mb-2" for="totalFees">Total Fees (₹)</label>
+                                                        <input type="number" class="form-control fee-total-input"
+                                                            id="totalFees" name="totalFees" placeholder="Enter total fees"
                                                             value="<%= formData.totalFees ?? '' %>" min="0.01" step="0.01"
                                                             required>
-                                                        <label for="totalFees">Total Fees (₹)</label>
                                                     </div>
                                                     <small class="text-muted d-none" id="freeInternshipNote">
                                                         No fee will be charged for this internship.
@@ -114,7 +125,7 @@
 
                                         <!-- Section 2: Branch & Internship -->
                                         <div class="mb-5">
-                                            <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
+                                            <h5 class="application-section-title text-primary fw-bold mb-4 d-flex align-items-center">
                                                 <span class="bg-soft-primary p-2 rounded-circle me-3"><i
                                                         class="fas fa-building"></i></span>
                                                 Branch & Internship Details
@@ -258,7 +269,7 @@
 
                                         <!-- Section 3: Faculty Details -->
                                         <div class="mb-4">
-                                            <h5 class="text-primary fw-bold mb-4 d-flex align-items-center">
+                                            <h5 class="application-section-title text-primary fw-bold mb-4 d-flex align-items-center">
                                                 <span class="bg-soft-primary p-2 rounded-circle me-3"><i
                                                         class="fas fa-chalkboard-teacher"></i></span>
                                                 Faculty Information
@@ -286,12 +297,15 @@
                                             </div>
                                         </div>
 
-                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5 pt-3 border-top">
+                                        <div class="application-submit-row d-grid gap-2 d-md-flex justify-content-md-between align-items-center mt-5 pt-4">
+                                            <div class="application-submit-note">
+                                                <i class="fas fa-lock me-2"></i>Application details are saved to the company record.
+                                            </div>
                                             <button type="submit"
-                                                class="btn btn-primary btn-lg px-5 rounded-pill fw-bold">
+                                                class="btn btn-primary btn-lg px-5 rounded-pill fw-bold application-submit">
                                                 <i class="fas fa-paper-plane me-2"></i> Submit Application
                                             </button>
-                                        </div>
+                                        </main>
                                     </form>
 
                                     <!-- Auto Calculation Script -->
@@ -368,6 +382,13 @@
                                         }
 
                                         function updateDate(dateObj) {
+                                            const start = new Date(startDateInput.value + 'T00:00:00');
+                                            const daySpan = Math.round((dateObj - start) / 86400000);
+                                            const firstSundayOffset = 7 - start.getDay();
+                                            const sundays = daySpan >= firstSundayOffset
+                                                ? Math.floor((daySpan - firstSundayOffset) / 7) + 1
+                                                : 0;
+                                            dateObj.setDate(dateObj.getDate() + sundays);
                                             const y = dateObj.getFullYear();
                                             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
                                             const d = String(dateObj.getDate()).padStart(2, '0');

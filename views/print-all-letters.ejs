@@ -1,10 +1,11 @@
+<% const isVerificationMode = typeof verificationMode !== 'undefined' && verificationMode; %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All Internship Letters - <%- internship.studentName %></title>
+    <title><%= isVerificationMode ? 'Verified Documents' : 'All Internship Letters' %> - <%- internship.studentName %></title>
     <link rel="stylesheet" href="/css/latter.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,6 +21,57 @@
             padding: 20px 0;
             margin: 0;
             font-family: 'Open Sans', sans-serif;
+        }
+
+        .verification-banner {
+            width: min(210mm, calc(100% - 32px));
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            padding: 18px 24px;
+            margin-bottom: 20px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.18);
+        }
+
+        .verification-brand {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .verification-brand img {
+            width: 150px;
+            height: auto;
+        }
+
+        .verification-brand h1 {
+            color: #17365d;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .verification-brand p {
+            color: #526174;
+            font-size: 13px;
+        }
+
+        .verification-back {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 7px;
+            background: #17365d;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        body.verification-away {
+            visibility: hidden !important;
         }
 
         .print-container {
@@ -43,6 +95,22 @@
             flex-direction: column;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
             overflow: hidden;
+        }
+
+        .verification-mode .page::after {
+            content: 'VERIFIED';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            z-index: 20;
+            color: rgba(23, 54, 93, 0.12);
+            font-size: 68px;
+            font-weight: 800;
+            letter-spacing: 8px;
+            white-space: nowrap;
+            transform: translate(-50%, -50%) rotate(-35deg);
+            pointer-events: none;
+            user-select: none;
         }
 
         footer {
@@ -102,6 +170,7 @@
         @media print {
             body { background: white; padding: 0; margin: 0; }
             .print-btn-container { display: none !important; }
+            body.verification-mode { display: none !important; }
             .print-container { background: white !important; padding: 0 !important; box-shadow: none !important; margin: 0 !important; }
             .page { 
                 margin: 0 !important;
@@ -168,15 +237,30 @@
     </style>
 </head>
 
-<body>
+<body class="<%= isVerificationMode ? 'verification-mode' : '' %>">
+
+    <% if (isVerificationMode) { %>
+        <div class="verification-banner">
+            <div class="verification-brand">
+                <img src="/logo.png" alt="Creative Web Infotech">
+                <div>
+                    <h1>Document Verification</h1>
+                    <p>Verified documents for Employee ID: <strong><%= internship.idno %></strong></p>
+                </div>
+            </div>
+            <a class="verification-back" href="/verify">Verify another ID</a>
+        </div>
+    <% } %>
 
     <div class="print-btn-container">
-        <button class="print-btn" onclick="window.print()">
-            <i class="fas fa-print"></i> Print All Documents
-        </button>
+        <% if (!isVerificationMode) { %>
+            <button class="print-btn" onclick="window.print()">
+                <i class="fas fa-print"></i> Print All Documents
+            </button>
+        <% } %>
     </div>
 
-    <div class="print-container">
+    <div class="print-container<%= isVerificationMode ? ' verification-mode' : '' %>">
         <!-- 1. Offer Letter -->
         <div class="page">
            <div class="watermark"></div>
@@ -193,7 +277,8 @@
             <div class="yellow-divider"></div>
             <h2 class="document-title">Internship Offer Letter</h2>
 
-            <div class="date-section">
+            <div class="date-section document-meta">
+                <p><strong>ID : <%= internship.idno || 'N/A' %></strong></p>
                 <p><strong>Date : <%= new Date(internship.date).getDate().toString().padStart(2, '0' ) %>-<%= (new
                                 Date(internship.date).getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new
                                     Date(internship.date).getFullYear() %></strong></p>
@@ -256,7 +341,7 @@
             </div>
 
             <div class="declaration">
-                <p><strong>Student declaration and acceptance of offer:</strong></p>
+                <p><strong>Employee declaration and acceptance of offer:</strong></p>
                 <p>I have read the terms and conditions and information regarding my internship offer letter. I affirm that
                     I accept the offer and will join the above-mentioned company on said date.</p>
             </div>
@@ -296,7 +381,8 @@
             <div class="yellow-divider"></div>
             <h2 class="document-title">Internship Joining Letter</h2>
 
-            <div class="date-section">
+            <div class="date-section document-meta">
+                <p><strong>ID : <%= internship.idno || 'N/A' %></strong></p>
                 <p><strong>Date : <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
                             internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %></strong>
                 </p>
@@ -307,11 +393,11 @@
             </div>
 
             <div class="letter-body">
-                <p>This is to certify that <strong><%- internship.studentName %></strong>, a student of <strong><%-
+                <p>This is to certify that <strong><%- internship.studentName %></strong>, an employee at <strong><%-
                             internship.collegeName %></strong>, has officially joined <strong>Creative Web Infotech</strong>
                     for an internship program.</p>
 
-                <p>The student has commenced the internship on <strong>
+                <p>The employee has commenced the internship on <strong>
                         <%= internship.startDate ? (internship.startDate.split('-')[0].length===4 ?
                             internship.startDate.split('-').reverse().join('-') : internship.startDate) : 'N/A' %>
                     </strong> and is working in the capacity of <strong><%- internship.internshipPosition %></strong>.</p>
@@ -379,7 +465,8 @@
 
             <h2 class="document-title">Internship Progress Report</h2>
 
-            <div class="date-section">
+            <div class="date-section document-meta">
+                <p><strong>ID : <%= internship.idno || 'N/A' %></strong></p>
                 <p><strong>Date : <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
                                 Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new
                                     Date().getFullYear() %></strong></p>
@@ -569,16 +656,11 @@
             <div class="yellow-divider"></div>
             <h2 class="document-title" style="text-transform: uppercase; font-size: 16px;">Completion Certificate</h2>
 
-            <div class="date-section"
-                style="text-align: left; display: flex; justify-content: space-between; align-items: flex-start;">
-                <div>
-                    <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
-                                    Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %>
-                                        </strong></p>
-                </div>
-                <div style="text-align: right;">
-                    <p><strong>ID: <%= internship.idno || '________________' %></strong></p>
-                </div>
+            <div class="date-section document-meta">
+                <p><strong>ID : <%= internship.idno || 'N/A' %></strong></p>
+                <p><strong>Issued on: <%= new Date().getDate().toString().padStart(2, '0' ) %>-<%= (new
+                                Date().getMonth() + 1).toString().padStart(2, '0' ) %>-<%= new Date().getFullYear() %>
+                    </strong></p>
             </div>
 
             <div class="letter-body" style="margin-top: 15px; line-height: 1.5; font-size: 13px;">
@@ -680,6 +762,9 @@
         </div>
     </div>
 
+    <% if (isVerificationMode) { %>
+        <script src="/js/verification-guard.js"></script>
+    <% } %>
 
 </body>
 
