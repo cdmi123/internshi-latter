@@ -53,17 +53,18 @@ const seedAdmin = async () => {
 
 const seedBranchAccounts = async () => {
     const branchAccounts = require('./config/branchAccounts');
-    const missingPasswords = branchAccounts
+    const configuredAccounts = branchAccounts.filter(account => account.password);
+    const missingBranches = branchAccounts
         .filter(account => !account.password)
         .map(account => account.branch);
 
-    if (missingPasswords.length > 0) {
-        throw new Error(
-            `Missing branch account password environment variables for: ${missingPasswords.join(', ')}`
+    if (missingBranches.length > 0) {
+        console.warn(
+            `Branch accounts not configured (set their password environment variables): ${missingBranches.join(', ')}`
         );
     }
 
-    for (const account of branchAccounts) {
+    for (const account of configuredAccounts) {
         let user = await User.findOne({ username: account.username });
         if (!user) {
             user = new User({
@@ -79,7 +80,9 @@ const seedBranchAccounts = async () => {
         }
         await user.save();
     }
-    console.log('Branch accounts are ready');
+    if (configuredAccounts.length > 0) {
+        console.log(`Configured ${configuredAccounts.length} branch account(s)`);
+    }
 };
 
 const startServer = async () => {
