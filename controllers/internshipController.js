@@ -737,6 +737,101 @@ exports.deleteFeePayment = async (req, res) => {
     }
 };
 
+exports.updateFeePayment = async (req, res) => {
+    try {
+        const index = Number(req.params.paymentIndex);
+        const amount = Number(req.body.amount);
+        const method = req.body.method;
+        const accountName = typeof req.body.accountName === 'string'
+            ? req.body.accountName.trim()
+            : '';
+        const paymentDate = req.body.paidAt;
+
+        if (!Number.isInteger(index) || index < 0) {
+            return res.status(404).json({ success: false, error: 'Payment entry not found.' });
+        }
+        if (!Number.isFinite(amount) || amount <= 0) {
+            return res.status(400).json({ success: false, error: 'Enter a payment amount greater than zero.' });
+        }
+        if (!['cash', 'upi'].includes(method)) {
+            return res.status(400).json({ success: false, error: 'Choose Cash or UPI.' });
+        }
+        if (method === 'upi' && !accountName) {
+            return res.status(400).json({ success: false, error: 'Enter the UPI account name.' });
+        }
+        if (typeof paymentDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(paymentDate)) {
+            return res.status(400).json({ success: false, error: 'Choose a valid payment date.' });
+        }
+        const [year, month, day] = paymentDate.split('-').map(Number);
+        const parsedPaymentDate = new Date(Date.UTC(year, month - 1, day));
+        if (getIndiaDateKey(parsedPaymentDate) !== paymentDate) {
+            return res.status(400).json({ success: false, error: 'Choose a valid calendar date.' });
+        }
+
+        const internship = await Internship.findById(req.params.id)
+            .select('totalFees feesPaid feePayments isFree');
+        if (!internship) {
+            return res.status(404).json({ success: false, error: 'Student registration not found.' });
+        }
+        if (internship.isFree) {
+            return res.status(400).json({ success: false, error: 'This is a free internship; fees cannot be edited.' });
+        }
+
+        const currentFeesPaid = Number(internship.feesPaid) || 0;
+        const payments = internship.feePayments || [];
+        if (index >= payments.length) {
+            return res.status(404).json({ success: false, error: 'Payment entry not found or cannot be edited.' });
+        }
+        const previousAmount = Number(payments[index].amount) || 0;
+        const nextFeesPaid = currentFeesPaid - previousAmount + amount;
+        const totalFees = Number(internship.totalFees) || 0;
+        if (nextFeesPaid > totalFees) {
+            return res.status(400).json({
+                success: false,
+                error: `Updated payment exceeds the remaining balance of ₹${(totalFees - (currentFeesPaid - previousAmount)).toFixed(2)}.`
+            });
+        }
+
+        const nextPayments = payments.map((payment, paymentIndex) => paymentIndex === index
+            ? {
+                amount,
+                method,
+                accountName: method === 'upi' ? accountName : '',
+                paidAt: getIndiaDateStart(paymentDate)
+            }
+            : payment);
+        const updateResult = await Internship.updateOne(
+            {
+                _id: internship._id,
+                feesPaid: currentFeesPaid,
+                feePayments: payments
+            },
+            {
+                $set: {
+                    feesPaid: nextFeesPaid,
+                    feePayments: nextPayments
+                }
+            },
+            { runValidators: true }
+        );
+        if (updateResult.matchedCount !== 1) {
+            return res.status(409).json({
+                success: false,
+                error: 'This payment history changed. Refresh and try again.'
+            });
+        }
+
+        return res.json({
+            success: true,
+            feesPaid: nextFeesPaid,
+            remainingFees: totalFees - nextFeesPaid
+        });
+    } catch (err) {
+        console.error('Error editing fee payment:', err);
+        return res.status(500).json({ success: false, error: 'Unable to edit the payment.' });
+    }
+};
+
 exports.getFeeCollectionReport = async (req, res) => {
     try {
         const now = new Date();

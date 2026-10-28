@@ -553,9 +553,13 @@
                 const saveButton = document.getElementById('saveFeePaymentButton');
 
                 form.dataset.studentId = button.dataset.studentId;
+                delete form.dataset.editPaymentIndex;
+                form.dataset.totalFees = String(totalFees);
+                form.dataset.feesPaid = String(feesPaid);
                 amountInput.max = remaining.toFixed(2);
                 amountInput.disabled = remaining <= 0;
                 amountInput.value = '';
+                paymentDateInput.disabled = false;
                 paymentDateInput.value = new Intl.DateTimeFormat('en-CA', {
                     timeZone: 'Asia/Kolkata',
                     year: 'numeric',
@@ -570,6 +574,8 @@
                 accountGroup.classList.add('d-none');
                 errorBox.classList.add('d-none');
                 errorBox.textContent = '';
+                document.getElementById('feePaymentModalLabel').textContent = 'Add Fee Payment';
+                saveButton.textContent = 'Save Payment';
                 saveButton.disabled = remaining <= 0;
                 document.getElementById('feePaymentStudentName').textContent = button.dataset.studentName;
                 document.getElementById('feePaymentRemaining').textContent = `₹${remaining.toFixed(2)}`;
@@ -590,7 +596,7 @@
 
                         const table = document.createElement('table');
                         table.className = 'table table-sm table-striped align-middle mb-0';
-                        table.innerHTML = '<thead><tr><th>Date</th><th>Mode</th><th class="text-end">Amount</th><th>UPI Account</th><th></th></tr></thead>';
+                        table.innerHTML = '<thead><tr><th>Date</th><th>Mode</th><th class="text-end">Amount</th><th>UPI Account</th><th>Actions</th></tr></thead>';
                         const tbody = document.createElement('tbody');
                         result.payments.forEach(payment => {
                             const row = document.createElement('tr');
@@ -614,6 +620,15 @@
                             amountCell.textContent = `₹${Number(payment.amount).toFixed(2)}`;
                             accountCell.textContent = payment.accountName || '--';
                             const deleteButton = document.createElement('button');
+                            const editButton = document.createElement('button');
+                            editButton.type = 'button';
+                            editButton.className = 'btn btn-sm btn-outline-primary me-1';
+                            editButton.textContent = 'Edit';
+                            editButton.setAttribute('aria-label', 'Edit this fee payment');
+                            editButton.disabled = payment.legacy;
+                            if (payment.legacy) editButton.title = 'Delete this legacy entry and add a new payment with correct details';
+                            editButton.addEventListener('click', () => editFeePayment(button.dataset.studentId, payment));
+                            actionCell.appendChild(editButton);
                             deleteButton.type = 'button';
                             deleteButton.className = 'btn btn-sm btn-outline-danger';
                             deleteButton.textContent = 'Delete';
@@ -632,6 +647,47 @@
                     .catch(error => {
                         historyContainer.textContent = error.message;
                     });
+            }
+
+            function editFeePayment(studentId, payment) {
+                const form = document.getElementById('feePaymentForm');
+                const amountInput = document.getElementById('paymentAmount');
+                const paymentDateInput = document.getElementById('paymentDate');
+                const paymentMethod = document.getElementById('paymentMethod');
+                const accountInput = document.getElementById('upiAccountName');
+                const accountGroup = document.getElementById('upiAccountGroup');
+                const errorBox = document.getElementById('feePaymentError');
+                const saveButton = document.getElementById('saveFeePaymentButton');
+
+                form.dataset.studentId = studentId;
+                form.dataset.editPaymentIndex = payment.paymentIndex;
+                document.getElementById('feePaymentModalLabel').textContent = 'Edit Fee Payment';
+                const maxAmount = Math.max(
+                    Number(form.dataset.totalFees) - Number(form.dataset.feesPaid) + Number(payment.amount),
+                    Number(payment.amount)
+                );
+                amountInput.max = maxAmount.toFixed(2);
+                amountInput.value = Number(payment.amount).toFixed(2);
+                amountInput.disabled = false;
+                paymentDateInput.value = payment.paidAt
+                    ? new Intl.DateTimeFormat('en-CA', {
+                        timeZone: 'Asia/Kolkata',
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                    }).format(new Date(payment.paidAt))
+                    : '';
+                paymentDateInput.disabled = false;
+                paymentMethod.value = payment.method;
+                paymentMethod.disabled = false;
+                accountInput.value = payment.accountName || '';
+                accountInput.disabled = false;
+                accountGroup.classList.toggle('d-none', payment.method !== 'upi');
+                accountInput.required = payment.method === 'upi';
+                errorBox.classList.add('d-none');
+                errorBox.textContent = '';
+                saveButton.textContent = 'Update Payment';
+                saveButton.disabled = false;
             }
 
             async function deleteFeePayment(studentId, paymentIndex) {
@@ -710,21 +766,29 @@
                     savePaymentButton.disabled = true;
 
                     try {
-                        const response = await fetch(`/fees/${feePaymentForm.dataset.studentId}/pay`, {
+                        const paymentIndex = feePaymentForm.dataset.editPaymentIndex;
+                        const editingPayment = paymentIndex !== undefined;
+                        const endpoint = editingPayment
+                            ? `/fees/${feePaymentForm.dataset.studentId}/payments/${encodeURIComponent(paymentIndex)}/edit`
+                            : `/fees/${feePaymentForm.dataset.studentId}/pay`;
+                        const response = await fetch(endpoint, {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                             body: new URLSearchParams(new FormData(feePaymentForm))
                         });
                         const result = await response.json();
                         if (!response.ok || !result.success) {
-                            throw new Error(result.error || 'Unable to save payment.');
+                            throw new Error(result.error || (editingPayment ? 'Unable to update payment.' : 'Unable to save payment.'));
                         }
                         window.location.reload();
                     } catch (error) {
                         feePaymentError.textContent = error.message;
                         feePaymentError.classList.remove('d-none');
-                    } finally {
                         savePaymentButton.disabled = false;
+                    } finally {
+                        if (!feePaymentError.classList.contains('d-none')) {
+                            savePaymentButton.disabled = false;
+                        }
                     }
                 });
 

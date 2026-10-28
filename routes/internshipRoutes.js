@@ -90,6 +90,7 @@ router.get('/day1', internshipController.getFeeCollectionReport);
 router.get('/edit/:id', internshipController.getEditForm);
 router.post('/edit/:id', internshipController.updateInternship);
 router.get('/fees/:id/payments', internshipController.getFeePaymentHistory);
+router.post('/fees/:id/payments/:paymentIndex/edit', internshipController.updateFeePayment);
 router.post('/fees/:id/payments/:paymentIndex/delete', internshipController.deleteFeePayment);
 router.post('/fees/:id/pay', internshipController.addFeePayment);
 
