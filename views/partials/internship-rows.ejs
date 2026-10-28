@@ -19,7 +19,7 @@
             (durationLower.includes('week')) { const weeks=parseInt(item.duration) || 0; endD.setDate(endD.getDate() +
             (weeks * 7)); } else if (durationLower.includes('day')) { const days=parseInt(item.duration) || 0;
             endD.setDate(endD.getDate() + days); } if (endD <=currentDate) { isCompleted=true; } } } %>
-            <% const feesNeedFullPayment = item.date &&
+            <% const feesNeedFullPayment = !item.isFree && item.date &&
                 new Intl.DateTimeFormat('en-CA', {
                     timeZone: 'Asia/Kolkata',
                     year: 'numeric',
@@ -83,7 +83,9 @@
                 <td class="px-4 text-end">
                     <% const totalFees = Number(item.totalFees) || 0; %>
                     <% const pendingFees = Math.max(totalFees - (Number(item.feesPaid) || 0), 0); %>
-                    <% if (totalFees <= 0) { %>
+                    <% if (item.isFree) { %>
+                        <span class="badge bg-info-subtle text-info-emphasis">Free internship</span>
+                    <% } else if (totalFees <= 0) { %>
                         <span class="badge bg-secondary-subtle text-secondary">Not set</span>
                     <% } else if (pendingFees === 0) { %>
                         <span class="badge bg-success-subtle text-success">Paid</span>

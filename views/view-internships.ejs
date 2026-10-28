@@ -189,6 +189,11 @@
                                                         <p class="small text-muted mb-3">
                                                             Remaining: <strong id="feePaymentRemaining"></strong>
                                                         </p>
+                                                        <div class="form-floating mb-3">
+                                                            <input type="date" class="form-control" id="paymentDate"
+                                                                name="paidAt" required>
+                                                            <label for="paymentDate">Payment Date</label>
+                                                        </div>
                                                         <div class="mb-4">
                                                             <h6 class="fw-semibold">Payment History</h6>
                                                             <div id="feePaymentHistory" class="small text-muted">
@@ -536,6 +541,7 @@
             function openFeePaymentModal(button) {
                 const form = document.getElementById('feePaymentForm');
                 const amountInput = document.getElementById('paymentAmount');
+                const paymentDateInput = document.getElementById('paymentDate');
                 const paymentMethod = document.getElementById('paymentMethod');
                 const accountGroup = document.getElementById('upiAccountGroup');
                 const accountInput = document.getElementById('upiAccountName');
@@ -550,6 +556,12 @@
                 amountInput.max = remaining.toFixed(2);
                 amountInput.disabled = remaining <= 0;
                 amountInput.value = '';
+                paymentDateInput.value = new Intl.DateTimeFormat('en-CA', {
+                    timeZone: 'Asia/Kolkata',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit'
+                }).format(new Date());
                 paymentMethod.value = 'cash';
                 paymentMethod.disabled = remaining <= 0;
                 accountInput.value = '';

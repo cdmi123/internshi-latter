@@ -376,6 +376,22 @@
                                             Preferred Joining Date</label>
                                     </div>
 
+                                    <div class="form-floating mb-4">
+                                        <select class="form-select" id="branch" name="branch" required>
+                                            <option value="" disabled <%= applicationFormData.branch ? '' : 'selected' %>>
+                                                Select Branch
+                                            </option>
+                                            <% branches.forEach(branch => { %>
+                                                <option value="<%= branch %>"
+                                                    <%= applicationFormData.branch === branch ? 'selected' : '' %>>
+                                                    <%= branch.charAt(0).toUpperCase() + branch.slice(1) %>
+                                                </option>
+                                            <% }) %>
+                                        </select>
+                                        <label for="branch"><i class="fas fa-code-branch me-2 text-primary"></i>
+                                            Preferred Branch</label>
+                                    </div>
+
                                     <button type="submit" class="btn btn-submit">
                                         <i class="fas fa-paper-plane me-2"></i> Submit Application
                                     </button>

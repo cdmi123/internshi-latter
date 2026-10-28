@@ -74,13 +74,31 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-floating shadow-sm rounded">
+                                                    <label class="form-label fw-semibold">Internship Fee Type</label>
+                                                    <div class="d-flex gap-3 align-items-center mb-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="isFree"
+                                                                id="editFeeTypePaid" value="false"
+                                                                <%= internship.isFree ? '' : 'checked' %>>
+                                                            <label class="form-check-label" for="editFeeTypePaid">Paid internship</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="isFree"
+                                                                id="editFeeTypeFree" value="true"
+                                                                <%= internship.isFree ? 'checked' : '' %>>
+                                                            <label class="form-check-label" for="editFeeTypeFree">Free internship</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-floating shadow-sm rounded" id="editTotalFeesGroup">
                                                         <input type="number" class="form-control border-0"
                                                             id="totalFees" name="totalFees" placeholder="Total Fees"
-                                                            value="<%= internship.totalFees ?? 0 %>" min="0"
+                                                            value="<%= internship.totalFees ?? 0 %>" min="0.01"
                                                             step="0.01" required>
                                                         <label for="totalFees">Total Fees (₹)</label>
                                                     </div>
+                                                    <small class="text-muted d-none" id="editFreeInternshipNote">
+                                                        No fee will be charged for this internship.
+                                                    </small>
                                                 </div>
                                                 <div class="col-12">
                                                     <div class="form-floating shadow-sm rounded">
@@ -368,6 +386,23 @@
                                         durationMonthsInput.addEventListener('input', calculate);
                                         totalHoursInput.addEventListener('input', calculate);
                                         workingTimeInputs.forEach(r => r.addEventListener('change', calculate));
+
+                                        const editFeeTypeRadios = document.querySelectorAll('input[name="isFree"]');
+                                        const editTotalFeesGroup = document.getElementById('editTotalFeesGroup');
+                                        const editTotalFeesField = document.getElementById('totalFees');
+                                        const editFreeInternshipNote = document.getElementById('editFreeInternshipNote');
+
+                                        function updateEditFeeType() {
+                                            const isFree = document.getElementById('editFeeTypeFree').checked;
+                                            editTotalFeesGroup.classList.toggle('d-none', isFree);
+                                            editFreeInternshipNote.classList.toggle('d-none', !isFree);
+                                            editTotalFeesField.disabled = isFree;
+                                            editTotalFeesField.required = !isFree;
+                                            if (isFree) editTotalFeesField.value = '';
+                                        }
+
+                                        editFeeTypeRadios.forEach(radio => radio.addEventListener('change', updateEditFeeType));
+                                        updateEditFeeType();
 
                                         // Init
                                         initializeForm();

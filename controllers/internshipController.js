@@ -28,6 +28,9 @@ const getIndiaDateStart = (dateKey) => {
     return new Date(Date.UTC(year, month - 1, day) - 330 * 60 * 1000);
 };
 const getTotalFeesFromForm = (body) => {
+    if (body.isFree === 'true' || body.isFree === true) {
+        return { totalFees: 0, isFree: true };
+    }
     if (body.totalFees == null || String(body.totalFees).trim() === '') {
         return { error: 'Enter total fees before submitting.' };
     }
@@ -35,10 +38,11 @@ const getTotalFeesFromForm = (body) => {
     if (!Number.isFinite(totalFees) || totalFees <= 0) {
         return { error: 'Total fees must be greater than zero.' };
     }
-    return { totalFees };
+    return { totalFees, isFree: false };
 };
 const requiresFullFeesForLetters = (internship) => {
     if (!internship || !internship.date) return false;
+    if (internship.isFree) return false;
     const totalFees = Number(internship.totalFees) || 0;
     const feesPaid = Number(internship.feesPaid) || 0;
     return isAfterFeeCutoff(internship.date) &&
@@ -407,6 +411,7 @@ exports.getAddForm = (req, res) => {
         title: 'Add Internship',
         error: null,
         formData: { branch: req.session.branch || '' },
+        branches: internshipBranches,
         branch: req.session.branch || null
     });
 };
@@ -420,6 +425,7 @@ exports.createInternship = async (req, res) => {
             title: 'Add Internship',
             error: feeValues.error,
             formData,
+            branches: internshipBranches,
             branch: req.session.branch || null
         });
     }
@@ -428,6 +434,7 @@ exports.createInternship = async (req, res) => {
             title: 'Add Internship',
             error: 'Select a valid branch.',
             formData,
+            branches: internshipBranches,
             branch: req.session.branch || null
         });
     }
@@ -436,6 +443,7 @@ exports.createInternship = async (req, res) => {
         const newInternship = new Internship({
             ...formData,
             totalFees: feeValues.totalFees,
+            isFree: feeValues.isFree,
             feesPaid: 0,
             feePayments: []
         });
@@ -448,6 +456,7 @@ exports.createInternship = async (req, res) => {
             title: 'Add Internship',
             error: 'Error saving data. Please check inputs.',
             formData,
+            branches: internshipBranches,
             branch: req.session.branch || null
         });
     }
@@ -507,7 +516,8 @@ exports.updateInternship = async (req, res) => {
         const updateData = {
             ...req.body,
             ...(req.session.branch ? { branch: req.session.branch } : {}),
-            totalFees: feeValues.totalFees
+            totalFees: feeValues.totalFees,
+            isFree: feeValues.isFree
         };
         delete updateData.feesPaid;
         delete updateData.feePayments;
@@ -544,10 +554,23 @@ exports.addFeePayment = async (req, res) => {
         if (method === 'upi' && !accountName) {
             return res.status(400).json({ success: false, error: 'Enter the UPI account name.' });
         }
+        const paymentDate = req.body.paidAt;
+        if (typeof paymentDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(paymentDate)) {
+            return res.status(400).json({ success: false, error: 'Choose a valid payment date.' });
+        }
+        const [year, month, day] = paymentDate.split('-').map(Number);
+        const parsedPaymentDate = new Date(Date.UTC(year, month - 1, day));
+        if (getIndiaDateKey(parsedPaymentDate) !== paymentDate) {
+            return res.status(400).json({ success: false, error: 'Choose a valid calendar date.' });
+        }
+        const paidAt = getIndiaDateStart(paymentDate);
 
         const internship = await Internship.findById(req.params.id);
         if (!internship) {
             return res.status(404).json({ success: false, error: 'Student registration not found.' });
+        }
+        if (internship.isFree) {
+            return res.status(400).json({ success: false, error: 'This is a free internship; fees cannot be added.' });
         }
 
         const currentTotalFees = Number(internship.totalFees) || 0;
@@ -577,7 +600,7 @@ exports.addFeePayment = async (req, res) => {
             amount,
             method,
             accountName: method === 'upi' ? accountName : '',
-            paidAt: new Date()
+            paidAt
         });
 
         const paymentFilter = {
@@ -1465,14 +1488,25 @@ exports.getPublicForm = (req, res) => {
         success: req.query.success === 'true',
         error: null,
         applicationId: req.query.applicationId || null,
-        formData: {}
+        formData: {},
+        branches: internshipBranches
     });
 };
 
 // Handle public form submission
 exports.submitPublicForm = async (req, res) => {
     try {
-        const { studentName, collegeName, address, studentContactNo, startDate, internshipPosition } = req.body;
+        const { studentName, collegeName, address, studentContactNo, startDate, internshipPosition, branch } = req.body;
+        if (!internshipBranches.includes(branch)) {
+            return res.status(400).render('public-form', {
+                title: 'Internship Application',
+                success: false,
+                error: 'Select a valid branch.',
+                applicationId: null,
+                formData: req.body,
+                branches: internshipBranches
+            });
+        }
 
         // Set default values for required fields not in public form
         const internshipData = {
@@ -1486,7 +1520,7 @@ exports.submitPublicForm = async (req, res) => {
             workingTime: '6 hrs/day',
             internFacultyName: 'Administrative Office',
             facultyContactNo: '0000000000',
-            branch: 'yogichowk',
+            branch,
             duration: '3 Months',
             status: 'active'
         };
@@ -1515,7 +1549,8 @@ exports.submitPublicForm = async (req, res) => {
             success: false,
             error: 'Error submitting application. Please check your details and try again.',
             applicationId: null,
-            formData: req.body
+            formData: req.body,
+            branches: internshipBranches
         });
     }
 };

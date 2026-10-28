@@ -73,13 +73,31 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <div class="form-floating shadow-sm rounded">
+                                                    <label class="form-label fw-semibold">Internship Fee Type</label>
+                                                    <div class="d-flex gap-3 align-items-center mb-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="isFree"
+                                                                id="feeTypePaid" value="false"
+                                                                <%=formData.isFree === 'true' || formData.isFree === true ? '' : 'checked' %>>
+                                                            <label class="form-check-label" for="feeTypePaid">Paid internship</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="isFree"
+                                                                id="feeTypeFree" value="true"
+                                                                <%=formData.isFree === 'true' || formData.isFree === true ? 'checked' : '' %>>
+                                                            <label class="form-check-label" for="feeTypeFree">Free internship</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-floating shadow-sm rounded" id="totalFeesGroup">
                                                         <input type="number" class="form-control border-0"
                                                             id="totalFees" name="totalFees" placeholder="Total Fees"
                                                             value="<%= formData.totalFees ?? '' %>" min="0.01" step="0.01"
                                                             required>
                                                         <label for="totalFees">Total Fees (₹)</label>
                                                     </div>
+                                                    <small class="text-muted d-none" id="freeInternshipNote">
+                                                        No fee will be charged for this internship.
+                                                    </small>
                                                 </div>
                                                 <div class="col-12">
                                                     <div class="form-floating shadow-sm rounded">
@@ -366,6 +384,24 @@
 
                                         // Init
                                         toggleMode();
+                                    </script>
+                                    <script>
+                                        const feeTypeRadios = document.querySelectorAll('input[name="isFree"]');
+                                        const totalFeesGroup = document.getElementById('totalFeesGroup');
+                                        const totalFeesField = document.getElementById('totalFees');
+                                        const freeInternshipNote = document.getElementById('freeInternshipNote');
+
+                                        function updateFeeType() {
+                                            const isFree = document.getElementById('feeTypeFree').checked;
+                                            totalFeesGroup.classList.toggle('d-none', isFree);
+                                            freeInternshipNote.classList.toggle('d-none', !isFree);
+                                            totalFeesField.disabled = isFree;
+                                            totalFeesField.required = !isFree;
+                                            if (isFree) totalFeesField.value = '';
+                                        }
+
+                                        feeTypeRadios.forEach(radio => radio.addEventListener('change', updateFeeType));
+                                        updateFeeType();
                                     </script>
                         </div>
                     </div>

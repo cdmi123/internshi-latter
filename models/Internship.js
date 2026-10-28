@@ -83,6 +83,10 @@ const internshipSchema = new mongoose.Schema({
         min: 0,
         default: 0
     },
+    isFree: {
+        type: Boolean,
+        default: false
+    },
     feesPaid: {
         type: Number,
         min: 0,
