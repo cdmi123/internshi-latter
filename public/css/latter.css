@@ -24,38 +24,51 @@ body {
     flex-direction: column;
 }
 
-/* WATERMARK */
-/* CROSS WATERMARK */
+/* Company watermark remains on every document. */
 .watermark {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-
     z-index: 0;
     pointer-events: none;
+    overflow: hidden;
 }
 
-/* LEFT WATERMARK */
 .watermark::before {
     content: '';
-
     position: absolute;
     top: 50%;
     left: 50%;
-
     width: 360px;
     height: 360px;
-
-    transform:
-        translate(-50%, -50%) rotate(-35deg);
-
-    background-image: url('/logo.png');
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-
+    transform: translate(-50%, -50%) rotate(-35deg);
+    background: url('/logo.png') center / contain no-repeat;
     opacity: 0.12;
+}
+
+.internet-copy-watermark {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    width: 100%;
+    height: 100%;
+    grid-template-rows: repeat(8, minmax(0, 1fr));
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.internet-copy-row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: center;
+    color: rgba(26, 26, 26, 0.09);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    white-space: nowrap;
+    text-align: center;
 }
 
 /* CONTENT */
@@ -210,10 +223,15 @@ footer p {
 
     body {
         background: #fff;
+        margin: 0;
     }
 
     .page {
         width: 210mm;
         height: 297mm;
+        margin: 0;
+        box-sizing: border-box;
+        break-inside: avoid-page;
+        page-break-inside: avoid;
     }
 }

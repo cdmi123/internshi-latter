@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Access | Creative Web Infotech</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f7f5ef;
+            --card: #ffffff;
+            --ink: #1f2937;
+            --muted: #6b7280;
+            --gold: #d3a52c;
+            --gold-deep: #a77a12;
+            --border: #ece7dc;
+            --success-bg: #ecfdf5;
+            --success: #16855b;
+            --danger-bg: #fff1f2;
+            --danger: #be123c;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 32px 18px;
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top left, rgba(211, 165, 44, 0.08), transparent 28%), var(--bg);
+            color: var(--ink);
+        }
+
+        .portal {
+            width: min(100%, 760px);
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 22px;
+            box-shadow: 0 28px 70px rgba(28, 25, 18, 0.08);
+            overflow: hidden;
+        }
+
+        .hero {
+            padding: 28px 30px 24px;
+            display: flex;
+            align-items: center;
+            gap: 22px;
+            background: linear-gradient(135deg, #fffefe 0, #fbf8ef 100%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .hero img {
+            width: 190px;
+            max-width: 40vw;
+            height: auto;
+        }
+
+        .hero h1 {
+            margin: 0 0 6px;
+            font-size: clamp(1.8rem, 3vw, 2.2rem);
+            line-height: 1.1;
+            letter-spacing: -0.04em;
+        }
+
+        .hero p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.96rem;
+            line-height: 1.5;
+        }
+
+        .content {
+            padding: 28px 30px 32px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 18px;
+            padding: 14px 18px;
+            border: 1px solid #f1e4b7;
+            background: #fffaf0;
+            border-radius: 12px;
+            font-size: 0.92rem;
+            margin-bottom: 22px;
+        }
+
+        .info-row strong {
+            color: var(--ink);
+        }
+
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px;
+        }
+
+        .doc-card {
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px 20px;
+            background: #fff;
+        }
+
+        .doc-card h2 {
+            margin: 0 0 8px;
+            font-size: 1.08rem;
+        }
+
+        .doc-card p {
+            margin: 0 0 18px;
+            color: var(--muted);
+            line-height: 1.5;
+            font-size: 0.9rem;
+        }
+
+        .doc-card a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 42px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            background: var(--gold);
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 700;
+            box-shadow: 0 8px 18px rgba(167, 122, 18, 0.18);
+        }
+
+        .doc-card a:hover {
+            background: #e9bf4e;
+        }
+
+        .doc-card.locked {
+            border-style: dashed;
+            background: #fffafb;
+            border-color: #f4d7dd;
+        }
+
+        .doc-card.locked p {
+            color: #7a1f39;
+        }
+
+        .doc-card.locked a {
+            background: #f3f4f6;
+            color: var(--muted);
+            box-shadow: none;
+            pointer-events: none;
+        }
+
+        .status {
+            margin-top: 22px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid #b4eed0;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .status.warning {
+            background: var(--danger-bg);
+            border-color: #f5bfd0;
+            color: var(--danger);
+        }
+
+        @media (max-width: 640px) {
+            .hero {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 24px 22px 20px;
+            }
+
+            .hero img {
+                max-width: 170px;
+            }
+
+            .content {
+                padding: 22px 20px 24px;
+            }
+
+            .info-row {
+                flex-direction: column;
+            }
+
+            .document-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="portal">
+        <header class="hero">
+            <img src="/logo.png" alt="Creative Web Infotech">
+            <div>
+                <h1>Secure Document Portal</h1>
+                <p>Welcome <strong><%= internship.studentName %></strong>. You can access your internship documents here.</p>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="info-row">
+                <span><strong>Employee ID:</strong> <%= internship.idno || 'N/A' %></span>
+                <span><strong>Branch:</strong> <%= internship.branch || 'N/A' %></span>
+            </div>
+
+            <div class="document-grid">
+                <article class="doc-card">
+                    <h2>Offer Letter</h2>
+                    <p>Your official internship offer letter.</p>
+                    <a href="/documents/<%= token %>/offer" target="_blank" rel="noopener">Open Offer Letter</a>
+                </article>
+
+                <article class="doc-card <%= hasCompletionAccess ? '' : 'locked' %>">
+                    <h2>Joining Letter</h2>
+                    <p><%= hasCompletionAccess ? 'Confirmation of your internship joining.' : 'Available after full fees are paid.' %></p>
+                    <a href="<%= hasCompletionAccess ? '/documents/' + token + '/joining' : '#' %>" target="_blank" rel="noopener"><%= hasCompletionAccess ? 'Open Joining Letter' : 'Locked' %></a>
+                </article>
+
+                <article class="doc-card <%= hasCompletionAccess ? '' : 'locked' %>">
+                    <h2>Internship Progress Report</h2>
+                    <p><%= hasCompletionAccess ? 'Review your internship progress report.' : 'Available after full fees are paid.' %></p>
+                    <a href="<%= hasCompletionAccess ? '/documents/' + token + '/progress' : '#' %>" target="_blank" rel="noopener"><%= hasCompletionAccess ? 'Open Progress Report' : 'Locked' %></a>
+                </article>
+
+                <article class="doc-card <%= hasLogbookAccess ? '' : 'locked' %>">
+                    <h2>Internship Log Book</h2>
+                    <p><%= hasLogbookAccess ? 'View your internship tasks and weekly logbook.' : 'Available after full fees are paid.' %></p>
+                    <a href="<%= hasLogbookAccess ? '/documents/' + token + '/logbook' : '#' %>" target="_blank" rel="noopener"><%= hasLogbookAccess ? 'Open Log Book' : 'Locked' %></a>
+                </article>
+
+                <article class="doc-card <%= hasCompletionAccess ? '' : 'locked' %>">
+                    <h2>Completion Certificate</h2>
+                    <p><%= hasCompletionAccess ? 'Open your internship completion certificate.' : 'Available after full fees are paid.' %></p>
+                    <a href="<%= hasCompletionAccess ? '/documents/' + token + '/completion' : '#' %>" target="_blank" rel="noopener"><%= hasCompletionAccess ? 'Open Certificate' : 'Locked' %></a>
+                </article>
+
+                <article class="doc-card <%= hasCompletionAccess ? '' : 'locked' %>">
+                    <h2>Performance Evaluation</h2>
+                    <p><%= hasCompletionAccess ? 'View your internship performance evaluation.' : 'Available after full fees are paid.' %></p>
+                    <a href="<%= hasCompletionAccess ? '/documents/' + token + '/evaluation' : '#' %>" target="_blank" rel="noopener"><%= hasCompletionAccess ? 'Open Evaluation' : 'Locked' %></a>
+                </article>
+
+                <article class="doc-card <%= hasCompletionAccess ? '' : 'locked' %>">
+                    <h2>Letter of Intent for SKP</h2>
+                    <p><%= hasCompletionAccess ? 'Company letter of intent for your institute.' : 'Available after full fees are paid.' %></p>
+                    <a href="<%= hasCompletionAccess ? '/documents/' + token + '/loi-skp' : '#' %>" target="_blank" rel="noopener"><%= hasCompletionAccess ? 'Open SKP Letter' : 'Locked' %></a>
+                </article>
+
+                <article class="doc-card <%= hasCompletionAccess ? '' : 'locked' %>">
+                    <h2>Letter of Intent to Student</h2>
+                    <p><%= hasCompletionAccess ? 'Student selection and acceptance letter.' : 'Available after full fees are paid.' %></p>
+                    <a href="<%= hasCompletionAccess ? '/documents/' + token + '/loi-student' : '#' %>" target="_blank" rel="noopener"><%= hasCompletionAccess ? 'Open Student Letter' : 'Locked' %></a>
+                </article>
+            </div>
+
+            <% if (hasCompletionAccess) { %>
+                <div class="status">Your additional documents are unlocked and ready for download.</div>
+            <% } else { %>
+                <div class="status warning">Only the offer letter is available right now. Complete the remaining fee payment to unlock more documents.</div>
+            <% } %>
+        </div>
+    </main>
+</body>
+</html>

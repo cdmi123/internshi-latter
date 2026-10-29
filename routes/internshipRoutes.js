@@ -43,6 +43,11 @@ router.get('/logout', authController.logout);
 // Public applications are not tied to a staff branch account.
 router.get('/apply', internshipController.getPublicForm);
 router.post('/apply', internshipController.submitPublicForm);
+router.get('/documents/:token', internshipController.employeeDocumentPortal);
+router.get('/documents/:token/offer-letter', internshipController.employeeOfferLetter);
+router.get('/documents/:token/completion-letter', internshipController.employeeCompletionLetter);
+router.get('/documents/:token/logbook', internshipController.employeeLogbook);
+router.get('/documents/:token/:documentType', internshipController.employeeDocument);
 router.get('/verify', internshipController.getLetterVerification);
 router.post('/verify', internshipController.verifyStudentLetters);
 

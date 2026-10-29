@@ -56,6 +56,24 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-floating shadow-sm rounded">
+                                                        <input type="number" class="form-control border-0"
+                                                            id="semesterCount" name="semesterCount"
+                                                            placeholder="Number of Semesters"
+                                                            value="<%= internship.semesterCount || '' %>" min="1"
+                                                            max="12" step="1" required>
+                                                        <label for="semesterCount">Number of Semesters</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <textarea class="form-control border-0" id="collegeAddress"
+                                                            name="collegeAddress" placeholder="College Address"
+                                                            style="height: 100px" required><%= internship.collegeAddress || '' %></textarea>
+                                                        <label for="collegeAddress">College Address</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
                                                         <input type="date" class="form-control border-0" id="date"
                                                             name="date" placeholder="Date"
                                                             value="<%= internship.date.toISOString().split('T')[0] %>"

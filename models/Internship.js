@@ -48,6 +48,20 @@ const internshipSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    collegeAddress: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    semesterCount: {
+        type: Number,
+        min: 1,
+        max: 12,
+        validate: {
+            validator: Number.isInteger,
+            message: 'Number of semesters must be a whole number.'
+        }
+    },
     address: {
         type: String,
         required: true
@@ -64,6 +78,16 @@ const internshipSchema = new mongoose.Schema({
     studentContactNo: {
         type: String,
         required: true
+    },
+    studentEmail: {
+        type: String,
+        trim: true,
+        lowercase: true
+    },
+    downloadTokenHash: {
+        type: String,
+        select: false,
+        index: true
     },
     internFacultyName: {
         type: String,

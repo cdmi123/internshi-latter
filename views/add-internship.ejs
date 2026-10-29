@@ -65,6 +65,34 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-floating shadow-sm rounded">
+                                                        <input type="number" class="form-control border-0"
+                                                            id="semesterCount" name="semesterCount"
+                                                            placeholder="Number of Semesters"
+                                                            value="<%= formData.semesterCount || '' %>" min="1" max="12"
+                                                            step="1" required>
+                                                        <label for="semesterCount">Number of Semesters</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="email" class="form-control border-0"
+                                                            id="studentEmail" name="studentEmail"
+                                                            placeholder="employee@example.com"
+                                                            value="<%= formData.studentEmail || '' %>" required
+                                                            autocomplete="email">
+                                                        <label for="studentEmail">Employee Email</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <textarea class="form-control border-0" id="collegeAddress"
+                                                            name="collegeAddress" placeholder="College Address"
+                                                            style="height: 100px" required><%= formData.collegeAddress || '' %></textarea>
+                                                        <label for="collegeAddress">College Address</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
                                                         <input type="date" class="form-control border-0" id="date"
                                                             name="date" placeholder="Date"
                                                             value="<%= formData.date || '' %>" required>
@@ -82,7 +110,7 @@
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
-                                                    <label class="form-label fw-semibold mb-2" for="feeTypePaid">Internship Type</label>
+                                                    
                                                     <div class="fee-type-options d-flex flex-wrap gap-3 align-items-center">
                                                         <div class="form-check">
                                                             <input class="form-check-input" type="radio" name="isFree"
@@ -100,7 +128,7 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div id="totalFeesGroup">
-                                                        <label class="form-label fw-semibold mb-2" for="totalFees">Total Fees (₹)</label>
+                                                        
                                                         <input type="number" class="form-control fee-total-input"
                                                             id="totalFees" name="totalFees" placeholder="Enter total fees"
                                                             value="<%= formData.totalFees ?? '' %>" min="0.01" step="0.01"

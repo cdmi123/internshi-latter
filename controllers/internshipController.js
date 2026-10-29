@@ -1,3 +1,5 @@
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 const Internship = require('../models/Internship');
 const Logbook = require('../models/Logbook');
 const ExcelJS = require('exceljs');
@@ -41,6 +43,20 @@ const getTotalFeesFromForm = (body) => {
     }
     return { totalFees, isFree: false };
 };
+const getSemesterCountFromForm = (body) => {
+    const semesterCount = Number(body.semesterCount);
+    if (!Number.isInteger(semesterCount) || semesterCount < 1 || semesterCount > 12) {
+        return { error: 'Enter a whole number of semesters between 1 and 12.' };
+    }
+    return { semesterCount };
+};
+const escapeHtml = (value) => String(value ?? '').replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+}[character]));
 const requiresFullFeesForLetters = (internship) => {
     if (!internship || !internship.date) return false;
     if (internship.isFree) return false;
@@ -54,7 +70,149 @@ const rejectRestrictedLetter = (res) => res.status(403).send(
 );
 const getBranchScope = (req) => req.session.branch ? { branch: req.session.branch } : {};
 
-// ... existing methods ...
+const createDocumentMailTransport = () => {
+    const host = process.env.SMTP_HOST;
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
+
+    if (!host || !user || !pass) {
+        return null;
+    }
+
+    return nodemailer.createTransport({
+        host,
+        port: Number(process.env.SMTP_PORT || 587),
+        secure: String(process.env.SMTP_SECURE || 'false').toLowerCase() === 'true',
+        auth: {
+            user,
+            pass
+        }
+    });
+};
+
+const createEmployeeDocumentToken = async (internship) => {
+    const token = crypto.randomBytes(24).toString('hex');
+    internship.downloadTokenHash = crypto.createHash('sha256').update(token).digest('hex');
+    await internship.save();
+    return token;
+};
+
+const getInternshipByDocumentToken = async (rawToken) => {
+    if (typeof rawToken !== 'string' || !rawToken.trim()) {
+        return null;
+    }
+
+    const tokenHash = crypto.createHash('sha256').update(rawToken.trim()).digest('hex');
+    return Internship.findOne({
+        downloadTokenHash: tokenHash,
+        status: { $ne: 'deleted' }
+    }).select('+downloadTokenHash');
+};
+
+const sendEmployeeRegistrationEmail = async (internship) => {
+    if (!internship.studentEmail) {
+        return { ok: false, reason: 'No employee email address found.' };
+    }
+
+    const transporter = createDocumentMailTransport();
+    if (!transporter) {
+        return { ok: false, reason: 'SMTP not configured for email delivery.' };
+    }
+
+    const token = await createEmployeeDocumentToken(internship);
+    const baseUrl = process.env.APP_BASE_URL || 'http://localhost:3000';
+    const documentUrl = `${baseUrl}/documents/${token}`;
+    const employeeName = escapeHtml(internship.studentName);
+    const employeeId = escapeHtml(internship.idno);
+    const safeDocumentUrl = escapeHtml(documentUrl);
+
+    try {
+        await transporter.sendMail({
+            from: process.env.SMTP_FROM || process.env.SMTP_USER,
+            to: internship.studentEmail,
+            subject: `Your Employee ID and Document Access - Creative Web Infotech`,
+            text: `Hello ${internship.studentName},\n\nYour employee ID is ${internship.idno}.\nAccess your secure portal here: ${documentUrl}\n\nIf you need additional internship letters, open the link and click the available button(s).\n\nRegards,\nCreative Web Infotech`,
+            html: `
+                <!doctype html>
+                <html lang="en">
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <meta name="x-apple-disable-message-reformatting">
+                    <title>Welcome to Creative Web Infotech</title>
+                </head>
+                <body style="margin:0;padding:0;background-color:#f4f5f7;font-family:Arial,Helvetica,sans-serif;color:#252a31;">
+                    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">
+                        Your employee ID and secure internship document portal are ready.
+                    </div>
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f4f5f7;">
+                        <tr>
+                            <td align="center" style="padding:32px 16px;">
+                                <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" style="width:100%;max-width:600px;background-color:#ffffff;border:1px solid #e8e9ec;border-radius:14px;overflow:hidden;">
+                                    <tr>
+                                        <td style="padding:26px 34px;background-color:#20252d;border-bottom:4px solid #d3a52c;">
+                                            <div style="font-size:20px;line-height:1.3;font-weight:700;letter-spacing:.2px;color:#ffffff;">Creative Web Infotech</div>
+                                            <div style="padding-top:5px;font-size:12px;line-height:1.5;letter-spacing:1.2px;text-transform:uppercase;color:#d7d9de;">Internship &amp; Employee Services</div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:34px 34px 12px;">
+                                            <div style="font-size:12px;line-height:1.4;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#a47712;">Registration complete</div>
+                                            <h1 style="margin:10px 0 0;font-size:25px;line-height:1.3;font-weight:700;color:#20252d;">Welcome, ${employeeName}</h1>
+                                            <p style="margin:14px 0 0;font-size:15px;line-height:1.7;color:#555d68;">Your registration is complete. Keep your employee ID below for your records, and use the secure portal to access your internship documents.</p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:18px 34px 8px;">
+                                            <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#fbf8ef;border:1px solid #eee2bd;border-radius:10px;">
+                                                <tr>
+                                                    <td style="padding:18px 20px;">
+                                                        <div style="font-size:12px;line-height:1.4;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#7a6a43;">Your Employee ID</div>
+                                                        <div style="padding-top:7px;font-size:22px;line-height:1.3;font-weight:700;letter-spacing:.5px;color:#252a31;">${employeeId}</div>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="center" style="padding:26px 34px 12px;">
+                                            <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                                                <tr>
+                                                    <td align="center" bgcolor="#d3a52c" style="border-radius:8px;">
+                                                        <a href="${safeDocumentUrl}" style="display:inline-block;padding:15px 26px;border:1px solid #d3a52c;border-radius:8px;color:#20252d;font-size:15px;line-height:1.2;font-weight:700;text-decoration:none;">Open Secure Document Portal</a>
+                                                    </td>
+                                                </tr>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:10px 34px 30px;">
+                                            <p style="margin:0;font-size:14px;line-height:1.7;color:#555d68;">From the portal, you can open and download the internship letters and other documents available to you. If you need an additional letter, choose it from the portal.</p>
+                                            <p style="margin:18px 0 0;font-size:12px;line-height:1.6;color:#78808b;">For your security, this personal access link should not be shared with others. If the button does not work, copy this address into your browser:<br><a href="${safeDocumentUrl}" style="color:#8a6818;word-break:break-all;text-decoration:underline;">${safeDocumentUrl}</a></p>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:20px 34px;background-color:#f8f8f6;border-top:1px solid #ececef;">
+                                            <p style="margin:0;font-size:13px;line-height:1.6;color:#555d68;">Regards,<br><strong style="color:#252a31;">Creative Web Infotech</strong></p>
+                                            <p style="margin:14px 0 0;font-size:11px;line-height:1.5;color:#8a9099;">This is an automated registration email. Please keep it for your records.</p>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </body>
+                </html>
+            `
+        });
+
+        return { ok: true, url: documentUrl };
+    } catch (error) {
+        console.error('Employee email send failed:', error);
+        return { ok: false, reason: error.message };
+    }
+};
+
 const getNextIdno = async () => {
     try {
         const lastIntern = await Internship.findOne({ 
@@ -319,6 +477,8 @@ exports.exportInternships = async (req, res) => {
             { header: 'Duration', key: 'duration', width: 15 },
             { header: 'Ending Date', key: 'endingDate', width: 15 },
             { header: 'College Name', key: 'collegeName', width: 25 },
+            { header: 'College Address', key: 'collegeAddress', width: 35 },
+            { header: 'Number of Semesters', key: 'semesterCount', width: 20 },
             { header: 'Address', key: 'address', width: 30 },
             { header: 'Position', key: 'internshipPosition', width: 25 },
             { header: 'Working Time', key: 'workingTime', width: 15 },
@@ -341,6 +501,8 @@ exports.exportInternships = async (req, res) => {
                 duration: intern.duration,
                 endingDate: intern.endingDate || '',
                 collegeName: intern.collegeName || '',
+                collegeAddress: intern.collegeAddress || '',
+                semesterCount: intern.semesterCount || '',
                 address: intern.address,
                 internshipPosition: intern.internshipPosition,
                 workingTime: intern.workingTime,
@@ -405,6 +567,118 @@ exports.viewEndingLetter = async (req, res) => {
     } catch (err) {
         console.error(err);
         res.status(500).send('Server Error');
+    }
+};
+
+exports.employeeDocumentPortal = async (req, res) => {
+    try {
+        const rawToken = typeof req.params.token === 'string' ? req.params.token.trim() : '';
+        if (!rawToken) {
+            return res.status(400).send('Invalid document access link.');
+        }
+
+        const internship = await getInternshipByDocumentToken(rawToken);
+        if (!internship) {
+            return res.status(403).send('This secure document link is invalid or has expired.');
+        }
+
+        const hasCompletionAccess = !requiresFullFeesForLetters(internship);
+
+        res.render('employee-documents', {
+            internship,
+            hasCompletionAccess,
+            hasLogbookAccess: hasCompletionAccess,
+            token: rawToken
+        });
+    } catch (error) {
+        console.error('Employee document portal error:', error);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.employeeOfferLetter = async (req, res) => {
+    try {
+        const internship = await getInternshipByDocumentToken(req.params.token);
+        if (!internship) {
+            return res.status(403).send('This secure document link is invalid or has expired.');
+        }
+        res.render('view-letter', {
+            internship,
+            verificationMode: false,
+            internetCopyWatermark: true
+        });
+    } catch (error) {
+        console.error('Employee offer letter error:', error);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.employeeCompletionLetter = async (req, res) => {
+    try {
+        const internship = await getInternshipByDocumentToken(req.params.token);
+        if (!internship) {
+            return res.status(403).send('This secure document link is invalid or has expired.');
+        }
+
+        if (requiresFullFeesForLetters(internship)) {
+            return res.status(403).send('This document is available only after full fees are paid.');
+        }
+
+        res.render('view-ending-letter', {
+            internship,
+            internetCopyWatermark: true
+        });
+    } catch (error) {
+        console.error('Employee completion letter error:', error);
+        res.status(500).send('Server Error');
+    }
+};
+
+exports.employeeLogbook = async (req, res) => {
+    req.params.documentType = 'logbook';
+    return exports.employeeDocument(req, res);
+};
+
+exports.employeeDocument = async (req, res) => {
+    try {
+        const documentTypes = [
+            'offer',
+            'joining',
+            'progress',
+            'logbook',
+            'completion',
+            'evaluation',
+            'loi-skp',
+            'loi-student'
+        ];
+        const { token, documentType } = req.params;
+        if (!documentTypes.includes(documentType)) {
+            return res.status(404).send('Document not found.');
+        }
+
+        const internship = await getInternshipByDocumentToken(token);
+        if (!internship) {
+            return res.status(403).send('This secure document link is invalid or has expired.');
+        }
+        if (documentType !== 'offer' && requiresFullFeesForLetters(internship)) {
+            return res.status(403).send('This document is available only after full fees are paid.');
+        }
+
+        const logbooks = await Logbook.find({ internshipId: internship._id }).sort({ weekNo: 1 });
+        res.set({
+            'Cache-Control': 'no-store',
+            'X-Robots-Tag': 'noindex, nofollow'
+        });
+        return res.render('print-all-letters', {
+            internship,
+            logbooks,
+            verificationMode: false,
+            selectedDocument: documentType,
+            internetCopyWatermark: true
+        });
+    } catch (error) {
+        console.error('Employee document render error:', error);
+        return res.status(500).send('Unable to open this document right now.');
     }
 };
 
@@ -485,6 +759,17 @@ exports.getAddForm = (req, res) => {
 exports.createInternship = async (req, res) => {
     const branch = req.session.branch || req.body.branch;
     const formData = { ...req.body, branch };
+    const semesterValues = getSemesterCountFromForm(req.body);
+    if (semesterValues.error) {
+        return res.status(400).render('add-internship', {
+            title: 'Add Internship',
+            pageStylesheet: '/css/application-form.css',
+            error: semesterValues.error,
+            formData,
+            branches: internshipBranches,
+            branch: req.session.branch || null
+        });
+    }
     const feeValues = getTotalFeesFromForm(req.body);
     if (feeValues.error) {
         return res.status(400).render('add-internship', {
@@ -510,6 +795,7 @@ exports.createInternship = async (req, res) => {
     try {
         const newInternship = new Internship({
             ...formData,
+            semesterCount: semesterValues.semesterCount,
             endingDate: calculateEndDate(formData.startDate, formData.duration, formData.workingTime) ||
                 formData.endingDate,
             totalFees: feeValues.totalFees,
@@ -519,6 +805,12 @@ exports.createInternship = async (req, res) => {
         });
         newInternship.idno = await getNextIdno();
         await newInternship.save();
+
+        const emailStatus = await sendEmployeeRegistrationEmail(newInternship);
+        if (!emailStatus.ok) {
+            console.warn(`Employee email not sent for ${newInternship.idno}: ${emailStatus.reason}`);
+        }
+
         res.redirect('/');
     } catch (err) {
         console.error(err);
@@ -565,6 +857,15 @@ exports.updateInternship = async (req, res) => {
             });
         }
 
+        const semesterValues = getSemesterCountFromForm(req.body);
+        if (semesterValues.error) {
+            return res.status(400).render('edit-internship', {
+                title: 'Edit Internship',
+                internship: { ...internship.toObject(), ...req.body },
+                error: semesterValues.error
+            });
+        }
+
         const feeValues = getTotalFeesFromForm(req.body);
         if (feeValues.error) {
             return res.status(400).render('edit-internship', {
@@ -586,6 +887,7 @@ exports.updateInternship = async (req, res) => {
 
         const updateData = {
             ...req.body,
+            semesterCount: semesterValues.semesterCount,
             ...(req.session.branch ? { branch: req.session.branch } : {}),
             totalFees: feeValues.totalFees,
             isFree: feeValues.isFree,
@@ -1675,6 +1977,8 @@ exports.getPublicForm = (req, res) => {
         success: req.query.success === 'true',
         error: null,
         applicationId: req.query.applicationId || null,
+        applicationEmail: req.query.email || '',
+        emailError: req.query.emailError === 'true',
         formData: {},
         branches: internshipBranches
     });
@@ -1683,26 +1987,53 @@ exports.getPublicForm = (req, res) => {
 // Handle public form submission
 exports.submitPublicForm = async (req, res) => {
     try {
-        const { studentName, collegeName, address, studentContactNo, startDate, internshipPosition, branch } = req.body;
+        const {
+            studentName,
+            collegeName,
+            collegeAddress,
+            address,
+            studentContactNo,
+            studentEmail,
+            startDate,
+            internshipPosition,
+            branch
+        } = req.body;
+        const semesterValues = getSemesterCountFromForm(req.body);
+        if (semesterValues.error) {
+            return res.status(400).render('public-form', {
+                title: 'Internship Application',
+                success: false,
+                error: semesterValues.error,
+                applicationId: null,
+                applicationEmail: studentEmail || '',
+                emailError: false,
+                formData: req.body,
+                branches: internshipBranches
+            });
+        }
         if (!internshipBranches.includes(branch)) {
             return res.status(400).render('public-form', {
                 title: 'Internship Application',
                 success: false,
                 error: 'Select a valid branch.',
                 applicationId: null,
+                applicationEmail: studentEmail || '',
+                emailError: false,
                 formData: req.body,
                 branches: internshipBranches
             });
         }
 
-        // Set default values for required fields not in public form
         const internshipData = {
             studentName,
             collegeName,
+            collegeAddress,
             address,
             studentContactNo,
-            startDate, // Should be YYYY-MM-DD from form
-            date: new Date(), // Application date
+            studentEmail,
+            semesterCount: semesterValues.semesterCount,
+            startDate,
+            date: new Date(),
             internshipPosition,
             workingTime: '6 hrs/day',
             internFacultyName: 'Administrative Office',
@@ -1718,7 +2049,12 @@ exports.submitPublicForm = async (req, res) => {
         newInternship.idno = await getNextIdno();
         await newInternship.save();
 
-        res.redirect(`/apply?success=true&applicationId=${encodeURIComponent(newInternship.idno)}`);
+        const emailStatus = await sendEmployeeRegistrationEmail(newInternship);
+        if (!emailStatus.ok) {
+            console.warn(`Employee email not sent for ${newInternship.idno}: ${emailStatus.reason}`);
+        }
+
+        res.redirect(`/apply?success=true&applicationId=${encodeURIComponent(newInternship.idno)}&email=${encodeURIComponent(newInternship.studentEmail || '')}&emailError=${emailStatus.ok ? 'false' : 'true'}`);
     } catch (err) {
         console.error("Error in submitPublicForm:", err);
         res.render('public-form', {
@@ -1726,6 +2062,8 @@ exports.submitPublicForm = async (req, res) => {
             success: false,
             error: 'Error submitting application. Please check your details and try again.',
             applicationId: null,
+            applicationEmail: req.body.studentEmail || '',
+            emailError: false,
             formData: req.body,
             branches: internshipBranches
         });

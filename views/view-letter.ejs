@@ -15,6 +15,30 @@
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @media print {
+            html,
+            body {
+                width: 210mm;
+                min-height: 0;
+                margin: 0;
+                padding: 0;
+                background: #fff;
+            }
+
+            .page {
+                box-sizing: border-box;
+                width: 210mm;
+                height: 297mm;
+                margin: 0;
+                overflow: hidden;
+                break-inside: avoid-page;
+                page-break-inside: avoid;
+                break-after: avoid-page;
+                page-break-after: avoid;
+            }
+        }
+    </style>
     <% if (isVerificationMode) { %>
         <style>
             body.verification-mode {
@@ -117,6 +141,9 @@
 
         <!-- Watermark -->
         <div class="watermark"></div>
+        <% if (typeof internetCopyWatermark !== 'undefined' && internetCopyWatermark) { %>
+            <%- include('partials/internet-copy-watermark') %>
+        <% } %>
 
         <!-- Header -->
         <header>

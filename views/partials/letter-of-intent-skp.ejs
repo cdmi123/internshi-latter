@@ -1,0 +1,99 @@
+<%
+    const formatSkpDate = (value) => {
+        if (!value) return '________________';
+        const parts = String(value).split('-');
+        if (parts.length !== 3) return String(value);
+        if (parts[0].length === 4) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        return String(value);
+    };
+    const internshipDuration = String(internship.duration || '').trim();
+    const durationIsHours = /\bhours?\b/i.test(internshipDuration);
+    const learningDuration = internshipDuration.match(/\d+(?:\.\d+)?/)?.[0] || '____________';
+    const learningDurationUnit = durationIsHours ? 'hours' : 'months';
+%>
+<div class="page" data-document="loi-skp">
+    <div class="watermark"></div>
+    <% if (showInternetCopyWatermark) { %><%- include('internet-copy-watermark') %><% } %>
+    <header>
+        <div class="logo-section">
+            <img src="/logo.png" alt="Creative Web Infotech" class="company-logo">
+        </div>
+        <div class="contact-info">
+            <p><i class="fa-solid fa-envelope"></i> info@creativewebinfotech.com</p>
+            <p><i class="fa-solid fa-phone"></i> +91 <%= internship.facultyContactNo %></p>
+            <p><i class="fa-solid fa-building"></i> UDYAM-GJ-22-0548946</p>
+        </div>
+    </header>
+
+    <div class="yellow-divider"></div>
+    <div class="loi-heading">
+        <p>Annexure 1</p>
+        <h2 class="document-title">Letter of Intent for Skills Knowledge Partner (SKP)</h2>
+    </div>
+
+    <div class="loi-content">
+        <p>To,</p>
+        <p>The Principal / Dean / Head of Department,</p>
+        <p><strong><%= internship.collegeName || '____________________________' %></strong></p>
+        <p>Address: <%= internship.collegeAddress || '______________________________________________' %></p>
+
+        <p class="loi-subject"><strong>Subject: Letter of Intent to be a Skill Knowledge Provider.</strong></p>
+        <p>Dear Sir / Madam,</p>
+
+        <ol>
+            <li>
+                Creative Web Infotech is desirous of becoming a Skill Knowledge Partner of
+                <strong><%= internship.collegeName || '____________________________' %></strong>
+                and providing OJT / internship / Apprenticeship opportunities to its students.
+            </li>
+            <li>
+                We would be providing OJT / internship / Apprenticeship opportunity to up to
+                <strong>35+</strong> students for the
+                <strong><%= internship.internshipPosition || '____________________________' %></strong> course.
+            </li>
+            <li>
+                We understand that the course is commencing on
+                <strong><%= formatSkpDate(internship.startDate) %></strong> and will be for the duration of
+                <strong><%= internship.duration || '________________' %></strong>, divided into
+                <strong><%= internship.semesterCount || '____________' %></strong> semesters.
+            </li>
+            <li>
+                As an organization, we shall provide opportunities to students towards achieving the desired learning
+                outcomes.
+                <% if (durationIsHours) { %>
+                    We understand that the minimum number of hours a student needs to spend on the learning outcome
+                    would be <strong><%= learningDuration %></strong> hours per semester, as per the credits assigned
+                    for the internship.
+                <% } else { %>
+                    The internship duration will be <strong><%= learningDuration %> <%= learningDurationUnit %></strong>,
+                    as per the credits assigned for the internship.
+                <% } %>
+            </li>
+            <li>
+                We shall share the completion letter with the names of the students and course once the batch is
+                finalized.
+            </li>
+        </ol>
+
+        <p class="loi-closing">Yours sincerely,</p>
+        <p><strong>Creative Web Infotech</strong></p>
+        <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat - 395006</p>
+        <p>Contact person: Authorized Signatory</p>
+        <p>Designation: Authorized Signatory</p>
+        <p>Phone number: +91 <%= internship.facultyContactNo %></p>
+    </div>
+
+    <div class="signatures">
+        <div class="sign-box"></div>
+        <div class="sign-box">
+            <div class="line"></div>
+            <p><strong>Creative Web Infotech</strong></p>
+            <p>Authorized Signatory</p>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</p>
+        <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
+    </footer>
+</div>

@@ -1,11 +1,13 @@
 <% const isVerificationMode = typeof verificationMode !== 'undefined' && verificationMode; %>
+<% const selectedDocumentType = typeof selectedDocument !== 'undefined' ? selectedDocument : null; %>
+<% const showInternetCopyWatermark = typeof internetCopyWatermark !== 'undefined' && internetCopyWatermark; %>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= isVerificationMode ? 'Verified Documents' : 'All Internship Letters' %> - <%- internship.studentName %></title>
+    <title><%= isVerificationMode ? 'Verified Documents' : selectedDocumentType ? 'Internship Document' : 'All Internship Letters' %> - <%- internship.studentName %></title>
     <link rel="stylesheet" href="/css/latter.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -168,20 +170,44 @@
         }
 
         @media print {
-            body { background: white; padding: 0; margin: 0; }
+            body {
+                display: block !important;
+                background: white;
+                padding: 0;
+                margin: 0;
+            }
             .print-btn-container { display: none !important; }
             body.verification-mode { display: none !important; }
-            .print-container { background: white !important; padding: 0 !important; box-shadow: none !important; margin: 0 !important; }
-            .page { 
+            .print-container {
+                display: block !important;
+                background: white !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                margin: 0 !important;
+            }
+            .page {
+                display: flex !important;
+                flex-direction: column;
+                justify-content: flex-start;
+                box-sizing: border-box !important;
                 margin: 0 !important;
                 box-shadow: none !important;
                 border: none !important;
+                break-inside: avoid-page;
+                page-break-inside: avoid;
+                break-after: page;
                 page-break-after: always;
                 width: 210mm !important;
                 height: 297mm !important;
+                overflow: hidden !important;
             }
-            .page:last-child {
+            .page:last-of-type {
+                break-after: auto;
                 page-break-after: avoid;
+            }
+
+            .internet-copy-watermark {
+                break-inside: avoid;
             }
         }
 
@@ -234,6 +260,292 @@
         }
         .eval-table th { background-color: #f0f0f0; text-align: center; }
         .eval-table .rating-col { text-align: center; width: 15%; }
+
+        .loi-heading {
+            margin: 8px 0 14px;
+            text-align: center;
+        }
+
+        .loi-heading > p {
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .loi-heading .document-title {
+            margin: 0 !important;
+        }
+
+        .loi-content {
+            font-size: 14px;
+            line-height: 1.55;
+        }
+
+        .loi-content p {
+            margin: 0 0 8px;
+        }
+
+        .loi-content .loi-subject {
+            margin-top: 12px;
+        }
+
+        .loi-content ol {
+            margin: 10px 0 12px;
+            padding-left: 24px;
+        }
+
+        .loi-content li {
+            margin-bottom: 8px;
+            padding-left: 3px;
+        }
+
+        .loi-blank {
+            white-space: nowrap;
+        }
+
+        .loi-closing {
+            margin-top: 14px !important;
+        }
+
+        .loi-date {
+            text-align: right;
+        }
+
+        .loi-salutation {
+            margin-top: 18px !important;
+        }
+
+        .loi-authorized-signatory {
+            margin: 12px 0 18px;
+        }
+
+        .loi-signature-line {
+            width: 210px;
+            margin: 30px 0 6px;
+            border-top: 1px solid #444;
+        }
+
+        .loi-declaration {
+            margin-top: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #d5d5d5;
+        }
+
+        .loi-declaration h3 {
+            margin: 0 0 8px;
+            font-size: 15px;
+        }
+
+        @media print {
+            .page {
+                padding: 11mm 16mm 9mm !important;
+            }
+
+            .page > header {
+                flex: 0 0 auto;
+            }
+
+            .page .company-logo {
+                width: 200px;
+            }
+
+            .page .yellow-divider {
+                margin: 12px 0 16px;
+            }
+
+            .page .document-title {
+                margin: 8px 0 12px !important;
+                font-size: 23px !important;
+            }
+
+            .page .date-section {
+                margin-bottom: 16px;
+                font-size: 14px;
+            }
+
+            .page .recipient-details {
+                margin-bottom: 16px;
+                font-size: 15px;
+                line-height: 1.65;
+            }
+
+            .page .letter-body {
+                margin-bottom: 16px;
+                font-size: 15px;
+                line-height: 1.7;
+            }
+
+            .page .letter-body p {
+                margin: 8px 0 !important;
+                font-size: 15px !important;
+            }
+
+            .page .internship-details {
+                margin-bottom: 16px;
+            }
+
+            .page .internship-details p {
+                margin-bottom: 8px;
+                font-size: 16px;
+            }
+
+            .page .internship-details table td {
+                padding: 5px !important;
+                font-size: 14px !important;
+            }
+
+            .page .declaration {
+                margin-bottom: 14px;
+                font-size: 14px;
+                line-height: 1.65;
+            }
+
+            .page .signatures {
+                flex: 0 0 auto;
+                margin: auto 0 10px !important;
+                padding-bottom: 0 !important;
+            }
+
+            .page .page-footer {
+                flex: 0 0 auto;
+                margin-top: 0 !important;
+                padding: 8px 0;
+                font-size: 11px;
+            }
+
+            .page .page-footer p {
+                font-size: 11px;
+                line-height: 1.5;
+            }
+
+            .page .page-bottom-group {
+                display: flex;
+                flex: 1 1 auto;
+                flex-direction: column;
+                justify-content: flex-end;
+                margin-top: 12px !important;
+            }
+
+            .page .page-bottom-group .signatures {
+                margin: 0 0 10px !important;
+            }
+
+            .page .page-bottom-group .page-footer {
+                margin-top: 0 !important;
+            }
+
+            .page .progress-table th,
+            .page .progress-table td {
+                padding: 9px;
+                font-size: 13px;
+            }
+
+            .page .logbook-table th,
+            .page .logbook-table td {
+                padding: 9px;
+                font-size: 13px;
+            }
+
+            .page .eval-table th,
+            .page .eval-table td {
+                padding: 12px;
+                font-size: 15px;
+            }
+
+                .page[data-document="progress"] .progress-table {
+                    font-size: 8px;
+                    line-height: 1.15;
+                }
+
+                .page[data-document="progress"] .progress-table th,
+                .page[data-document="progress"] .progress-table td {
+                    padding: 3px;
+                    line-height: 1.15;
+                    overflow-wrap: anywhere;
+                }
+
+                .page[data-document="progress"] .progress-table th:first-child,
+                .page[data-document="progress"] .progress-table td:first-child {
+                    width: 9%;
+                }
+
+                .page[data-document="progress"] .progress-table th:nth-child(2),
+                .page[data-document="progress"] .progress-table td:nth-child(2),
+                .page[data-document="progress"] .progress-table th:nth-child(3),
+                .page[data-document="progress"] .progress-table td:nth-child(3) {
+                    width: 38%;
+                }
+
+                .page[data-document="progress"] .progress-table th:last-child,
+                .page[data-document="progress"] .progress-table td:last-child {
+                    width: 15%;
+                }
+
+                .page[data-document="progress"] > .internship-details table td {
+                    padding: 2px !important;
+                    font-size: 11px !important;
+                }
+
+                .page[data-document="logbook"] .logbook-table {
+                    font-size: 8px;
+                    line-height: 1.1;
+                    margin-top: 6px;
+                }
+
+                .page[data-document="logbook"] .logbook-table th,
+                .page[data-document="logbook"] .logbook-table td {
+                    padding: 3px;
+                    line-height: 1.1;
+                    overflow-wrap: anywhere;
+                }
+
+                .page[data-document="logbook"] .logbook-table th:first-child,
+                .page[data-document="logbook"] .logbook-table td:first-child {
+                    width: 8%;
+                }
+
+                .page[data-document="logbook"] .logbook-table th:nth-child(2),
+                .page[data-document="logbook"] .logbook-table td:nth-child(2) {
+                    width: 19%;
+                }
+
+                .page[data-document="logbook"] .logbook-table th:last-child,
+                .page[data-document="logbook"] .logbook-table td:last-child {
+                    width: 73%;
+                }
+
+                .page[data-document^="loi-"] .loi-heading {
+                    margin: 6px 0 12px;
+                }
+
+                .page[data-document^="loi-"] .loi-content {
+                    font-size: 14px;
+                    line-height: 1.48;
+                }
+
+                .page[data-document^="loi-"] .loi-content p {
+                    margin-bottom: 6px;
+                }
+
+                .page[data-document^="loi-"] .loi-content ol {
+                    margin: 8px 0 10px;
+                }
+
+                .page[data-document^="loi-"] .loi-content li {
+                    margin-bottom: 7px;
+                }
+
+                .page[data-document^="loi-"] .signatures {
+                    margin: auto 0 10px !important;
+                    padding-bottom: 0 !important;
+                }
+
+                .page[data-document="loi-student"] .loi-declaration {
+                    margin-top: 12px;
+                    padding-top: 10px;
+                }
+            }
     </style>
 </head>
 
@@ -255,15 +567,17 @@
     <div class="print-btn-container">
         <% if (!isVerificationMode) { %>
             <button class="print-btn" onclick="window.print()">
-                <i class="fas fa-print"></i> Print All Documents
+                <i class="fas fa-print"></i> <%= selectedDocumentType ? 'Print / Download Document' : 'Print All Documents' %>
             </button>
         <% } %>
     </div>
 
     <div class="print-container<%= isVerificationMode ? ' verification-mode' : '' %>">
         <!-- 1. Offer Letter -->
-        <div class="page">
+        <% if (!selectedDocumentType || selectedDocumentType === 'offer') { %>
+        <div class="page" data-document="offer">
            <div class="watermark"></div>
+            <% if (showInternetCopyWatermark) { %><%- include('partials/internet-copy-watermark') %><% } %>
             <header>
                 <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
                 <div class="contact-info">
@@ -363,11 +677,14 @@
                 <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
             </footer>
         </div>
+        <% } %>
 
 
         <!-- 2. Joining Letter -->
-        <div class="page">
+        <% if (!selectedDocumentType || selectedDocumentType === 'joining') { %>
+        <div class="page" data-document="joining">
            <div class="watermark"></div>
+            <% if (showInternetCopyWatermark) { %><%- include('partials/internet-copy-watermark') %><% } %>
             <header>
                 <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
                 <div class="contact-info">
@@ -447,11 +764,15 @@
                 <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
             </footer>
         </div>
+        <% } %>
 
 
         <!-- 3. Progress Report -->
-        <div class="page">
+        <% if (!selectedDocumentType || selectedDocumentType === 'progress') { %>
+        <% const progressPage = logbooks || []; %>
+        <div class="page" data-document="progress">
            <div class="watermark"></div>
+            <% if (showInternetCopyWatermark) { %><%- include('partials/internet-copy-watermark') %><% } %>
             <header>
                 <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
                 <div class="contact-info">
@@ -503,18 +824,15 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% if (logbooks && logbooks.length> 0) { %>
-                            <% // Show max 5 entries
-                                const maxEntries=Math.min(logbooks.length, 5); for(let i=0; i<maxEntries; i++) { const
-                                    entry=logbooks[i]; %>
+                        <% if (progressPage.length > 0) { %>
+                            <% for (const entry of progressPage) { %>
                                 <tr>
                                     <td align="center">Week <%= entry.weekNo %>
                                     </td>
                                     <td>
                                         <%= entry.taskAssigned %>
                                     </td>
-                                    <td><%- entry.taskCompleted.length> 80 ? entry.taskCompleted.substring(0, 80) + '...'
-                                            : entry.taskCompleted %></td>
+                                    <td><%= entry.taskCompleted %></td>
                                     <td>
                                         <%= entry.technology %>
                                     </td>
@@ -529,7 +847,7 @@
                 </table>
             </div>
 
-            <div style="page-break-inside: avoid; margin-top: auto;">
+            <div class="page-bottom-group" style="page-break-inside: avoid; margin-top: 12px;">
                 <div class="signatures" style="margin-top: 10px;">
                     <div class="sign-box">
                         <div class="line"></div>
@@ -548,11 +866,15 @@
                 </footer>
             </div>
         </div>
+        <% } %>
 
 
         <!-- 4. Log Book -->
-        <div class="page">
+        <% if (!selectedDocumentType || selectedDocumentType === 'logbook') { %>
+        <% const logbookPage = logbooks || []; %>
+        <div class="page" data-document="logbook">
            <div class="watermark"></div>
+            <% if (showInternetCopyWatermark) { %><%- include('partials/internet-copy-watermark') %><% } %>
             <header>
                 <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
                 <div class="contact-info">
@@ -590,16 +912,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <% if (logbooks && logbooks.length> 0) { %>
+                    <% if (logbookPage.length > 0) { %>
                         <% const formatDate=(dateStr)=> {
                             const d = new Date(dateStr);
                             return `${d.getDate().toString().padStart(2, '0')}-${(d.getMonth() +
                             1).toString().padStart(2, '0')}-${d.getFullYear()}`;
                             };
-
-                            // Limit to 8 entries for one-page set
-                            const maxLogEntries = Math.min(logbooks.length, 8);
-                            for(let i=0; i<maxLogEntries; i++) { const week=logbooks[i]; %>
+                            for(const week of logbookPage) { %>
                                 <tr>
                                     <td align="center">
                                         <%= week.weekNo %>
@@ -638,11 +957,14 @@
                 <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
             </footer>
         </div>
+        <% } %>
 
 
         <!-- 5. Completion Certificate -->
-        <div class="page">
+        <% if (!selectedDocumentType || selectedDocumentType === 'completion') { %>
+        <div class="page" data-document="completion">
            <div class="watermark"></div>
+           <% if (showInternetCopyWatermark) { %><%- include('partials/internet-copy-watermark') %><% } %>
             <header>
                 <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
                 <div class="contact-info">
@@ -690,11 +1012,14 @@
                 <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
             </footer>
         </div>
+        <% } %>
 
 
         <!-- 6. Performance Evaluation -->
-        <div class="page">
+        <% if (!selectedDocumentType || selectedDocumentType === 'evaluation') { %>
+        <div class="page" data-document="evaluation">
            <div class="watermark"></div>
+           <% if (showInternetCopyWatermark) { %><%- include('partials/internet-copy-watermark') %><% } %>
             <header>
                 <div class="logo-section"><img src="/logo.png" alt="Creative Web Infotech" class="company-logo"></div>
                 <div class="contact-info">
@@ -760,6 +1085,15 @@
                 <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
             </footer>
         </div>
+        <% } %>
+
+        <% if (!selectedDocumentType || selectedDocumentType === 'loi-skp') { %>
+            <%- include('partials/letter-of-intent-skp', { showInternetCopyWatermark }) %>
+        <% } %>
+
+        <% if (!selectedDocumentType || selectedDocumentType === 'loi-student') { %>
+            <%- include('partials/letter-of-intent-student', { showInternetCopyWatermark }) %>
+        <% } %>
     </div>
 
     <% if (isVerificationMode) { %>
