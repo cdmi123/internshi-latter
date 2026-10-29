@@ -1,5 +1,5 @@
 const crypto = require('crypto');
-const nodemailer = require('nodemailer');
+const axios = require('axios');
 const Internship = require('../models/Internship');
 const Logbook = require('../models/Logbook');
 const ExcelJS = require('exceljs');
@@ -70,26 +70,6 @@ const rejectRestrictedLetter = (res) => res.status(403).send(
 );
 const getBranchScope = (req) => req.session.branch ? { branch: req.session.branch } : {};
 
-const createDocumentMailTransport = () => {
-    const host = process.env.SMTP_HOST;
-    const user = process.env.SMTP_USER;
-    const pass = process.env.SMTP_PASS;
-
-    if (!host || !user || !pass) {
-        return null;
-    }
-
-    return nodemailer.createTransport({
-        host,
-        port: Number(process.env.SMTP_PORT || 587),
-        secure: String(process.env.SMTP_SECURE || 'false').toLowerCase() === 'true',
-        auth: {
-            user,
-            pass
-        }
-    });
-};
-
 const createEmployeeDocumentToken = async (internship) => {
     const token = crypto.randomBytes(24).toString('hex');
     internship.downloadTokenHash = crypto.createHash('sha256').update(token).digest('hex');
@@ -114,9 +94,10 @@ const sendEmployeeRegistrationEmail = async (internship) => {
         return { ok: false, reason: 'No employee email address found.' };
     }
 
-    const transporter = createDocumentMailTransport();
-    if (!transporter) {
-        return { ok: false, reason: 'SMTP not configured for email delivery.' };
+    const apiKey = (process.env.BREVO_API_KEY || '').trim();
+    const senderEmail = (process.env.BREVO_SENDER_EMAIL || '').trim();
+    if (!apiKey || !senderEmail) {
+        return { ok: false, reason: 'Brevo API key or verified sender email is not configured.' };
     }
 
     const token = await createEmployeeDocumentToken(internship);
@@ -127,12 +108,18 @@ const sendEmployeeRegistrationEmail = async (internship) => {
     const safeDocumentUrl = escapeHtml(documentUrl);
 
     try {
-        await transporter.sendMail({
-            from: process.env.SMTP_FROM || process.env.SMTP_USER,
-            to: internship.studentEmail,
+        await axios.post('https://api.brevo.com/v3/smtp/email', {
+            sender: {
+                email: senderEmail,
+                name: 'Creative Web Infotech'
+            },
+            to: [{
+                email: internship.studentEmail,
+                name: internship.studentName
+            }],
             subject: `Your Employee ID and Document Access - Creative Web Infotech`,
-            text: `Hello ${internship.studentName},\n\nYour employee ID is ${internship.idno}.\nAccess your secure portal here: ${documentUrl}\n\nIf you need additional internship letters, open the link and click the available button(s).\n\nRegards,\nCreative Web Infotech`,
-            html: `
+            textContent: `Hello ${internship.studentName},\n\nYour employee ID is ${internship.idno}.\nAccess your secure portal here: ${documentUrl}\n\nIf you need additional internship letters, open the link and click the available button(s).\n\nRegards,\nCreative Web Infotech`,
+            htmlContent: `
                 <!doctype html>
                 <html lang="en">
                 <head>
@@ -204,12 +191,26 @@ const sendEmployeeRegistrationEmail = async (internship) => {
                 </body>
                 </html>
             `
+        }, {
+            headers: {
+                'api-key': apiKey,
+                accept: 'application/json',
+                'content-type': 'application/json'
+            },
+            timeout: 15000
         });
 
         return { ok: true, url: documentUrl };
     } catch (error) {
-        console.error('Employee email send failed:', error);
-        return { ok: false, reason: error.message };
+        const reason = error.response && error.response.data && error.response.data.message
+            ? error.response.data.message
+            : error.message;
+        console.error('Brevo email send failed:', {
+            code: error.code,
+            status: error.response && error.response.status,
+            message: reason
+        });
+        return { ok: false, reason };
     }
 };
 
