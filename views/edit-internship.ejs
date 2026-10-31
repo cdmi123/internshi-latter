@@ -64,6 +64,16 @@
                                                         <label for="semesterCount">Number of Semesters</label>
                                                     </div>
                                                 </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-floating shadow-sm rounded">
+                                                        <input type="email" class="form-control border-0"
+                                                            id="studentEmail" name="studentEmail"
+                                                            placeholder="employee@example.com"
+                                                            value="<%= internship.studentEmail || '' %>" required
+                                                            autocomplete="email">
+                                                        <label for="studentEmail">Employee Email</label>
+                                                    </div>
+                                                </div>
                                                 <div class="col-12">
                                                     <div class="form-floating shadow-sm rounded">
                                                         <textarea class="form-control border-0" id="collegeAddress"

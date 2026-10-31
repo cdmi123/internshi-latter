@@ -7,9 +7,11 @@ const session = require('express-session');
 const connectDB = require('./config/db');
 const internshipRoutes = require('./routes/internshipRoutes');
 const User = require('./models/User');
+const getBranchAddress = require('./utils/branchAddresses');
 
 // Initialize Express
 const app = express();
+app.locals.getBranchAddress = getBranchAddress;
 
 // Middleware
 app.use(express.json());

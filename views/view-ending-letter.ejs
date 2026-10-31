@@ -87,8 +87,7 @@
                                 internship.endingDate.split('-').reverse().join('-') : internship.endingDate) : 'N/A' %>
                         </strong>
                         <% } %>
-                            at <strong>Creative Web Infotech, 401, 4th Floor, City Center Complex, Nr. Yogichowk,
-                                Varachha, Surat, Gujarat INDIA - 395006</strong>.
+                            at <strong>Creative Web Infotech, <%= getBranchAddress(internship.branch) %></strong>.
                 </p>
                 <% } else { %>
                     <p>This is to certify that Ms. / Mr. <strong><%- internship.studentName %></strong> has successfully
@@ -106,8 +105,7 @@
                                     : 'N/A' %>
                             </strong>
                             <% } %>
-                                at <strong>Creative Web Infotech, 401, 4th Floor, City Center Complex, Nr. Yogichowk,
-                                    Varachha, Surat, Gujarat INDIA - 395006</strong>.
+                                at <strong>Creative Web Infotech, <%= getBranchAddress(internship.branch) %></strong>.
                     </p>
                     <% } %>
         </div>
@@ -198,8 +196,8 @@
 
             <footer>
                 <div class="footer-line"></div>
-                <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha,</p>
-                <p>Surat,Gujarat INDIA - 395006 | https://www.creativewebinfotech.com/</p>
+                <p><%= getBranchAddress(internship.branch) %></p>
+                <p>https://www.creativewebinfotech.com/</p>
             </footer>
     </div>
 

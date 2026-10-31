@@ -77,7 +77,7 @@
 
         <p class="loi-closing">Yours sincerely,</p>
         <p><strong>Creative Web Infotech</strong></p>
-        <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat - 395006</p>
+        <p><%= getBranchAddress(internship.branch) %></p>
         <p>Contact person: Authorized Signatory</p>
         <p>Designation: Authorized Signatory</p>
         <p>Phone number: +91 <%= internship.facultyContactNo %></p>
@@ -93,7 +93,7 @@
     </div>
 
     <footer class="page-footer">
-        <p>401, 4th Floor, City Center Complex, Nr. Yogichowk, Varachha, Surat, Gujarat INDIA - 395006</p>
+        <p><%= getBranchAddress(internship.branch) %></p>
         <p>https://www.creativewebinfotech.com/ | info@creativewebinfotech.com</p>
     </footer>
 </div>

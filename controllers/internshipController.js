@@ -871,23 +871,23 @@ exports.updateInternship = async (req, res) => {
         if (feeValues.error) {
             return res.status(400).render('edit-internship', {
                 title: 'Edit Internship',
-                internship: {
-                    ...internship.toObject(),
-                    totalFees: req.body.totalFees
-                },
+                internship: { ...internship.toObject(), ...req.body },
                 error: feeValues.error
             });
         }
         if (feeValues.totalFees < (Number(internship.feesPaid) || 0)) {
             return res.status(400).render('edit-internship', {
                 title: 'Edit Internship',
-                internship: { ...internship.toObject(), totalFees: req.body.totalFees },
+                internship: { ...internship.toObject(), ...req.body },
                 error: 'Total fees cannot be less than the fees already paid.'
             });
         }
 
         const updateData = {
             ...req.body,
+            studentEmail: typeof req.body.studentEmail === 'string'
+                ? req.body.studentEmail.trim().toLowerCase()
+                : '',
             semesterCount: semesterValues.semesterCount,
             ...(req.session.branch ? { branch: req.session.branch } : {}),
             totalFees: feeValues.totalFees,
@@ -900,14 +900,26 @@ exports.updateInternship = async (req, res) => {
         if (!internshipBranches.includes(internship.branch) && updateData.branch === internship.branch) {
             delete updateData.branch;
         }
-        await Internship.findByIdAndUpdate(req.params.id, updateData, { runValidators: true });
+        const shouldSendRegistrationEmail = !String(internship.studentEmail || '').trim() &&
+            Boolean(updateData.studentEmail);
+        const updatedInternship = await Internship.findByIdAndUpdate(
+            req.params.id,
+            updateData,
+            { new: true, runValidators: true }
+        );
+        if (shouldSendRegistrationEmail) {
+            const emailStatus = await sendEmployeeRegistrationEmail(updatedInternship);
+            if (!emailStatus.ok) {
+                console.warn(`Employee email not sent for ${updatedInternship.idno}: ${emailStatus.reason}`);
+            }
+        }
         res.redirect('/');
     } catch (err) {
         console.error(err);
         const internship = await Internship.findById(req.params.id);
         res.render('edit-internship', {
             title: 'Edit Internship',
-            internship: internship,
+            internship: internship ? { ...internship.toObject(), ...req.body } : internship,
             error: 'Error updating data.'
         });
     }
