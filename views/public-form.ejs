@@ -524,7 +524,7 @@
                 <div class="success-content" role="status">
                     <div class="success-icon"><i class="fas fa-check" aria-hidden="true"></i></div>
                     <h2>Submitted successfully</h2>
-                    <p>Your internship application has been received. Your employee ID and secure document download link will be sent to <strong><%= applicationEmail || '' %></strong>.</p>
+                    <p><% if (emailError) { %>Your internship application has been received, but we couldn't send the employee ID and secure document link to<% } else { %>Your internship application has been received. The employee ID and secure document link have been sent to<% } %> <strong><%= applicationEmail || '' %></strong>.</p>
                     <% if (applicationId) { %>
                         <div class="application-id">Application ID: <%= applicationId %></div>
                     <% } %>
@@ -702,6 +702,19 @@
             startDateInput.value = localDate;
         }
     </script>
+    <% if (success) { %>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            Swal.fire({
+                icon: <%- JSON.stringify(emailError ? 'warning' : 'success') %>,
+                title: <%- JSON.stringify(emailError ? 'Application received, email not sent' : 'Application received') %>,
+                text: <%- JSON.stringify(emailError
+                    ? 'Your application was saved, but the employee email could not be sent. Please contact Creative Web Infotech.'
+                    : 'The employee ID and secure document link were sent to the email address provided.') %>,
+                confirmButtonText: 'OK'
+            });
+        </script>
+    <% } %>
 </body>
 
 </html>

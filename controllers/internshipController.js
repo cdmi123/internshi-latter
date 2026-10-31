@@ -753,7 +753,9 @@ exports.getAddForm = (req, res) => {
         error: null,
         formData: { branch: req.session.branch || '' },
         branches: internshipBranches,
-        branch: req.session.branch || null
+        branch: req.session.branch || null,
+        registrationSuccess: req.query.registration === 'success',
+        emailSent: req.query.emailSent === 'true'
     });
 };
 
@@ -812,7 +814,7 @@ exports.createInternship = async (req, res) => {
             console.warn(`Employee email not sent for ${newInternship.idno}: ${emailStatus.reason}`);
         }
 
-        res.redirect('/');
+        res.redirect(`/add?registration=success&emailSent=${emailStatus.ok}`);
     } catch (err) {
         console.error(err);
         res.render('add-internship', {

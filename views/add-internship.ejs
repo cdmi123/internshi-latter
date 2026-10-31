@@ -458,4 +458,17 @@
             </div>
         </div>
 
+        <% if (typeof registrationSuccess !== 'undefined' && registrationSuccess) { %>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+            <script>
+                Swal.fire({
+                    icon: <%- JSON.stringify(emailSent ? 'success' : 'warning') %>,
+                    title: <%- JSON.stringify(emailSent ? 'Employee registered' : 'Employee registered, email not sent') %>,
+                    text: <%- JSON.stringify(emailSent
+                        ? 'The employee registration email has been sent successfully.'
+                        : 'The employee was registered, but the email could not be sent. Please check the email configuration.') %>,
+                    confirmButtonText: 'OK'
+                });
+            </script>
+        <% } %>
         <%- include('partials/footer') %>
